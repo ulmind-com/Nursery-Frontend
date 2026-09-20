@@ -15,7 +15,7 @@ function NavLinks({ className, activeClassName, onNavigate }: { className: strin
   return (
     <>
       <Link to="/plants" search={{}} {...props}>Plants</Link>
-      <Link to="/plants" search={{ q: "pots" }} {...props}>Pots &amp; Planters</Link>
+      <Link to="/category/$slug" params={{ slug: "pots" }} {...props}>Pots</Link>
       <Link to="/plants" search={{ q: "plant care" }} {...props}>Plant Care</Link>
       <Link to="/plants" search={{ q: "seeds" }} {...props}>Seeds</Link>
       <Link to="/combos" {...props}>Combos</Link>
@@ -103,7 +103,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
         <nav className="mx-auto hidden h-11 max-w-[1480px] items-center justify-center gap-8 overflow-hidden px-9 lg:flex">
           {categories.slice(0, 7).map((category) => (
-            <Link key={category.id} to="/category/$slug" params={{ slug: category.slug || category.id }} className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary">{category.name}</Link>
+            <Link key={category.id} to="/category/$slug" params={{ slug: category.slug || category.id }} className="shrink-0 border-b border-transparent py-3 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary" activeProps={{ className: "border-primary text-primary" }}>{category.name}</Link>
           ))}
           {categories.length === 0 && <NavLinks className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary" activeClassName="text-primary" />}
         </nav>

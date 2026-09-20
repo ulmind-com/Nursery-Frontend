@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { productsApi } from "@/api/services";
 import { ProductCard } from "./product-card";
+import { CategoryPreviewGrid } from "@/components/category/category-preview-grid";
 import { EmptyState, ErrorState, PageSkeleton } from "@/components/shared/page-state";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -64,6 +65,7 @@ export function CataloguePage({
   filters,
   onFiltersChange,
   hideHeader = false,
+  previewCategory,
 }: {
   title: string;
   description?: string;
@@ -71,6 +73,7 @@ export function CataloguePage({
   filters?: CatalogueFilters;
   onFiltersChange?: (next: CatalogueFilters) => void;
   hideHeader?: boolean;
+  previewCategory?: string;
 }) {
   const [limit, setLimit] = useState(24);
   const active = filters ?? {};
@@ -164,7 +167,7 @@ export function CataloguePage({
   );
 
   return (
-    <div className={`mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10 ${hideHeader ? "pb-12 pt-5 lg:pb-16" : "py-10"}`}>
+    <div className={`mx-auto max-w-[1480px] px-3 sm:px-6 lg:px-9 ${hideHeader ? "border-t border-border pb-12 lg:pb-16" : "py-10"}`}>
       {!hideHeader && <header className="mb-8">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">The nursery edit</p>
         <h1 className="mt-2 text-3xl sm:text-4xl">{title}</h1>
@@ -173,28 +176,27 @@ export function CataloguePage({
         </p>
       </header>}
 
-      <div className={editable ? "grid gap-8 lg:grid-cols-[250px_1fr]" : ""}>
-        {editable && <aside className="hidden h-fit lg:sticky lg:top-28 lg:block">{filterPanel}</aside>}
+      <div>
         <div>
-          <div className="mb-6 flex flex-wrap items-center gap-3">
+          <div className="mb-5 flex h-14 items-center gap-3 sm:h-16">
             {editable && (
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="lg:hidden"><SlidersHorizontal className="size-4" /> Filters</Button>
+                  <Button variant="ghost" size="sm" className="px-0 text-xs font-semibold uppercase text-forest hover:bg-transparent hover:text-primary sm:text-sm"><SlidersHorizontal className="size-4" /> Filter</Button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+                <SheetContent side="left" className="w-[min(90vw,390px)] overflow-y-auto">
                   <SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader>
                   <div className="p-4">{filterPanel}</div>
                 </SheetContent>
               </Sheet>
             )}
             {editable && (
-              <label className="ml-auto flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                Sort
+              <label className="ml-auto flex items-center gap-2 text-xs font-medium text-forest sm:text-sm">
+                Sort by
                 <select
                   value={active.sort_by ?? ""}
                   onChange={(e) => set({ sort_by: e.target.value || undefined })}
-                  className="rounded-md border bg-background px-3 py-2 text-xs font-semibold text-foreground"
+                  className="max-w-32 border-0 bg-transparent py-2 text-xs font-medium text-forest outline-none sm:max-w-none sm:text-sm"
                 >
                   {SORTS.map((sort) => <option key={sort.label} value={sort.value}>{sort.label}</option>)}
                 </select>
@@ -224,7 +226,7 @@ export function CataloguePage({
             <ErrorState retry={() => void query.refetch()} />
           ) : products.length ? (
             <>
-              <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:gap-x-5 lg:gap-y-8">
                 {products.map((product) => <ProductCard key={product.id} product={product} />)}
               </div>
               {canLoadMore && (
@@ -233,6 +235,8 @@ export function CataloguePage({
                 </div>
               )}
             </>
+          ) : previewCategory ? (
+            <CategoryPreviewGrid slug={previewCategory} />
           ) : (
             <EmptyState title="Nothing matches yet" description="Try removing a filter or exploring a different collection." />
           )}
