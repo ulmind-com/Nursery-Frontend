@@ -19,7 +19,7 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
 
   return (
     <section className="bg-storefront-wash px-3 pt-3 sm:px-6 sm:pt-4 lg:px-9">
-      <div className="relative mx-auto aspect-[16/7] min-h-[250px] max-w-[1480px] overflow-hidden rounded-xl sm:aspect-[16/5] sm:min-h-[290px]">
+      <div className="relative mx-auto h-[250px] w-full max-w-[1480px] overflow-hidden rounded-xl sm:h-[290px] lg:h-auto lg:aspect-[16/5]">
         {active ? (
           active.video ? (
             <video key={active.id} src={active.video} poster={active.poster} autoPlay muted loop playsInline className="absolute inset-0 size-full object-cover" />
