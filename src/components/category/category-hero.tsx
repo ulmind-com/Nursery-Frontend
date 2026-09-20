@@ -100,17 +100,17 @@ export function CategoryHero({ slug, name, description, image }: { slug: string;
 
   return (
     <section className="bg-storefront-wash px-3 pb-5 pt-3 sm:px-6 sm:pb-7 lg:px-9 lg:pb-8 lg:pt-4">
-      <div className="relative mx-auto h-[220px] max-w-[1480px] overflow-hidden rounded-2xl sm:h-[270px] lg:aspect-[4.58/1] lg:h-auto">
+      <div className="relative mx-auto h-[240px] max-w-[1480px] overflow-hidden rounded-2xl bg-background sm:h-[270px] lg:aspect-[4.58/1] lg:h-auto">
         <img
           src={image || details.image}
           alt=""
           width={1600}
           height={560}
-          className="absolute inset-0 size-full object-cover object-center"
+          className="absolute inset-x-0 top-0 h-[140px] w-full object-cover object-center sm:inset-0 sm:size-full"
         />
-        <div className="absolute inset-y-0 right-0 flex w-[48%] items-center px-4 sm:w-[46%] sm:px-8 lg:w-[43%] lg:px-12">
+        <div className="absolute inset-x-0 bottom-0 flex h-[100px] items-center bg-storefront-wash px-5 sm:inset-y-0 sm:left-auto sm:right-0 sm:h-auto sm:w-[46%] sm:bg-transparent sm:px-8 lg:w-[43%] lg:px-12">
           <div className="max-w-[19rem] lg:max-w-[28rem]">
-            <h1 className="font-display text-[1.7rem] leading-[1.04] text-primary-dark sm:text-[2.45rem] lg:text-[3.5rem]">
+            <h1 className="font-display text-[1.65rem] leading-[1.04] text-primary-dark sm:text-[2.45rem] lg:text-[3.5rem]">
               {details.title}
             </h1>
             <p className="mt-3 hidden max-w-[34ch] text-sm leading-6 text-primary-dark/75 sm:block lg:text-base">
