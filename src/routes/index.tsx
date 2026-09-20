@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDownUp, Leaf, SlidersHorizontal, Star } from "lucide-react";
-import { blogApi, categoriesApi, homeApi, miscApi, queryKeys, settingsApi } from "@/api/services";
+import { Leaf, Star } from "lucide-react";
+import { blogApi, categoriesApi, homeApi, miscApi, productsApi, queryKeys, settingsApi } from "@/api/services";
 import { HeroCarousel } from "@/components/home/hero-carousel";
+import { StorefrontProductGrid } from "@/components/home/storefront-product-grid";
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
 import { brand } from "@/config/brand";
@@ -49,6 +50,7 @@ function HomePage() {
   const categories = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list });
   const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get });
   const recommendations = useQuery({ queryKey: ["recommendations", "home"], queryFn: homeApi.recommendations });
+  const storefrontProducts = useQuery({ queryKey: queryKeys.products({ limit: 6 }), queryFn: () => productsApi.list({ limit: 6 }) });
   const googleReviews = useQuery({ queryKey: ["google-reviews"], queryFn: miscApi.googleReviews });
   const posts = useQuery({ queryKey: queryKeys.blog, queryFn: blogApi.list });
 
@@ -57,6 +59,8 @@ function HomePage() {
     : [];
   const blogPosts = posts.data?.items ?? [];
   const reviews = googleReviews.data ?? [];
+  const productResult = storefrontProducts.data;
+  const products: Product[] = Array.isArray(productResult) ? productResult : productResult?.items ?? [];
 
   return (
     <>
@@ -89,16 +93,7 @@ function HomePage() {
           </div>
       </section>
 
-      <div className="border-y border-border bg-storefront-wash px-4 sm:px-6 lg:px-9">
-        <div className="mx-auto flex h-14 max-w-[1480px] items-center justify-between">
-          <Link to="/plants" search={{}} className="flex items-center gap-2 text-xs font-semibold uppercase text-forest transition-colors hover:text-primary">
-            <SlidersHorizontal className="size-4" /> Filter
-          </Link>
-          <Link to="/plants" search={{ sort_by: "recommended" }} className="flex items-center gap-2 text-sm font-medium text-forest transition-colors hover:text-primary">
-            Sort by <ArrowDownUp className="size-4" />
-          </Link>
-        </div>
-      </div>
+      <StorefrontProductGrid products={products} />
 
       <TrustBar settings={settings.data} />
 
