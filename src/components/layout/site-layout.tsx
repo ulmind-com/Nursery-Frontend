@@ -51,12 +51,12 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {announcement && (
-        <div className="bg-forest px-4 py-2.5 text-center text-xs font-semibold tracking-wide text-forest-foreground">
+        <div className="bg-forest px-4 py-2 text-center text-[11px] font-semibold text-forest-foreground sm:text-xs">
           <span key={announcement} className="rise-in inline-block">{announcement}</span>
         </div>
       )}
       <header className="sticky top-0 z-40 border-b border-border bg-background/98 backdrop-blur-md">
-        <div className="mx-auto grid h-16 max-w-[1480px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:h-[72px] lg:gap-8 lg:px-9">
+        <div className="mx-auto grid h-16 max-w-[1480px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:h-[68px] lg:grid-cols-[220px_minmax(360px,1fr)_220px] lg:gap-8 lg:px-9">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu"><Menu /></Button>
@@ -78,8 +78,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               )}
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-extrabold text-forest sm:text-[1.4rem] lg:min-w-48 lg:text-2xl">
-            <Leaf className="hidden size-7 fill-primary-soft text-primary sm:block" />
+          <Link to="/" className="flex items-center gap-2 font-display text-lg font-extrabold text-forest sm:text-[1.4rem] lg:text-[1.75rem]">
+            <Leaf className="hidden size-8 fill-primary-soft text-primary sm:block" />
             <span className="truncate">{settings?.shop.name || brand.brandName}</span>
           </Link>
           <form
@@ -89,7 +89,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-forest" />
             <input value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search products" placeholder="Search plants, pots and more" className="h-11 w-full rounded-lg bg-search-surface pl-11 pr-4 text-sm outline-none ring-primary transition-shadow duration-200 placeholder:text-muted-foreground focus:ring-1" />
           </form>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center justify-end gap-0.5">
             <Button variant="ghost" size="icon" asChild className="lg:hidden"><Link to="/search" search={{}} aria-label="Search"><Search /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/account" aria-label="Account"><UserRound /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/wishlist" aria-label="Wishlist"><Heart /></Link></Button>

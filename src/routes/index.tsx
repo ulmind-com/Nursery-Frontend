@@ -1,23 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Droplets, Flower2, Leaf, Package, Shovel, Sparkles, Sprout, Star, TestTube2 } from "lucide-react";
+import { ArrowDownUp, SlidersHorizontal, Star } from "lucide-react";
 import { blogApi, categoriesApi, homeApi, miscApi, queryKeys, settingsApi } from "@/api/services";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
+import categoryPlants from "@/assets/category-plants.png";
+import categoryPots from "@/assets/category-pots.png";
+import categorySoil from "@/assets/category-soil.png";
+import categoryFertilisers from "@/assets/category-fertilisers.png";
+import categorySeeds from "@/assets/category-seeds.png";
+import categoryTools from "@/assets/category-tools.png";
+import categoryWatering from "@/assets/category-watering.png";
+import categoryPestControl from "@/assets/category-pest-control.png";
+import categoryDecor from "@/assets/category-decor.png";
 
 const browseShortcuts = [
-  { name: "Plants", q: "plants", icon: Leaf },
-  { name: "Pots", q: "pots", icon: Package },
-  { name: "Soil", q: "soil", icon: Shovel },
-  { name: "Fertilisers", q: "fertiliser", icon: TestTube2 },
-  { name: "Seeds", q: "seeds", icon: Sprout },
-  { name: "Garden Tools", q: "garden tools", icon: Shovel },
-  { name: "Watering", q: "watering", icon: Droplets },
-  { name: "Plant Care", q: "plant care", icon: Sparkles },
-  { name: "Gardening Decor", q: "garden decor", icon: Flower2 },
+  { name: "Plants", q: "plants", image: categoryPlants },
+  { name: "Pots", q: "pots", image: categoryPots },
+  { name: "Soil", q: "soil", image: categorySoil },
+  { name: "Fertilisers", q: "fertiliser", image: categoryFertilisers },
+  { name: "Seeds", q: "seeds", image: categorySeeds },
+  { name: "Garden Tools", q: "garden tools", image: categoryTools },
+  { name: "Watering Solutions", q: "watering", image: categoryWatering },
+  { name: "Pest Control", q: "pest control", image: categoryPestControl },
+  { name: "Gardening Decor", q: "garden decor", image: categoryDecor },
 ] as const;
 
 export const Route = createFileRoute("/")({
@@ -53,11 +62,11 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="min-w-0 overflow-hidden bg-storefront-wash px-3 pb-7 pt-5 sm:px-6 sm:pb-9 lg:px-9">
+      <section className="min-w-0 overflow-hidden bg-storefront-wash px-3 pb-7 pt-4 sm:px-6 sm:pb-8 lg:px-9 lg:pt-4">
           <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max justify-start gap-4 sm:gap-6 lg:w-full lg:justify-between lg:gap-5">
+            <div className="flex min-w-max justify-start gap-3 sm:gap-5 lg:w-full lg:justify-between lg:gap-4">
             {(categories.data ?? []).slice(0, 9).map((cat, index) => (
-              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[116px]">
+              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
                 <div className={`mx-auto aspect-square overflow-hidden rounded-full bg-background p-1 transition-colors duration-200 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} loading="lazy" className="size-full rounded-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -68,19 +77,28 @@ function HomePage() {
                 <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm">{cat.name}</h2>
               </Link>
             ))}
-            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, q, icon: Icon }, index) => (
-              <Link key={name} to="/plants" search={{ q }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[116px]">
-                <div className={`mx-auto flex aspect-square items-center justify-center rounded-full bg-background transition-colors duration-200 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
-                  <span className="flex size-[72%] items-center justify-center rounded-full bg-primary-tint text-primary transition-transform duration-300 group-hover:scale-105">
-                    <Icon className="size-8 sm:size-10" strokeWidth={1.5} />
-                  </span>
+            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, q, image }, index) => (
+              <Link key={name} to="/plants" search={{ q }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
+                <div className={`mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-background p-2 transition-colors duration-200 sm:p-2.5 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
+                  <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain transition-transform duration-300 group-hover:scale-105" />
                 </div>
-                <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm">{name}</h2>
+                <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm lg:min-h-10">{name}</h2>
               </Link>
             ))}
             </div>
           </div>
       </section>
+
+      <div className="border-y border-border bg-storefront-wash px-4 sm:px-6 lg:px-9">
+        <div className="mx-auto flex h-14 max-w-[1480px] items-center justify-between">
+          <Link to="/plants" search={{}} className="flex items-center gap-2 text-xs font-semibold uppercase text-forest transition-colors hover:text-primary">
+            <SlidersHorizontal className="size-4" /> Filter
+          </Link>
+          <Link to="/plants" search={{ sort_by: "recommended" }} className="flex items-center gap-2 text-sm font-medium text-forest transition-colors hover:text-primary">
+            Sort by <ArrowDownUp className="size-4" />
+          </Link>
+        </div>
+      </div>
 
       <TrustBar settings={settings.data} />
 
