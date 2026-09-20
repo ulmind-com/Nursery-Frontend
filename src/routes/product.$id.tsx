@@ -43,9 +43,10 @@ function ProductPage() {
 
 function Gallery({ images, title, activeImage, onChange }: { images: string[]; title: string; activeImage: number; onChange: (index: number) => void }) {
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
+  const hasThumbnails = images.length > 1;
   return (
-    <div className="grid min-w-0 gap-3 lg:grid-cols-[78px_minmax(0,1fr)]">
-      {images.length > 1 && (
+    <div className={`grid min-w-0 gap-3 ${hasThumbnails ? "lg:grid-cols-[78px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+      {hasThumbnails && (
         <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
             <button key={`${src}-${index}`} type="button" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-lg border-2 bg-card transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-transparent hover:border-border"}`}>
