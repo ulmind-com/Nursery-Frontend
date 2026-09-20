@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDownUp, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowDownUp, Leaf, SlidersHorizontal, Star } from "lucide-react";
 import { blogApi, categoriesApi, homeApi, miscApi, queryKeys, settingsApi } from "@/api/services";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { TrustBar } from "@/components/home/trust-bar";
