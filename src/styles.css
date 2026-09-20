@@ -29,6 +29,8 @@
   --color-sale: var(--sale);
   --color-sale-foreground: var(--sale-foreground);
   --color-star: var(--star);
+  --color-storefront-wash: var(--storefront-wash);
+  --color-search-surface: var(--search-surface);
   --shadow-card: 0 1px 3px oklch(0 0 0 / 0.06);
   --shadow-card-hover: 0 12px 28px -12px oklch(0.35 0.06 160 / 0.25);
   --radius-sm: calc(var(--radius) - 4px);
@@ -102,6 +104,8 @@
   --sale: oklch(0.637 0.237 25.331);
   --sale-foreground: oklch(0.99 0.005 25);
   --star: oklch(0.769 0.188 70.08);
+  --storefront-wash: oklch(0.978 0.012 32);
+  --search-surface: oklch(0.965 0.004 160);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
