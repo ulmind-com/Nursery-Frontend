@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/shared/page-state";
 import { money } from "@/components/product/product-card";
 import { normalizeApiError } from "@/lib/api";
 import type { Address, OrderQuote } from "@/types/api";
+import { GIFT_NOTE_KEY, GIFT_ORDER_KEY } from "@/components/product/purchase-extras";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -51,8 +52,14 @@ function CheckoutPage() {
       return "";
     }
   });
-  const [isGift, setIsGift] = useState(false);
-  const [giftNote, setGiftNote] = useState("");
+  const [isGift, setIsGift] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem(GIFT_ORDER_KEY) === "true"; } catch { return false; }
+  });
+  const [giftNote, setGiftNote] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try { return window.localStorage.getItem(GIFT_NOTE_KEY) ?? ""; } catch { return ""; }
+  });
   const [payment, setPayment] = useState("cod");
   const [busy, setBusy] = useState(false);
   const nav = useNavigate();

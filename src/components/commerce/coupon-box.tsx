@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Check, Copy, Lock, TicketPercent } from "lucide-react";
+import { Check, Copy, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { couponApi } from "@/api/services";
 import type { Coupon } from "@/types/api";
+import { Button } from "@/components/ui/button";
 
 export const COUPON_STORAGE_KEY = "plant-nursery-coupon";
 
@@ -16,7 +17,7 @@ export function CouponBox({ subtotal }: { subtotal: number }) {
   const { data, isPending, isError } = useQuery({ queryKey: ["coupons", "active"], queryFn: couponApi.active, staleTime: 5 * 60 * 1000 });
   const coupons: Coupon[] = data ?? [];
 
-  if (isPending) return <div className="h-24 animate-pulse rounded-xl bg-muted" />;
+  if (isPending) return <div className="h-24 animate-pulse rounded-lg bg-muted" />;
   if (isError || coupons.length === 0) return null;
 
   const pick = (coupon: Coupon) => {
@@ -31,35 +32,33 @@ export function CouponBox({ subtotal }: { subtotal: number }) {
   };
 
   return (
-    <section aria-label="Available offers" className="rounded-xl border bg-card p-5">
-      <h2 className="flex items-center gap-2 text-sm font-bold"><TicketPercent className="size-4 text-primary" /> Offers for you</h2>
-      <ul className="mt-4 space-y-3">
+    <section aria-label="Available offers">
+      <h2 className="text-xl text-forest">Offers for you:</h2>
+      <ul className="mt-4 divide-y divide-dashed divide-primary/35 overflow-hidden rounded-lg border border-dashed border-primary/55 bg-primary-tint/65">
         {coupons.map((coupon) => {
           const min = coupon.minimum_order ?? 0;
           const needed = Math.max(0, min - subtotal);
           const locked = needed > 0;
           return (
-            <li key={coupon.code} className="flex items-start gap-3 rounded-lg border border-dashed p-3">
+            <li key={coupon.code} className="flex items-center gap-3 px-4 py-4">
               <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-sm font-bold tracking-wide">
-                  {coupon.code}
-                  {locked && <Lock className="size-3.5 text-muted-foreground" aria-hidden />}
-                </p>
-                {coupon.description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{coupon.description}</p>}
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="text-sm font-semibold text-foreground">{coupon.description || coupon.code}</p>
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {locked && <Lock className="size-3.5" aria-hidden />}
                   {locked ? `Add ${money(needed)} more to unlock` : "Ready to apply"}
                   {coupon.max_discount ? ` · Up to ${money(coupon.max_discount)} off` : ""}
                   {coupon.free_shipping ? " · Free shipping" : ""}
                 </p>
               </div>
-              <button
+              <Button
                 type="button"
                 disabled={locked}
                 onClick={() => pick(coupon)}
-                className="shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 hover:border-primary hover:text-primary disabled:opacity-50"
+                variant="ghost"
+                className="h-9 shrink-0 gap-2 rounded-full px-3 text-xs font-semibold text-forest"
               >
-                {copied === coupon.code ? <Check className="size-3.5" aria-label="Saved" /> : <Copy className="size-3.5" aria-label={`Use ${coupon.code}`} />}
-              </button>
+                <span>{coupon.code}</span>{copied === coupon.code ? <Check className="size-3.5" aria-label="Saved" /> : <Copy className="size-3.5" aria-label={`Use ${coupon.code}`} />}
+              </Button>
             </li>
           );
         })}
