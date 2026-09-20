@@ -78,12 +78,12 @@ export function CataloguePage({
 
   const set = (patch: FilterPatch) => {
     if (!onFiltersChange) return;
-    const next: CatalogueFilters = { ...active, ...patch };
+    const next: FilterPatch = { ...active, ...patch };
     (Object.keys(next) as Array<keyof CatalogueFilters>).forEach((key) => {
       const value = next[key];
       if (value === undefined || value === "" || value === false) delete next[key];
     });
-    onFiltersChange(next);
+    onFiltersChange(next as CatalogueFilters);
   };
 
   const activePills = (Object.entries(active) as Array<[keyof CatalogueFilters, string | number | boolean]>)
