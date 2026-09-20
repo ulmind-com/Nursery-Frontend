@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BellRing, Check, ChevronRight, Droplets, Heart, Leaf, PackageOpen, PawPrint, Ruler, ShieldCheck, ShoppingBag, Sparkles, Star, Sun, Wind, X } from "lucide-react";
+import { BellRing, Check, ChevronRight, Droplets, Heart, Leaf, PackageOpen, PawPrint, Ruler, ShoppingBag, Sparkles, Star, Sun, Wind, X } from "lucide-react";
 import { toast } from "sonner";
 import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi, reviewsApi } from "@/api/services";
 import { PageSkeleton, ErrorState } from "@/components/shared/page-state";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
+import { PurchaseExtras } from "@/components/product/purchase-extras";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -76,6 +77,9 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<"Small" | "Medium">("Small");
   const [selectedPlanter, setSelectedPlanter] = useState("Yoda");
+  const [selectedColor, setSelectedColor] = useState("Ivory");
+  const [quantity, setQuantity] = useState(1);
+  const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   const previewPlanters = [
     { name: "GroPot", prices: { Small: 249, Medium: 349 }, shape: "plain" },
     { name: "Krish", prices: { Small: 299, Medium: 399 }, shape: "rim" },
@@ -133,15 +137,19 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-baseline gap-3">
-              <span className="price-num text-3xl text-forest">{money(preview.price + planterPrice)}</span>
-              <span className="price-num text-sm text-muted-foreground">Plant + {selectedPlanter} planter</span>
-            </div>
-            <div className="mt-6 rounded-xl border border-border bg-background p-5">
-              <p className="font-display text-lg font-bold text-forest">Preview product</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Add this product in the admin panel to enable live variants, inventory, pricing and checkout.</p>
-            </div>
-            <Button className="mt-5 h-12 w-full rounded-lg bg-forest text-forest-foreground hover:bg-forest/90" onClick={() => toast.info("Add this product in the admin panel to enable shopping.")}><ShoppingBag />Preview only</Button>
+            <PurchaseExtras
+              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
+              selectedColor={selectedColor}
+              onColorChange={setSelectedColor}
+              price={preview.price + planterPrice}
+              mrp={preview.mrp + planterPrice}
+              quantity={quantity}
+              stock={0}
+              onQuantityChange={setQuantity}
+              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              preview
+              settings={settings.data}
+            />
           </section>
         </div>
       </div>
@@ -156,6 +164,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const [selected, setSelected] = useState(() => Math.max(0, p.sizes?.findIndex((size) => size.stock > 0) ?? 0));
   const [activeImage, setActiveImage] = useState(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
 
   const variants = p.sizes ?? [];
@@ -164,12 +173,14 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const mrp = v?.mrp ?? p.mrp;
   const stock = v?.stock ?? p.stock ?? 0;
   const imgs = (v?.images?.length ? v.images : p.images) || [];
-  const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const spec = p.plant_spec;
-  const guarantee = settings.data?.plant_guarantee;
   const sizeNames = [...new Set(variants.map((item) => item.name).filter(Boolean))];
   const selectedSize = v?.name ?? sizeNames[0];
-  const planterVariants = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === selectedSize && Boolean(item.pot_type || item.pot_color));
+  const sizeVariants = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === selectedSize);
+  const planterNames = [...new Set(sizeVariants.map(({ item }) => item.pot_type).filter((name): name is string => Boolean(name)))];
+  const selectedPlanter = v?.pot_type ?? planterNames[0];
+  const colorVariants = sizeVariants.filter(({ item }) => selectedPlanter ? item.pot_type === selectedPlanter : true);
+  const colorNames = [...new Set(colorVariants.map(({ item }) => item.pot_color).filter((name): name is string => Boolean(name)))];
   const heights = variants.filter((item) => item.height).map((item) => ({ name: item.name, height: item.height }));
   const reviewItems = reviews.data ? (Array.isArray(reviews.data) ? reviews.data : reviews.data.items) : [];
 
@@ -191,15 +202,24 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const care = toList(p.care_instructions);
   const tips = toList(p.care_tips);
 
-  const selectVariant = (index: number) => { setSelected(index); setActiveImage(0); };
+  const selectVariant = (index: number) => { setSelected(index); setActiveImage(0); setQuantity(1); };
   const selectSize = (name: string) => {
     const available = variants.findIndex((item) => item.name === name && item.stock > 0);
     const fallback = variants.findIndex((item) => item.name === name);
     selectVariant(available >= 0 ? available : fallback);
   };
+  const selectPlanter = (name: string) => {
+    const matching = sizeVariants.filter(({ item }) => item.pot_type === name);
+    const preferred = matching.find(({ item }) => item.pot_color === v?.pot_color && item.stock > 0) ?? matching.find(({ item }) => item.stock > 0) ?? matching[0];
+    if (preferred) selectVariant(preferred.index);
+  };
+  const selectColor = (name: string) => {
+    const matching = colorVariants.find(({ item }) => item.pot_color === name && item.stock > 0) ?? colorVariants.find(({ item }) => item.pot_color === name);
+    if (matching) selectVariant(matching.index);
+  };
   const add = () => {
-    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: 1, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) });
-    toast.success(`${p.title} added to cart`);
+    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: quantity, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) });
+    toast.success(`${quantity} × ${p.title} added to cart`);
   };
   const notifyMe = async () => {
     try {
@@ -235,37 +255,38 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
-            {planterVariants.length > 0 && (
+            {planterNames.length > 0 && (
               <div className="mt-7">
                 <h2 className="mb-3 text-lg text-foreground">Select Planter</h2>
                 <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                  {planterVariants.map(({ item, index }) => (
-                    <button key={`${item.pot_type}-${item.pot_color}-${index}`} type="button" disabled={item.stock < 1} aria-pressed={index === selected} onClick={() => selectVariant(index)} className={`relative flex min-h-24 flex-col items-center justify-center rounded-md border px-2 py-2 text-center transition-colors duration-200 ${index === selected ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>
+                  {planterNames.map((name) => {
+                    const options = sizeVariants.filter(({ item }) => item.pot_type === name);
+                    const representative = options.find(({ item }) => item.stock > 0)?.item ?? options[0]?.item;
+                    const unavailable = options.every(({ item }) => item.stock < 1);
+                    return representative ? <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedPlanter} onClick={() => selectPlanter(name)} className={`relative flex min-h-24 flex-col items-center justify-center rounded-md border px-2 py-2 text-center transition-colors duration-200 ${name === selectedPlanter ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>
                       <PackageOpen className="mb-1 size-7 stroke-1" />
-                      <span className="line-clamp-1 text-xs font-semibold">{item.pot_type || item.pot_color}</span>
-                      <span className="price-num mt-1 text-xs">{money(item.price)}</span>
-                    </button>
-                  ))}
+                      <span className="line-clamp-1 text-xs font-semibold">{name}</span>
+                      <span className="price-num mt-1 text-xs">{money(representative.price)}</span>
+                    </button> : null;
+                  })}
                 </div>
               </div>
             )}
 
-            <div className="mt-7 flex flex-wrap items-baseline gap-3">
-              <span className="price-num text-3xl text-forest">{money(price)}</span>
-              {mrp && mrp > price && <span className="price-num text-base text-muted-foreground line-through">{money(mrp)}</span>}
-              {discount > 0 && <span className="rounded-md bg-sale px-2 py-1 text-xs font-bold text-sale-foreground">{discount}% off</span>}
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">Taxes and delivery are calculated by the store at checkout.</p>
-            {v?.sku && <p className="mt-2 text-xs text-muted-foreground">SKU: {v.sku}</p>}
-
+            <PurchaseExtras
+              colors={colorNames.map((name) => ({ label: name, available: colorVariants.some(({ item }) => item.pot_color === name && item.stock > 0) }))}
+              selectedColor={v?.pot_color ?? colorNames[0]}
+              onColorChange={selectColor}
+              price={price}
+              mrp={mrp}
+              quantity={quantity}
+              stock={stock}
+              onQuantityChange={setQuantity}
+              onAdd={stock > 0 ? add : () => void notifyMe()}
+              settings={settings.data}
+            />
+            {v?.sku && <p className="mt-3 text-xs text-muted-foreground">SKU: {v.sku}</p>}
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
-
-            <div className="mt-7 hidden grid-cols-[48px_1fr] gap-3 lg:grid">
-              <Button variant="outline" size="lg" className="h-12 px-0" aria-label="Add to wishlist"><Heart /></Button>
-              {stock > 0 ? <Button className="h-12 bg-forest text-forest-foreground hover:bg-forest/90" onClick={add}><ShoppingBag />Add to cart</Button> : <Button className="h-12" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me when available</Button>}
-            </div>
-
-            {guarantee?.enabled && <div className="mt-7 flex items-start gap-3 rounded-xl bg-primary-tint p-4"><ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" /><div><p className="text-sm font-bold text-forest">{guarantee.label}</p>{guarantee.description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{guarantee.description}</p>}</div></div>}
           </section>
         </div>
 
@@ -284,7 +305,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>
-        {stock > 0 ? <Button className="flex-1 bg-forest text-forest-foreground hover:bg-forest/90" size="lg" onClick={add}><ShoppingBag />Add to cart — {money(price)}</Button> : <Button className="flex-1" size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me</Button>}
+        {stock > 0 ? <Button className="flex-1 bg-forest text-forest-foreground hover:bg-forest/90" size="lg" onClick={add}><ShoppingBag />Add {quantity} — {money(price * quantity)}</Button> : <Button className="flex-1" size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me</Button>}
       </div>
 
       {sizeGuideOpen && (

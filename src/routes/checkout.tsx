@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Gift, ShieldCheck } from "lucide-react";
 import { ordersApi } from "@/api/services";
@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/shared/page-state";
 import { money } from "@/components/product/product-card";
 import { normalizeApiError } from "@/lib/api";
 import type { Address, OrderQuote } from "@/types/api";
+import { GIFT_NOTE_KEY, GIFT_ORDER_KEY } from "@/components/product/purchase-extras";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -56,6 +57,13 @@ function CheckoutPage() {
   const [payment, setPayment] = useState("cod");
   const [busy, setBusy] = useState(false);
   const nav = useNavigate();
+
+  useEffect(() => {
+    try {
+      setIsGift(window.localStorage.getItem(GIFT_ORDER_KEY) === "true");
+      setGiftNote(window.localStorage.getItem(GIFT_NOTE_KEY) ?? "");
+    } catch { /* storage unavailable */ }
+  }, []);
 
   if (!items.length) {
     return (
@@ -113,6 +121,10 @@ function CheckoutPage() {
     try {
       const order = await ordersApi.create(payload(address));
       clear();
+      try {
+        window.localStorage.removeItem(GIFT_ORDER_KEY);
+        window.localStorage.removeItem(GIFT_NOTE_KEY);
+      } catch { /* storage unavailable */ }
       await nav({ to: "/account/orders/$id", params: { id: order.id } });
     } catch (err) {
       toast.error(normalizeApiError(err).message);
@@ -173,11 +185,11 @@ function CheckoutPage() {
 
           <section className="rounded-xl border p-4">
             <label className="flex items-center gap-3 text-sm font-semibold">
-              <input type="checkbox" checked={isGift} onChange={(e) => setIsGift(e.target.checked)} className="size-4 accent-[var(--primary)]" />
+              <input type="checkbox" checked={isGift} onChange={(e) => { setIsGift(e.target.checked); try { window.localStorage.setItem(GIFT_ORDER_KEY, String(e.target.checked)); } catch { /* storage unavailable */ } }} className="size-4 accent-[var(--primary)]" />
               <Gift className="size-4 text-primary" /> This order is a gift
             </label>
             {isGift && (
-              <Textarea value={giftNote} onChange={(e) => setGiftNote(e.target.value)} placeholder="Add a short gift note (optional)" className="mt-4" rows={3} aria-label="Gift note" />
+              <Textarea value={giftNote} onChange={(e) => { setGiftNote(e.target.value); try { window.localStorage.setItem(GIFT_NOTE_KEY, e.target.value); } catch { /* storage unavailable */ } }} placeholder="Add a short gift note (optional)" className="mt-4" rows={3} aria-label="Gift note" />
             )}
           </section>
 
