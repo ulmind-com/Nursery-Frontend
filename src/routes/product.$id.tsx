@@ -173,9 +173,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const mrp = v?.mrp ?? p.mrp;
   const stock = v?.stock ?? p.stock ?? 0;
   const imgs = (v?.images?.length ? v.images : p.images) || [];
-  const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const spec = p.plant_spec;
-  const guarantee = settings.data?.plant_guarantee;
   const sizeNames = [...new Set(variants.map((item) => item.name).filter(Boolean))];
   const selectedSize = v?.name ?? sizeNames[0];
   const sizeVariants = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === selectedSize);

@@ -180,11 +180,11 @@ function CheckoutPage() {
 
           <section className="rounded-xl border p-4">
             <label className="flex items-center gap-3 text-sm font-semibold">
-              <input type="checkbox" checked={isGift} onChange={(e) => setIsGift(e.target.checked)} className="size-4 accent-[var(--primary)]" />
+              <input type="checkbox" checked={isGift} onChange={(e) => { setIsGift(e.target.checked); try { window.localStorage.setItem(GIFT_ORDER_KEY, String(e.target.checked)); } catch { /* storage unavailable */ } }} className="size-4 accent-[var(--primary)]" />
               <Gift className="size-4 text-primary" /> This order is a gift
             </label>
             {isGift && (
-              <Textarea value={giftNote} onChange={(e) => setGiftNote(e.target.value)} placeholder="Add a short gift note (optional)" className="mt-4" rows={3} aria-label="Gift note" />
+              <Textarea value={giftNote} onChange={(e) => { setGiftNote(e.target.value); try { window.localStorage.setItem(GIFT_NOTE_KEY, e.target.value); } catch { /* storage unavailable */ } }} placeholder="Add a short gift note (optional)" className="mt-4" rows={3} aria-label="Gift note" />
             )}
           </section>
 

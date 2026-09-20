@@ -14,16 +14,16 @@ type ColorOption = { label: string; available: boolean };
 
 type PurchaseExtrasProps = {
   colors?: ColorOption[];
-  selectedColor?: string;
+  selectedColor?: string | undefined;
   onColorChange?: (color: string) => void;
   price: number;
-  mrp?: number | null;
+  mrp?: number | null | undefined;
   quantity: number;
   stock: number;
   onQuantityChange: (quantity: number) => void;
   onAdd: () => void;
   preview?: boolean;
-  settings?: Settings;
+  settings?: Settings | undefined;
 };
 
 function swatchClass(color: string) {
