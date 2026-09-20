@@ -1,24 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Leaf, PackageCheck, ShieldCheck, Sprout } from "lucide-react";
+import { homeApi, queryKeys, categoriesApi, settingsApi } from "@/api/services";
+import { Button } from "@/components/ui/button";
+import { ProductGrid } from "@/components/product/product-card";
+import heroImage from "@/assets/botanical-hero.jpg";
+import type { Product } from "@/types/api";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+export const Route = createFileRoute("/")({ head: () => ({ meta: [{ title: "Premium Plants Online | Plant Nursery" }, { name: "description", content: "Shop healthy indoor and outdoor plants, planters, and care essentials from a trusted Indian nursery." }, { property: "og:title", content: "Premium Plants Online | Plant Nursery" }, { property: "og:description", content: "Thoughtfully grown plants and garden essentials, delivered with care." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: HomePage });
+function HomePage() {
+ const sections = useQuery({ queryKey: queryKeys.home, queryFn: homeApi.sections }); const categories = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list }); const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get }); const recommendations = useQuery({ queryKey: ["recommendations","home"], queryFn: homeApi.recommendations });
+ const products: Product[] = Array.isArray(recommendations.data) ? recommendations.data.flatMap((entry) => "products" in entry ? entry.products || [] : [entry as Product]) : [];
+ return <>
+  <section className="relative min-h-[74vh] overflow-hidden bg-secondary"><img src={heroImage} alt="Sunlit collection of thriving indoor plants" className="absolute inset-0 size-full object-cover"/><div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/30 to-transparent"/><div className="relative mx-auto flex min-h-[74vh] max-w-[1480px] items-center px-6 py-20 lg:px-10"><div className="max-w-xl text-primary-foreground"><p className="mb-4 text-xs font-bold uppercase">Grown for Indian homes</p><h1 className="font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">Bring home something living.</h1><p className="mt-6 max-w-md text-base leading-7 text-primary-foreground/85">Healthy plants, considered planters, and honest care guidance—packed by people who know plants.</p><Button asChild size="lg" className="mt-8 bg-background text-foreground hover:bg-background/90"><Link to="/plants">Shop plants <ArrowRight /></Link></Button></div></div></section>
+  {categories.data && categories.data.length > 0 && <section className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><div className="mb-8 flex items-end justify-between"><div><p className="text-xs font-bold uppercase text-primary">Find your green</p><h2 className="mt-2 font-display text-4xl">Shop by category</h2></div><Link to="/plants" className="text-sm font-semibold text-primary">View all</Link></div><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">{categories.data.slice(0,6).map((cat) => <Link key={cat.id} to="/category/$slug" params={{slug:cat.slug||cat.id}} className="group"><div className="aspect-square overflow-hidden rounded-full bg-accent">{cat.image ? <img src={cat.image} alt={cat.name} className="size-full object-cover transition group-hover:scale-105"/> : <div className="flex size-full items-center justify-center"><Leaf className="size-8 text-primary"/></div>}</div><h3 className="mt-3 text-center text-sm font-semibold">{cat.name}</h3></Link>)}</div></section>}
+  {products.length > 0 && <section className="bg-secondary"><div className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><h2 className="mb-8 font-display text-4xl">Recommended for you</h2><ProductGrid products={products.slice(0,8)} /></div></section>}
+  {!sections.isLoading && !categories.isLoading && categories.data?.length === 0 && <section className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><div className="grid gap-6 md:grid-cols-3"><Trust icon={<Sprout/>} title="Nursery fresh" text="Selected and packed directly by plant specialists."/><Trust icon={<PackageCheck/>} title="Securely packed" text="Protective packaging designed for living plants."/><Trust icon={<ShieldCheck/>} title={settings.data?.plant_guarantee?.label || "Plant guarantee"} text={settings.data?.plant_guarantee?.description || "Support that continues after delivery."}/></div></section>}
+ </>;
 }
+function Trust({icon,title,text}:{icon:React.ReactNode;title:string;text:string}) { return <div className="border-t border-border py-6"><span className="text-primary">{icon}</span><h3 className="mt-4 font-display text-2xl">{title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p></div>; }
