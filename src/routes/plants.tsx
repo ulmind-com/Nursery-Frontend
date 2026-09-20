@@ -1,8 +1,29 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CataloguePage } from "@/components/product/catalogue-page";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CataloguePage, type CatalogueFilters } from "@/components/product/catalogue-page";
+
+const STRING_KEYS = ["q", "plant_type", "sunlight", "watering", "difficulty", "sort_by"] as const;
+const BOOL_KEYS = ["pet_safe", "air_purifying", "flowering", "is_bestseller", "is_new_arrival"] as const;
+const NUM_KEYS = ["min_price", "max_price"] as const;
+
+function parseSearch(raw: Record<string, unknown>): CatalogueFilters {
+  const out: Record<string, string | boolean | number> = {};
+  STRING_KEYS.forEach((key) => {
+    const value = raw[key];
+    if (typeof value === "string" && value) out[key] = value;
+  });
+  BOOL_KEYS.forEach((key) => {
+    const value = raw[key];
+    if (value === true || value === "true") out[key] = true;
+  });
+  NUM_KEYS.forEach((key) => {
+    const value = Number(raw[key]);
+    if (Number.isFinite(value) && value > 0) out[key] = value;
+  });
+  return out as CatalogueFilters;
+}
 
 export const Route = createFileRoute("/plants")({
-  validateSearch: (s: Record<string, unknown>): { q?: string } => (typeof s["q"] === "string" && s["q"] ? { q: s["q"] } : {}),
+  validateSearch: parseSearch,
   head: () => ({
     meta: [
       { title: "Plants | Plant Nursery" },
@@ -17,6 +38,14 @@ export const Route = createFileRoute("/plants")({
 });
 
 function PlantsPage() {
-  const s = Route.useSearch();
-  return <CataloguePage title="Plants" {...(s.q ? { params: { q: s.q } } : {})} />;
+  const filters = Route.useSearch();
+  const nav = useNavigate();
+  return (
+    <CataloguePage
+      title="All plants"
+      description="Indoor greens, flowering favourites, and hardy outdoor plants — grown and hardened at our nursery."
+      filters={filters}
+      onFiltersChange={(next) => void nav({ to: "/plants", search: next, replace: true })}
+    />
+  );
 }
