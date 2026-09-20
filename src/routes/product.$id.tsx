@@ -45,18 +45,18 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
   return (
-    <div className={`grid min-w-0 gap-3 ${hasThumbnails ? "lg:grid-cols-[78px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`grid min-w-0 gap-3 ${hasThumbnails ? "lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
       {hasThumbnails && (
         <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
-            <button key={`${src}-${index}`} type="button" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-lg border-2 bg-card transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-transparent hover:border-border"}`}>
-              <img src={src} alt="" className="size-full object-cover" />
-            </button>
+            <Button key={`${src}-${index}`} type="button" variant="ghost" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-lg border-2 bg-card p-0 transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-transparent hover:border-border"}`}>
+              <img src={src} alt="" width={1024} height={1280} loading="lazy" className="size-full object-cover" />
+            </Button>
           ))}
         </div>
       )}
       <div className="order-1 aspect-[1.04/1] overflow-hidden rounded-2xl bg-primary-tint lg:order-2">
-        {hero ? <img src={hero} alt={title} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
+        {hero ? <img src={hero} alt={title} width={1024} height={1280} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
       </div>
     </div>
   );
@@ -74,25 +74,74 @@ function Breadcrumbs({ title, category }: { title: string; category?: string }) 
 
 function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeof findPreviewItem>> }) {
   const [activeImage, setActiveImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<"Small" | "Medium">("Small");
+  const [selectedPlanter, setSelectedPlanter] = useState("Yoda");
+  const previewPlanters = [
+    { name: "GroPot", prices: { Small: 249, Medium: 349 }, shape: "plain" },
+    { name: "Krish", prices: { Small: 299, Medium: 399 }, shape: "rim" },
+    { name: "Kyoto", prices: { Small: 299, Medium: 449 }, shape: "ribbed" },
+    { name: "Yoda", prices: { Small: 299, Medium: 449 }, shape: "round" },
+    { name: "Lagos", prices: { Small: 349, Medium: 499 }, shape: "legs" },
+    { name: "Roma", prices: { Small: 549, Medium: 699 }, shape: "ribbed" },
+    { name: "Diamond", prices: { Small: 549, Medium: 699 }, shape: "diamond" },
+    { name: "Table Top", prices: { Small: 549, Medium: 699 }, shape: "plain" },
+    { name: "Spiro", prices: { Small: 549, Medium: 699 }, shape: "rim" },
+  ] as const;
+  const selectedPreviewPlanter = previewPlanters.find((item) => item.name === selectedPlanter) ?? previewPlanters[0];
+  const planterPrice = selectedPreviewPlanter.prices[selectedSize];
+  const gallery = preview.gallery?.length ? preview.gallery : [preview.image];
+  const chooseSize = (size: "Small" | "Medium") => {
+    setSelectedSize(size);
+    setActiveImage(size === "Medium" && gallery.length > 1 ? gallery.length - 1 : 0);
+  };
   return (
     <div className="bg-storefront-wash pb-24 lg:pb-16">
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={preview.title} category={preview.category} />
         <div className="grid gap-8 lg:grid-cols-[1.18fr_.92fr] lg:gap-14">
-          <Gallery images={[preview.image]} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="lg:pt-1">
-            <p className="inline-flex rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary-soft-foreground">Design preview</p>
-            <h1 className="mt-4 text-3xl leading-tight text-forest sm:text-5xl">{preview.title}</h1>
-            <p className="mt-3 text-base text-foreground/80">A premium nursery product preview.</p>
-            <div className="mt-8 flex items-baseline gap-3">
-              <span className="price-num text-2xl text-forest">{money(preview.price)}</span>
-              <span className="price-num text-sm text-muted-foreground line-through">{money(preview.mrp)}</span>
+          <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+          <section className="min-w-0 lg:pt-1">
+            <p className="flex flex-wrap items-center gap-2 text-sm text-foreground/85"><Star className="size-5 fill-primary text-primary" /><span className="font-semibold">{preview.rating?.toFixed(1) ?? "Preview"}</span>{preview.reviewCount ? <span>({preview.reviewCount} reviews)</span> : null}<span aria-hidden="true">|</span><span>Design preview</span></p>
+            <h1 className="mt-3 text-4xl leading-[1.08] text-forest sm:text-5xl lg:text-[3.5rem]">{preview.title}</h1>
+            <p className="mt-4 text-lg text-foreground/85 sm:text-xl">{preview.subtitle ?? "Premium nursery product preview"}</p>
+
+            <div className="mt-10">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="text-xl text-forest sm:text-2xl">Select Plant Size</h2>
+                <span className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</span>
+              </div>
+              <div className="grid max-w-lg grid-cols-2 gap-3">
+                {(["Small", "Medium"] as const).map((size) => (
+                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-24 rounded-lg text-lg font-semibold sm:h-32 sm:text-xl ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
+                ))}
+              </div>
             </div>
-            <div className="mt-8 rounded-xl border border-border bg-background p-5">
+
+            <div className="mt-9">
+              <h2 className="mb-4 text-xl text-forest sm:text-2xl">Select Planter</h2>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {previewPlanters.map((planter) => {
+                  const active = planter.name === selectedPlanter;
+                  return (
+                    <Button key={planter.name} type="button" variant="outline" aria-pressed={active} onClick={() => setSelectedPlanter(planter.name)} className={`h-32 min-w-0 flex-col gap-1 rounded-lg px-2 py-3 ${active ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>
+                      <span aria-hidden="true" data-pot-shape={planter.shape} className="preview-pot-icon"><span /></span>
+                      <span className="max-w-full truncate text-sm font-semibold">{planter.name}</span>
+                      <span className="price-num text-sm">{money(planter.prices[selectedSize])}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-baseline gap-3">
+              <span className="price-num text-3xl text-forest">{money(preview.price + planterPrice)}</span>
+              <span className="price-num text-sm text-muted-foreground">Plant + {selectedPlanter} planter</span>
+            </div>
+            <div className="mt-6 rounded-xl border border-border bg-background p-5">
               <p className="font-display text-lg font-bold text-forest">Preview product</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Add this product in the admin panel to enable live variants, inventory, pricing and checkout.</p>
             </div>
-            <Button className="mt-6 h-12 w-full rounded-lg bg-forest text-forest-foreground hover:bg-forest/90" onClick={() => toast.info("Add this product in the admin panel to enable shopping.")}><ShoppingBag />Preview only</Button>
+            <Button className="mt-5 h-12 w-full rounded-lg bg-forest text-forest-foreground hover:bg-forest/90" onClick={() => toast.info("Add this product in the admin panel to enable shopping.")}><ShoppingBag />Preview only</Button>
           </section>
         </div>
       </div>

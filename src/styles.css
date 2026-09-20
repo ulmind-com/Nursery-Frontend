@@ -191,6 +191,51 @@
   }
 }
 
+@utility preview-pot-icon {
+  position: relative;
+  display: block;
+  width: 2.6rem;
+  height: 2.35rem;
+  color: currentColor;
+  opacity: 0.78;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0.35rem 0.35rem 0.1rem;
+    border: 1.5px solid currentColor;
+    border-radius: 0.18rem 0.18rem 0.55rem 0.55rem;
+    transform: perspective(2rem) rotateX(-5deg);
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0.2rem;
+    right: 0.2rem;
+    top: 0.18rem;
+    height: 0.48rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+  }
+  &[data-pot-shape="ribbed"]::before {
+    background: repeating-linear-gradient(90deg, transparent 0 0.3rem, currentColor 0.32rem 0.35rem);
+  }
+  &[data-pot-shape="round"]::before { border-radius: 0.25rem 0.25rem 1rem 1rem; }
+  &[data-pot-shape="diamond"]::before { transform: perspective(2rem) rotateX(-5deg) rotate(2deg); border-radius: 0.15rem 0.15rem 0.7rem 0.7rem; }
+  &[data-pot-shape="legs"] span::before,
+  &[data-pot-shape="legs"] span::after {
+    content: "";
+    position: absolute;
+    bottom: -0.05rem;
+    width: 0.22rem;
+    height: 0.42rem;
+    border: 1.5px solid currentColor;
+  }
+  &[data-pot-shape="legs"] span::before { left: 0.55rem; }
+  &[data-pot-shape="legs"] span::after { right: 0.55rem; }
+  &[data-pot-shape="rim"]::after { height: 0.62rem; }
+}
+
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }

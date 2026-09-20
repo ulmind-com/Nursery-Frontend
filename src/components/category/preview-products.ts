@@ -4,6 +4,9 @@ import sampleJade from "@/assets/sample-jade.jpg";
 import sampleArecaPalm from "@/assets/sample-areca-palm.jpg";
 import sampleMoneyPlant from "@/assets/sample-money-plant.jpg";
 import sampleSnakePlant from "@/assets/sample-snake-plant.jpg";
+import peaceLilyDetailMain from "@/assets/peace-lily-detail-main.jpg";
+import peaceLilyDetailLeaves from "@/assets/peace-lily-detail-leaves.jpg";
+import peaceLilyDetailRoom from "@/assets/peace-lily-detail-room.jpg";
 import potsTerracotta from "@/assets/sample-pots-terracotta.jpg";
 import potsCeramic from "@/assets/sample-pots-ceramic.jpg";
 import potsWooden from "@/assets/sample-pots-wooden.jpg";
@@ -24,13 +27,28 @@ export type PreviewItem = {
   category: string;
   title: string;
   image: string;
+  gallery?: string[];
+  subtitle?: string;
+  rating?: number;
+  reviewCount?: number;
   price: number;
   mrp: number;
   bestseller?: boolean;
 };
 
 const plants: PreviewItem[] = [
-  { id: "preview-plants-0", category: "plants", title: "Peace Lily Plant", image: samplePeaceLily, price: 299, mrp: 350 },
+  {
+    id: "preview-plants-0",
+    category: "plants",
+    title: "Peace Lily Plant",
+    image: samplePeaceLily,
+    gallery: [peaceLilyDetailMain, samplePeaceLily, peaceLilyDetailLeaves, peaceLilyDetailRoom],
+    subtitle: "Stunning air-purifying plant",
+    rating: 4.8,
+    reviewCount: 440,
+    price: 299,
+    mrp: 350,
+  },
   { id: "preview-plants-1", category: "plants", title: "Anthurium Red Plant", image: sampleAnthurium, price: 699, mrp: 800, bestseller: true },
   { id: "preview-plants-2", category: "plants", title: "Jade Mini Plant", image: sampleJade, price: 249, mrp: 300 },
   { id: "preview-plants-3", category: "plants", title: "Areca Palm Plant", image: sampleArecaPalm, price: 599, mrp: 749, bestseller: true },
