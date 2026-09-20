@@ -120,6 +120,10 @@ function CheckoutPage() {
     try {
       const order = await ordersApi.create(payload(address));
       clear();
+      try {
+        window.localStorage.removeItem(GIFT_ORDER_KEY);
+        window.localStorage.removeItem(GIFT_NOTE_KEY);
+      } catch { /* storage unavailable */ }
       await nav({ to: "/account/orders/$id", params: { id: order.id } });
     } catch (err) {
       toast.error(normalizeApiError(err).message);

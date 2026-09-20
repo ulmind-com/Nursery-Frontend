@@ -12,13 +12,23 @@ function money(n: number) {
   return `₹${n.toLocaleString("en-IN")}`;
 }
 
-export function CouponBox({ subtotal }: { subtotal: number }) {
+export function CouponBox({ subtotal, preview = false }: { subtotal: number; preview?: boolean }) {
   const [copied, setCopied] = useState<string | null>(null);
   const { data, isPending, isError } = useQuery({ queryKey: ["coupons", "active"], queryFn: couponApi.active, staleTime: 5 * 60 * 1000 });
   const coupons: Coupon[] = data ?? [];
 
   if (isPending) return <div className="h-24 animate-pulse rounded-lg bg-muted" />;
-  if (isError || coupons.length === 0) return null;
+  if (isError || coupons.length === 0) {
+    if (!preview) return null;
+    return (
+      <section aria-label="Available offers">
+        <h2 className="text-xl text-forest">Offers for you:</h2>
+        <div className="mt-4 rounded-lg border border-dashed border-primary/55 bg-primary-tint/65 px-4 py-5 text-sm text-muted-foreground">
+          Current shop offers will appear here when added in the admin panel.
+        </div>
+      </section>
+    );
+  }
 
   const pick = (coupon: Coupon) => {
     try {

@@ -103,7 +103,7 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
         <Button type="button" className="h-14 rounded-full bg-forest text-base text-forest-foreground hover:bg-forest/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add To Cart" : "Out of stock"}</Button>
       </div>
 
-      <div className="mt-8"><CouponBox subtotal={price * quantity} /></div>
+      <div className="mt-8"><CouponBox subtotal={price * quantity} preview={preview} /></div>
 
       {(settings?.plant_guarantee?.enabled || supportTitle || supportDetail || deliveryTitle || freeAbove !== undefined) && (
         <div className="mt-4 space-y-3">
