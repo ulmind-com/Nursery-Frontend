@@ -1,21 +1,120 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Leaf, PackageCheck, ShieldCheck, Sprout } from "lucide-react";
-import { homeApi, queryKeys, categoriesApi, settingsApi } from "@/api/services";
-import { Button } from "@/components/ui/button";
-import { ProductGrid } from "@/components/product/product-card";
-import heroImage from "@/assets/botanical-hero.jpg";
+import { Leaf, Star } from "lucide-react";
+import { blogApi, categoriesApi, homeApi, miscApi, queryKeys, settingsApi } from "@/api/services";
+import { HeroCarousel } from "@/components/home/hero-carousel";
+import { TrustBar } from "@/components/home/trust-bar";
+import { ProductRail, SectionHeader } from "@/components/home/section-rail";
+import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 
-export const Route = createFileRoute("/")({ head: () => ({ meta: [{ title: "Premium Plants Online | Plant Nursery" }, { name: "description", content: "Shop healthy indoor and outdoor plants, planters, and care essentials from a trusted Indian nursery." }, { property: "og:title", content: "Premium Plants Online | Plant Nursery" }, { property: "og:description", content: "Thoughtfully grown plants and garden essentials, delivered with care." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: HomePage });
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Premium Plants Online | Plant Nursery" },
+      { name: "description", content: "Shop healthy indoor and outdoor plants, planters, and care essentials from a trusted Indian nursery." },
+      { property: "og:title", content: "Premium Plants Online | Plant Nursery" },
+      { property: "og:description", content: "Thoughtfully grown plants and garden essentials, delivered with care." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: HomePage,
+});
+
 function HomePage() {
- const sections = useQuery({ queryKey: queryKeys.home, queryFn: homeApi.sections }); const categories = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list }); const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get }); const recommendations = useQuery({ queryKey: ["recommendations","home"], queryFn: homeApi.recommendations });
- const products: Product[] = Array.isArray(recommendations.data) ? recommendations.data.flatMap((entry) => "products" in entry ? entry.products || [] : [entry as Product]) : [];
- return <>
-  <section className="relative min-h-[74vh] overflow-hidden bg-secondary"><img src={heroImage} alt="Sunlit collection of thriving indoor plants" className="absolute inset-0 size-full object-cover"/><div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/30 to-transparent"/><div className="relative mx-auto flex min-h-[74vh] max-w-[1480px] items-center px-6 py-20 lg:px-10"><div className="max-w-xl text-primary-foreground"><p className="mb-4 text-xs font-bold uppercase">Grown for Indian homes</p><h1 className="font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">Bring home something living.</h1><p className="mt-6 max-w-md text-base leading-7 text-primary-foreground/85">Healthy plants, considered planters, and honest care guidance—packed by people who know plants.</p><Button asChild size="lg" className="mt-8 bg-background text-foreground hover:bg-background/90"><Link to="/plants">Shop plants <ArrowRight /></Link></Button></div></div></section>
-  {categories.data && categories.data.length > 0 && <section className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><div className="mb-8 flex items-end justify-between"><div><p className="text-xs font-bold uppercase text-primary">Find your green</p><h2 className="mt-2 font-display text-4xl">Shop by category</h2></div><Link to="/plants" className="text-sm font-semibold text-primary">View all</Link></div><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">{categories.data.slice(0,6).map((cat) => <Link key={cat.id} to="/category/$slug" params={{slug:cat.slug||cat.id}} className="group"><div className="aspect-square overflow-hidden rounded-full bg-accent">{cat.image ? <img src={cat.image} alt={cat.name} className="size-full object-cover transition group-hover:scale-105"/> : <div className="flex size-full items-center justify-center"><Leaf className="size-8 text-primary"/></div>}</div><h3 className="mt-3 text-center text-sm font-semibold">{cat.name}</h3></Link>)}</div></section>}
-  {products.length > 0 && <section className="bg-secondary"><div className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><h2 className="mb-8 font-display text-4xl">Recommended for you</h2><ProductGrid products={products.slice(0,8)} /></div></section>}
-  {!sections.isLoading && !categories.isLoading && categories.data?.length === 0 && <section className="mx-auto max-w-[1480px] px-6 py-16 lg:px-10"><div className="grid gap-6 md:grid-cols-3"><Trust icon={<Sprout/>} title="Nursery fresh" text="Selected and packed directly by plant specialists."/><Trust icon={<PackageCheck/>} title="Securely packed" text="Protective packaging designed for living plants."/><Trust icon={<ShieldCheck/>} title={settings.data?.plant_guarantee?.label || "Plant guarantee"} text={settings.data?.plant_guarantee?.description || "Support that continues after delivery."}/></div></section>}
- </>;
+  const sections = useQuery({ queryKey: queryKeys.home, queryFn: homeApi.sections });
+  const banners = useQuery({ queryKey: ["banners"], queryFn: homeApi.banners });
+  const categories = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list });
+  const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get });
+  const recommendations = useQuery({ queryKey: ["recommendations", "home"], queryFn: homeApi.recommendations });
+  const googleReviews = useQuery({ queryKey: ["google-reviews"], queryFn: miscApi.googleReviews });
+  const posts = useQuery({ queryKey: queryKeys.blog, queryFn: blogApi.list });
+
+  const recommended: Product[] = Array.isArray(recommendations.data)
+    ? recommendations.data.flatMap((entry) => ("products" in entry ? entry.products || [] : [entry as Product]))
+    : [];
+  const blogPosts = posts.data?.items ?? [];
+  const reviews = googleReviews.data ?? [];
+
+  return (
+    <>
+      <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
+      <TrustBar settings={settings.data} />
+
+      {categories.data && categories.data.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+          <SectionHeader eyebrow="Find your green" title="Shop by category" linkLabel="View all" />
+          <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            {categories.data.slice(0, 6).map((cat) => (
+              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group">
+                <div className="aspect-square overflow-hidden rounded-full bg-primary-soft">
+                  {cat.image ? (
+                    <img src={cat.image} alt={cat.name} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  ) : (
+                    <span className="flex size-full items-center justify-center"><Leaf className="size-7 text-primary" /></span>
+                  )}
+                </div>
+                <h3 className="mt-3 text-center text-xs font-semibold sm:text-sm">{cat.name}</h3>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(sections.data ?? [])
+        .filter((section) => section.active !== false && (section.products?.length ?? 0) > 0)
+        .map((section) => (
+          <div key={section.id} className={section.layout === "featured" ? "bg-primary-tint" : ""}>
+            <ProductRail title={section.title || "Handpicked"} products={section.products ?? []} />
+          </div>
+        ))}
+
+      {recommended.length > 0 && (
+        <div className="bg-primary-tint">
+          <ProductRail eyebrow="Picked for you" title="Recommended for you" products={recommended} />
+        </div>
+      )}
+
+      {reviews.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+          <SectionHeader eyebrow="Google reviews" title="What our customers say" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {reviews.slice(0, 6).map((review, i) => (
+              <figure key={review.id ?? i} className="surface-card p-5">
+                <div className="flex gap-0.5" aria-label={`Rated ${review.rating} out of 5`}>
+                  {Array.from({ length: 5 }, (_, s) => (
+                    <Star key={s} className={`size-3.5 ${s < review.rating ? "fill-star text-star" : "text-border"}`} />
+                  ))}
+                </div>
+                {review.text && <blockquote className="mt-3 line-clamp-5 text-sm leading-6 text-muted-foreground">{review.text}</blockquote>}
+                <figcaption className="mt-4 text-xs font-semibold">{review.author_name || "Google user"}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {blogPosts.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 pb-16 sm:px-6 lg:px-10">
+          <SectionHeader eyebrow="Journal" title="Plant care stories" />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {blogPosts.slice(0, 3).map((post) => (
+              <Link key={post.slug ?? post.key ?? post.title} to="/blog/$slug" params={{ slug: post.slug || post.key || "" }} className="surface-card group overflow-hidden">
+                <div className="aspect-[16/10] overflow-hidden bg-primary-soft">
+                  {(post.hero_image || post.image) && (
+                    <img src={post.hero_image || post.image} alt={post.title} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="text-base">{post.title}</h3>
+                  {post.excerpt && <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{post.excerpt}</p>}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
 }
-function Trust({icon,title,text}:{icon:React.ReactNode;title:string;text:string}) { return <div className="border-t border-border py-6"><span className="text-primary">{icon}</span><h3 className="mt-4 font-display text-2xl">{title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p></div>; }

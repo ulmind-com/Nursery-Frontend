@@ -21,9 +21,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
 import { Route as PlantsRouteImport } from './routes/plants'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerifyOtpRouteImport } from './routes/verify-otp'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
@@ -96,9 +101,19 @@ const PlantsRoute = PlantsRouteImport.update({
   path: '/plants',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -106,9 +121,24 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerifyOtpRoute = VerifyOtpRouteImport.update({
@@ -180,9 +210,14 @@ export interface FileRoutesByFullPath {
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/plants': typeof PlantsRoute
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/signup': typeof SignupRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
@@ -207,9 +242,14 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/plants': typeof PlantsRoute
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/signup': typeof SignupRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
@@ -235,9 +275,14 @@ export interface FileRoutesById {
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/plants': typeof PlantsRoute
+  '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/returns': typeof ReturnsRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/signup': typeof SignupRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
@@ -265,9 +310,14 @@ export interface FileRouteTypes {
     | '/offers'
     | '/order-confirmation'
     | '/plants'
+    | '/privacy'
     | '/products'
+    | '/returns'
     | '/search'
+    | '/shipping'
     | '/signup'
+    | '/support'
+    | '/terms'
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
@@ -292,9 +342,14 @@ export interface FileRouteTypes {
     | '/offers'
     | '/order-confirmation'
     | '/plants'
+    | '/privacy'
     | '/products'
+    | '/returns'
     | '/search'
+    | '/shipping'
     | '/signup'
+    | '/support'
+    | '/terms'
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
@@ -319,9 +374,14 @@ export interface FileRouteTypes {
     | '/offers'
     | '/order-confirmation'
     | '/plants'
+    | '/privacy'
     | '/products'
+    | '/returns'
     | '/search'
+    | '/shipping'
     | '/signup'
+    | '/support'
+    | '/terms'
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
@@ -348,9 +408,14 @@ export interface RootRouteChildren {
   OffersRoute: typeof OffersRoute
   OrderConfirmationRoute: typeof OrderConfirmationRoute
   PlantsRoute: typeof PlantsRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRoute
+  ReturnsRoute: typeof ReturnsRoute
   SearchRoute: typeof SearchRoute
+  ShippingRoute: typeof ShippingRoute
   SignupRoute: typeof SignupRoute
+  SupportRoute: typeof SupportRoute
+  TermsRoute: typeof TermsRoute
   VerifyOtpRoute: typeof VerifyOtpRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -443,11 +508,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlantsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -457,11 +536,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verify-otp': {
@@ -598,9 +698,14 @@ const rootRouteChildren: RootRouteChildren = {
   OffersRoute: OffersRoute,
   OrderConfirmationRoute: OrderConfirmationRoute,
   PlantsRoute: PlantsRoute,
+  PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRoute,
+  ReturnsRoute: ReturnsRoute,
   SearchRoute: SearchRoute,
+  ShippingRoute: ShippingRoute,
   SignupRoute: SignupRoute,
+  SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
   VerifyOtpRoute: VerifyOtpRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
