@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Gift, MessageCircle, Minus, Plus, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { CouponBox } from "@/components/commerce/coupon-box";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
   const [isGift, setIsGift] = React.useState(() => readStored(GIFT_ORDER_KEY, "false") === "true");
   const [giftNote, setGiftNote] = React.useState(() => readStored(GIFT_NOTE_KEY, ""));
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-  const deliveryTitle = settingText(settings?.delivery?.title) ?? settingText(settings?.delivery?.label);
+  const deliveryTitle = settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
   const supportTitle = settingText(settings?.support?.title);
   const supportDetail = settingText(settings?.support?.note) ?? settingText(settings?.support?.hours);
   const freeAbove = typeof settings?.delivery?.free_above === "number" ? settings.delivery.free_above : undefined;
@@ -123,5 +124,3 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
     </div>
   );
 }
-
-import * as React from "react";
