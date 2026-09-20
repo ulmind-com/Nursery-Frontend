@@ -1,16 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { BellRing, Check, Droplets, Heart, Leaf, PawPrint, Ruler, ShieldCheck, ShoppingBag, Sparkles, Star, Sun, Wind } from "lucide-react";
+import { BellRing, Check, ChevronRight, Droplets, Heart, Leaf, PackageOpen, PawPrint, Ruler, ShieldCheck, ShoppingBag, Sparkles, Star, Sun, Wind, X } from "lucide-react";
 import { toast } from "sonner";
-import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi } from "@/api/services";
+import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi, reviewsApi } from "@/api/services";
 import { PageSkeleton, ErrorState } from "@/components/shared/page-state";
 import { Button } from "@/components/ui/button";
 import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
+import { findPreviewItem } from "@/components/category/preview-products";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
-import type { Product } from "@/types/api";
+import type { Product, ProductSize, Review } from "@/types/api";
 
 export const Route = createFileRoute("/product/$id")({
   head: ({ params }) => ({
@@ -31,26 +32,97 @@ const toList = (value: string | string[] | undefined): string[] =>
 
 function ProductPage() {
   const { id } = Route.useParams();
-  const q = useQuery({ queryKey: queryKeys.product(id), queryFn: () => productsApi.get(id) });
-  const similar = useQuery({ queryKey: ["recommendations", "similar", id], queryFn: () => recommendationApi.similar(id) });
-  const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
-  const [selected, setSelected] = useState(0);
-  const [activeImage, setActiveImage] = useState(0);
-  const { addItem } = useCart();
+  const preview = findPreviewItem(id);
+  const q = useQuery({ queryKey: queryKeys.product(id), queryFn: () => productsApi.get(id), enabled: !preview });
 
+  if (preview) return <PreviewProductPage preview={preview} />;
   if (q.isLoading) return <PageSkeleton />;
   if (q.isError || !q.data) return <ErrorState retry={() => void q.refetch()} />;
+  return <LiveProductPage product={q.data} />;
+}
 
-  const p: Product = q.data;
-  const v = p.sizes?.[selected];
+function Gallery({ images, title, activeImage, onChange }: { images: string[]; title: string; activeImage: number; onChange: (index: number) => void }) {
+  const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
+  const hasThumbnails = images.length > 1;
+  return (
+    <div className={`grid min-w-0 gap-3 ${hasThumbnails ? "lg:grid-cols-[78px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+      {hasThumbnails && (
+        <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
+          {images.map((src, index) => (
+            <button key={`${src}-${index}`} type="button" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-lg border-2 bg-card transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-transparent hover:border-border"}`}>
+              <img src={src} alt="" className="size-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="order-1 aspect-[1.04/1] overflow-hidden rounded-2xl bg-primary-tint lg:order-2">
+        {hero ? <img src={hero} alt={title} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
+      </div>
+    </div>
+  );
+}
+
+function Breadcrumbs({ title, category }: { title: string; category?: string }) {
+  return (
+    <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
+      <Link to="/" className="hover:text-primary">Home</Link><ChevronRight className="size-3.5" />
+      <Link to="/plants" search={{}} className="hover:text-primary">{category || "Products"}</Link><ChevronRight className="size-3.5" />
+      <span className="truncate text-foreground">{title}</span>
+    </nav>
+  );
+}
+
+function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeof findPreviewItem>> }) {
+  const [activeImage, setActiveImage] = useState(0);
+  return (
+    <div className="bg-storefront-wash pb-24 lg:pb-16">
+      <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
+        <Breadcrumbs title={preview.title} category={preview.category} />
+        <div className="grid gap-8 lg:grid-cols-[1.18fr_.92fr] lg:gap-14">
+          <Gallery images={[preview.image]} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+          <section className="lg:pt-1">
+            <p className="inline-flex rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary-soft-foreground">Design preview</p>
+            <h1 className="mt-4 text-3xl leading-tight text-forest sm:text-5xl">{preview.title}</h1>
+            <p className="mt-3 text-base text-foreground/80">A premium nursery product preview.</p>
+            <div className="mt-8 flex items-baseline gap-3">
+              <span className="price-num text-2xl text-forest">{money(preview.price)}</span>
+              <span className="price-num text-sm text-muted-foreground line-through">{money(preview.mrp)}</span>
+            </div>
+            <div className="mt-8 rounded-xl border border-border bg-background p-5">
+              <p className="font-display text-lg font-bold text-forest">Preview product</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Add this product in the admin panel to enable live variants, inventory, pricing and checkout.</p>
+            </div>
+            <Button className="mt-6 h-12 w-full rounded-lg bg-forest text-forest-foreground hover:bg-forest/90" onClick={() => toast.info("Add this product in the admin panel to enable shopping.")}><ShoppingBag />Preview only</Button>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LiveProductPage({ product: p }: { product: Product }) {
+  const similar = useQuery({ queryKey: ["recommendations", "similar", p.id], queryFn: () => recommendationApi.similar(p.id) });
+  const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
+  const reviews = useQuery({ queryKey: ["reviews", p.id], queryFn: () => reviewsApi.list({ product_id: p.id, limit: 6 }) });
+  const [selected, setSelected] = useState(() => Math.max(0, p.sizes?.findIndex((size) => size.stock > 0) ?? 0));
+  const [activeImage, setActiveImage] = useState(0);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const { addItem } = useCart();
+
+  const variants = p.sizes ?? [];
+  const v = variants[selected] ?? variants[0];
   const price = v?.price ?? p.price ?? 0;
   const mrp = v?.mrp ?? p.mrp;
   const stock = v?.stock ?? p.stock ?? 0;
   const imgs = (v?.images?.length ? v.images : p.images) || [];
-  const hero = imgs[Math.min(activeImage, imgs.length - 1)];
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const spec = p.plant_spec;
   const guarantee = settings.data?.plant_guarantee;
+  const sizeNames = [...new Set(variants.map((item) => item.name).filter(Boolean))];
+  const selectedSize = v?.name ?? sizeNames[0];
+  const planterVariants = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === selectedSize && Boolean(item.pot_type || item.pot_color));
+  const heights = variants.filter((item) => item.height).map((item) => ({ name: item.name, height: item.height }));
+  const reviewItems = reviews.data ? (Array.isArray(reviews.data) ? reviews.data : reviews.data.items) : [];
 
   const specRows = [
     spec?.plant_type ? { icon: Leaf, label: "Plant type", value: String(spec.plant_type) } : null,
@@ -59,204 +131,132 @@ function ProductPage() {
     spec?.difficulty || spec?.difficulty_level ? { icon: Sparkles, label: "Care level", value: String(spec.difficulty ?? spec.difficulty_level) } : null,
     v?.height ? { icon: Ruler, label: "Height", value: String(v.height) } : null,
   ].filter((row): row is { icon: typeof Leaf; label: string; value: string } => row !== null);
-
   const traits = [
     spec?.pet_safe ? { icon: PawPrint, label: "Pet safe" } : null,
     spec?.air_purifying ? { icon: Wind, label: "Air purifying" } : null,
     spec?.flowering ? { icon: Sparkles, label: "Flowering" } : null,
     spec?.medicinal ? { icon: Leaf, label: "Medicinal" } : null,
     spec?.fragrant ? { icon: Sparkles, label: "Fragrant" } : null,
-  ].filter((t): t is { icon: typeof Leaf; label: string } => t !== null);
-
+  ].filter((item): item is { icon: typeof Leaf; label: string } => item !== null);
   const includes = toList(p.includes);
   const care = toList(p.care_instructions);
   const tips = toList(p.care_tips);
 
+  const selectVariant = (index: number) => { setSelected(index); setActiveImage(0); };
+  const selectSize = (name: string) => {
+    const available = variants.findIndex((item) => item.name === name && item.stock > 0);
+    const fallback = variants.findIndex((item) => item.name === name);
+    selectVariant(available >= 0 ? available : fallback);
+  };
   const add = () => {
-    addItem({
-      product_id: p.id,
-      title: p.title,
-      ...(imgs[0] ? { image: imgs[0] } : {}),
-      qty: 1,
-      ...(v?.name ? { size_variant: v.name } : {}),
-      ...(v?.pot_type ? { pot_type: v.pot_type } : {}),
-      unit_price: price,
-      ...(mrp ? { mrp } : {}),
-      stock,
-    });
+    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: 1, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) });
     toast.success(`${p.title} added to cart`);
   };
-
   const notifyMe = async () => {
     try {
       await miscApi.waitlist({ product_id: p.id, ...(v?.name ? { size_variant: v.name } : {}) });
-      toast.success("We'll let you know when this plant is back.");
-    } catch (err) {
-      toast.error(normalizeApiError(err).message);
-    }
+      toast.success("We'll let you know when this item is back.");
+    } catch (err) { toast.error(normalizeApiError(err).message); }
   };
 
   return (
-    <div className="pb-24 lg:pb-0">
-      <div className="mx-auto grid max-w-[1480px] gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[1.1fr_.9fr] lg:px-10 lg:py-12">
-        <div>
-          <div className="aspect-square overflow-hidden rounded-xl bg-primary-tint">
-            {hero ? (
-              <img src={hero} alt={p.title} className="size-full object-cover" />
-            ) : (
-              <span className="flex size-full items-center justify-center text-muted-foreground">Image coming soon</span>
+    <div className="bg-storefront-wash pb-24 lg:pb-0">
+      <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
+        <Breadcrumbs title={p.title} />
+        <div className="grid gap-8 lg:grid-cols-[1.18fr_.92fr] lg:gap-14">
+          <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
+          <section className="min-w-0 lg:pt-1">
+            {Boolean(p.rating) && <p className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/80"><Star className="size-5 fill-primary text-primary" /><span className="font-semibold">{p.rating?.toFixed(1)}</span><span>({p.review_count || 0} reviews)</span></p>}
+            <h1 className="mt-2 text-3xl leading-[1.08] text-forest sm:text-5xl">{p.title}</h1>
+            <p className="mt-3 text-base text-foreground/85 sm:text-lg">{p.short_description || p.description}</p>
+
+            {sizeNames.length > 0 && (
+              <div className="mt-9">
+                <div className="mb-3 flex items-center justify-between gap-4">
+                  <h2 className="text-lg text-foreground">Select Size</h2>
+                  {heights.length > 0 && <button type="button" onClick={() => setSizeGuideOpen(true)} className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</button>}
+                </div>
+                <div className="grid max-w-md grid-cols-2 gap-2.5 sm:grid-cols-3">
+                  {sizeNames.map((name) => {
+                    const indices = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === name);
+                    const unavailable = indices.every(({ item }) => item.stock < 1);
+                    return <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedSize} onClick={() => selectSize(name)} className={`min-h-16 rounded-lg border px-5 py-3 text-sm font-semibold transition-colors duration-200 ${name === selectedSize ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>{name}</button>;
+                  })}
+                </div>
+              </div>
             )}
-          </div>
-          {imgs.length > 1 && (
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
-              {imgs.map((src, i) => (
-                <button
-                  key={src + i}
-                  type="button"
-                  onClick={() => setActiveImage(i)}
-                  aria-label={`View image ${i + 1}`}
-                  className={`size-20 shrink-0 overflow-hidden rounded-lg border-2 transition-colors duration-200 ${i === activeImage ? "border-primary" : "border-transparent"}`}
-                >
-                  <img src={src} alt="" className="size-full object-cover" />
-                </button>
-              ))}
+
+            {planterVariants.length > 0 && (
+              <div className="mt-7">
+                <h2 className="mb-3 text-lg text-foreground">Select Planter</h2>
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                  {planterVariants.map(({ item, index }) => (
+                    <button key={`${item.pot_type}-${item.pot_color}-${index}`} type="button" disabled={item.stock < 1} aria-pressed={index === selected} onClick={() => selectVariant(index)} className={`relative flex min-h-24 flex-col items-center justify-center rounded-md border px-2 py-2 text-center transition-colors duration-200 ${index === selected ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>
+                      <PackageOpen className="mb-1 size-7 stroke-1" />
+                      <span className="line-clamp-1 text-xs font-semibold">{item.pot_type || item.pot_color}</span>
+                      <span className="price-num mt-1 text-xs">{money(item.price)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-7 flex flex-wrap items-baseline gap-3">
+              <span className="price-num text-3xl text-forest">{money(price)}</span>
+              {mrp && mrp > price && <span className="price-num text-base text-muted-foreground line-through">{money(mrp)}</span>}
+              {discount > 0 && <span className="rounded-md bg-sale px-2 py-1 text-xs font-bold text-sale-foreground">{discount}% off</span>}
             </div>
-          )}
+            <p className="mt-1 text-xs text-muted-foreground">Taxes and delivery are calculated by the store at checkout.</p>
+            {v?.sku && <p className="mt-2 text-xs text-muted-foreground">SKU: {v.sku}</p>}
+
+            {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
+
+            <div className="mt-7 hidden grid-cols-[48px_1fr] gap-3 lg:grid">
+              <Button variant="outline" size="lg" className="h-12 px-0" aria-label="Add to wishlist"><Heart /></Button>
+              {stock > 0 ? <Button className="h-12 bg-forest text-forest-foreground hover:bg-forest/90" onClick={add}><ShoppingBag />Add to cart</Button> : <Button className="h-12" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me when available</Button>}
+            </div>
+
+            {guarantee?.enabled && <div className="mt-7 flex items-start gap-3 rounded-xl bg-primary-tint p-4"><ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" /><div><p className="text-sm font-bold text-forest">{guarantee.label}</p>{guarantee.description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{guarantee.description}</p>}</div></div>}
+          </section>
         </div>
 
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{typeof p.brand === "string" ? p.brand : p.brand?.name}</p>
-          <h1 className="mt-2 text-3xl lg:text-4xl">{p.title}</h1>
-          {Boolean(p.rating) && (
-            <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Star className="size-4 fill-star text-star" />
-              <span className="font-semibold text-foreground">{p.rating?.toFixed(1)}</span>
-              <span>· {p.review_count || 0} reviews</span>
-            </p>
-          )}
-          <div className="mt-5 flex flex-wrap items-baseline gap-3">
-            <span className="price-num text-3xl text-forest">{money(price)}</span>
-            {mrp && mrp > price && <span className="price-num text-base font-medium text-muted-foreground line-through">{money(mrp)}</span>}
-            {discount > 0 && <span className="rounded-md bg-sale px-2 py-1 text-xs font-bold text-sale-foreground">{discount}% off</span>}
+        {(specRows.length > 0 || includes.length > 0 || care.length > 0 || tips.length > 0 || (p.description && p.short_description)) && (
+          <div className="mt-12 grid gap-8 border-t border-border pt-10 lg:grid-cols-2">
+            {specRows.length > 0 && <section><h2 className="text-2xl text-forest">Product details</h2><dl className="mt-5 grid grid-cols-2 gap-5">{specRows.map(({ icon: Icon, label, value }) => <div key={label} className="flex items-start gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon className="size-4" /></span><div><dt className="text-[11px] uppercase text-muted-foreground">{label}</dt><dd className="mt-0.5 text-sm font-semibold">{value}</dd></div></div>)}</dl></section>}
+            {includes.length > 0 && <section><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
+            {(care.length > 0 || tips.length > 0) && <section><h2 className="text-2xl text-forest">Care guide</h2><ul className="mt-5 space-y-2.5">{[...care, ...tips].map((item) => <li key={item} className="flex items-start gap-2.5 text-sm leading-6 text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
+            {p.description && p.short_description && <section><h2 className="text-2xl text-forest">About this product</h2><p className="mt-4 text-sm leading-7 text-muted-foreground">{p.description}</p></section>}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Inclusive of taxes. Delivery calculated at checkout.</p>
-
-          {p.sizes?.length ? (
-            <div className="mt-7">
-              <p className="mb-3 text-sm font-bold">Choose a size</p>
-              <div className="flex flex-wrap gap-2">
-                {p.sizes.map((s, i) => (
-                  <button
-                    key={s.name}
-                    type="button"
-                    aria-pressed={i === selected}
-                    onClick={() => { setSelected(i); setActiveImage(0); }}
-                    className={`rounded-lg border px-4 py-2.5 text-xs font-semibold transition-colors duration-200 ${i === selected ? "border-primary bg-primary-soft text-primary-soft-foreground" : "hover:border-primary"} ${s.stock < 1 ? "opacity-50" : ""}`}
-                  >
-                    {s.name}{s.pot_size ? ` · ${s.pot_size}` : ""}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          {traits.length > 0 && (
-            <ul className="mt-6 flex flex-wrap gap-2">
-              {traits.map(({ icon: Icon, label }) => (
-                <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground">
-                  <Icon className="size-3.5" />{label}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <p className="mt-6 text-sm leading-7 text-muted-foreground">{p.short_description || p.description}</p>
-
-          <div className="mt-8 hidden grid-cols-[auto_1fr] gap-3 lg:grid">
-            <Button variant="outline" size="lg" aria-label="Add to wishlist"><Heart /></Button>
-            {stock > 0 ? (
-              <Button size="lg" onClick={add}><ShoppingBag />Add to cart</Button>
-            ) : (
-              <Button size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me when available</Button>
-            )}
-          </div>
-
-          {guarantee?.enabled && (
-            <div className="mt-8 flex items-start gap-3 rounded-xl bg-primary-tint p-4">
-              <ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" />
-              <div>
-                <p className="text-sm font-bold text-forest">{guarantee.label || `${guarantee.days ?? 30}-day plant guarantee`}</p>
-                {guarantee.description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{guarantee.description}</p>}
-              </div>
-            </div>
-          )}
-
-          {specRows.length > 0 && (
-            <div className="mt-10 border-t pt-8">
-              <h2 className="text-xl">Plant details</h2>
-              <dl className="mt-4 grid grid-cols-2 gap-5">
-                {specRows.map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="flex items-start gap-3">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon className="size-4" /></span>
-                    <div>
-                      <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</dt>
-                      <dd className="mt-0.5 text-sm font-semibold">{value}</dd>
-                    </div>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
-
-          {includes.length > 0 && (
-            <div className="mt-10 border-t pt-8">
-              <h2 className="text-xl">What's included</h2>
-              <ul className="mt-4 space-y-2.5">
-                {includes.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />{item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {(care.length > 0 || tips.length > 0) && (
-            <div className="mt-10 border-t pt-8">
-              <h2 className="text-xl">Care guide</h2>
-              <ul className="mt-4 space-y-2.5">
-                {[...care, ...tips].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm leading-6 text-muted-foreground">
-                    <Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {p.description && p.short_description && (
-            <div className="mt-10 border-t pt-8">
-              <h2 className="text-xl">About this plant</h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">{p.description}</p>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {similar.data && similar.data.length > 0 && (
-        <div className="bg-primary-tint">
-          <ProductRail eyebrow="You may also like" title="Similar plants" products={similar.data} />
-        </div>
-      )}
+      {reviewItems.length > 0 && <ReviewsSection reviews={reviewItems} rating={p.rating} count={p.review_count} />}
+      {similar.data && similar.data.length > 0 && <div className="bg-primary-tint"><ProductRail eyebrow="You may also like" title="Similar products" products={similar.data} /></div>}
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>
-        {stock > 0 ? (
-          <Button className="flex-1" size="lg" onClick={add}><ShoppingBag />Add to cart — {money(price)}</Button>
-        ) : (
-          <Button className="flex-1" size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me</Button>
-        )}
+        {stock > 0 ? <Button className="flex-1 bg-forest text-forest-foreground hover:bg-forest/90" size="lg" onClick={add}><ShoppingBag />Add to cart — {money(price)}</Button> : <Button className="flex-1" size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me</Button>}
       </div>
+
+      {sizeGuideOpen && (
+        <div role="dialog" aria-modal="true" aria-labelledby="size-guide-title" className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/35 p-4" onMouseDown={(event) => { if (event.currentTarget === event.target) setSizeGuideOpen(false); }}>
+          <div className="w-full max-w-md rounded-xl bg-background p-6 shadow-xl">
+            <div className="flex items-center justify-between"><h2 id="size-guide-title" className="text-xl text-forest">Size guide</h2><Button variant="ghost" size="icon" onClick={() => setSizeGuideOpen(false)} aria-label="Close size guide"><X /></Button></div>
+            <div className="mt-5 divide-y divide-border">{heights.map((row, index) => <div key={`${row.name}-${index}`} className="flex justify-between gap-4 py-3 text-sm"><span className="font-semibold">{row.name}</span><span className="text-muted-foreground">{row.height}</span></div>)}</div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function ReviewsSection({ reviews, rating, count }: { reviews: Review[]; rating: number | undefined; count: number | undefined }) {
+  return (
+    <section className="border-t border-border bg-background py-12">
+      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
+        <div className="flex items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase text-primary">Customer reviews</p><h2 className="mt-1 text-2xl text-forest">What plant parents say</h2></div>{Boolean(rating) && <p className="price-num text-xl text-forest">{rating?.toFixed(1)} <Star className="inline size-4 fill-star text-star" /> <span className="text-sm font-normal text-muted-foreground">({count || reviews.length})</span></p>}</div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">{reviews.slice(0, 3).map((review) => <article key={review.id} className="rounded-xl border border-border p-5"><p className="flex gap-0.5">{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-3.5 ${index < review.rating ? "fill-star text-star" : "text-border"}`} />)}</p>{review.title && <h3 className="mt-3 text-base">{review.title}</h3>}<p className="mt-2 line-clamp-4 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-4 text-xs font-semibold">{review.user_name || "Verified customer"}</p></article>)}</div>
+      </div>
+    </section>
   );
 }
