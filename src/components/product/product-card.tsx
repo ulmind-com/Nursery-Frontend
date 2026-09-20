@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Droplets, Heart, Leaf, ShoppingBag, Star, Sun } from "lucide-react";
-import { toast } from "sonner";
+import { Droplets, Heart, Leaf, Star, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/cart-context";
 import type { Product, ProductSize } from "@/types/api";
 
 export const money = (value: number) =>
@@ -20,7 +18,6 @@ function carePills(product: Product) {
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart();
   const [hovered, setHovered] = useState(false);
   const variant: ProductSize | undefined = product.sizes?.find((size) => size.stock > 0) || product.sizes?.[0];
   const price = variant?.price ?? product.price ?? 0;
@@ -32,22 +29,6 @@ export function ProductCard({ product }: { product: Product }) {
   const image = hovered && secondary ? secondary : primary;
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const pills = carePills(product);
-
-  const add = () => {
-    if (stock < 1) return;
-    addItem({
-      product_id: product.id,
-      title: product.title,
-      ...(primary ? { image: primary } : {}),
-      qty: 1,
-      ...(variant?.name ? { size_variant: variant.name } : {}),
-      ...(variant?.pot_type ? { pot_type: variant.pot_type } : {}),
-      unit_price: price,
-      ...(mrp ? { mrp } : {}),
-      stock,
-    });
-    toast.success(`${product.title} added to cart`);
-  };
 
   return (
     <article
@@ -107,7 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="price-num text-base text-forest">{money(price)}</span>
           {mrp && mrp > price && <span className="price-num text-xs font-medium text-muted-foreground line-through">{money(mrp)}</span>}
         </div>
-        <Button onClick={add} disabled={stock < 1} className="mt-3 w-full rounded-full bg-forest text-xs text-forest-foreground hover:bg-forest/90"><ShoppingBag />{stock > 0 ? "View Product" : "Out of stock"}</Button>
+        {stock > 0 ? <Button asChild className="mt-3 w-full rounded-full bg-forest text-xs text-forest-foreground hover:bg-forest/90"><Link to="/product/$id" params={{ id: product.id }}>View Product</Link></Button> : <Button disabled className="mt-3 w-full rounded-full text-xs">Out of stock</Button>}
       </div>
     </article>
   );
