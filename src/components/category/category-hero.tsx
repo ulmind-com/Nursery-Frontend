@@ -95,7 +95,7 @@ export function getCategoryHero(value: string, fallbackName?: string): CategoryH
   };
 }
 
-export function CategoryHero({ slug, name, description, image }: { slug: string; name: string; description?: string; image?: string }) {
+export function CategoryHero({ slug, name, description, image }: { slug: string; name: string; description?: string | undefined; image?: string | undefined }) {
   const details = getCategoryHero(slug, name);
 
   return (
