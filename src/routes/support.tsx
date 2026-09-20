@@ -62,10 +62,10 @@ function SupportPage() {
             Support contact details are being updated. Please use the plant assistant in the corner of the screen and our team will follow up.
           </p>
         )}
-        {support?.socials?.length ? (
+        {support?.socials?.some((s) => s.href) ? (
           <div className="mt-8 flex flex-wrap gap-3">
-            {support.socials.map((s) => (
-              <a key={s.href} href={s.href} target="_blank" rel="noreferrer noopener" className="rounded-full border px-4 py-2 text-xs font-semibold transition-colors duration-200 hover:border-primary hover:text-primary">{s.label}</a>
+            {support.socials.filter((s) => s.href).map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noreferrer noopener" className="rounded-full border px-4 py-2 text-xs font-semibold transition-colors duration-200 hover:border-primary hover:text-primary">{s.label}</a>
             ))}
           </div>
         ) : null}
