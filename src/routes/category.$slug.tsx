@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { categoriesApi, queryKeys } from "@/api/services";
 import { CategoryHero, normalizeCategorySlug } from "@/components/category/category-hero";
+import { CategoryRail } from "@/components/category/category-rail";
 import { CataloguePage, type CatalogueFilters } from "@/components/product/catalogue-page";
 
 const titleCase = (value: string) => value.replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -38,12 +39,14 @@ function CategoryPage() {
   return (
     <div className="bg-storefront-wash">
       <CategoryHero slug={slug} name={name} description={category?.description} image={category?.image} />
+      <CategoryRail activeSlug={slug} />
       <CataloguePage
         title={name}
         params={{ category_id: category?.id || slug }}
         filters={filters}
         onFiltersChange={setFilters}
         hideHeader
+        previewCategory={slug}
       />
     </div>
   );

@@ -113,9 +113,6 @@ export function CategoryHero({ slug, name, description, image }: { slug: string;
             <h1 className="font-display text-[1.65rem] leading-[1.04] text-primary-dark sm:text-[2.45rem] lg:text-[3.5rem]">
               {details.title}
             </h1>
-            <p className="mt-3 hidden max-w-[34ch] text-sm leading-6 text-primary-dark/75 sm:block lg:text-base">
-              {description || details.description}
-            </p>
           </div>
         </div>
       </div>

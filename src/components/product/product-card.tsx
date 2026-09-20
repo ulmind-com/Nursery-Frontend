@@ -51,11 +51,11 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      className="surface-card group relative flex min-w-0 flex-col overflow-hidden"
+      className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl bg-card"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Link to="/product/$id" params={{ id: product.id }} className="relative block aspect-[4/5] overflow-hidden bg-primary-tint">
+      <Link to="/product/$id" params={{ id: product.id }} className="relative block aspect-[1.08/1] overflow-hidden bg-primary-tint">
         {image ? (
           <img src={image} alt={product.title} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
@@ -107,14 +107,7 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="price-num text-base text-forest">{money(price)}</span>
           {mrp && mrp > price && <span className="price-num text-xs font-medium text-muted-foreground line-through">{money(mrp)}</span>}
         </div>
-        <Button
-          onClick={add}
-          disabled={stock < 1}
-          className="mt-3 w-full text-xs lg:opacity-0 lg:transition-opacity lg:duration-200 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100"
-        >
-          <ShoppingBag />
-          {stock > 0 ? "Add to cart" : "Out of stock"}
-        </Button>
+        <Button onClick={add} disabled={stock < 1} className="mt-3 w-full rounded-full bg-forest text-xs text-forest-foreground hover:bg-forest/90"><ShoppingBag />{stock > 0 ? "View Product" : "Out of stock"}</Button>
       </div>
     </article>
   );
