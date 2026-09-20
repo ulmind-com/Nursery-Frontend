@@ -19,15 +19,15 @@ import categoryPestControl from "@/assets/category-pest-control.png";
 import categoryDecor from "@/assets/category-decor.png";
 
 const browseShortcuts = [
-  { name: "Plants", q: "plants", image: categoryPlants },
-  { name: "Pots", q: "pots", image: categoryPots },
-  { name: "Soil", q: "soil", image: categorySoil },
-  { name: "Fertilisers", q: "fertiliser", image: categoryFertilisers },
-  { name: "Seeds", q: "seeds", image: categorySeeds },
-  { name: "Garden Tools", q: "garden tools", image: categoryTools },
-  { name: "Watering Solutions", q: "watering", image: categoryWatering },
-  { name: "Pest Control", q: "pest control", image: categoryPestControl },
-  { name: "Gardening Decor", q: "garden decor", image: categoryDecor },
+  { name: "Plants", slug: "plants", image: categoryPlants },
+  { name: "Pots", slug: "pots", image: categoryPots },
+  { name: "Soil", slug: "soil", image: categorySoil },
+  { name: "Fertilisers", slug: "fertilisers", image: categoryFertilisers },
+  { name: "Seeds", slug: "seeds", image: categorySeeds },
+  { name: "Garden Tools", slug: "garden-tools", image: categoryTools },
+  { name: "Watering Solutions", slug: "watering-solutions", image: categoryWatering },
+  { name: "Pest Control", slug: "pest-control", image: categoryPestControl },
+  { name: "Gardening Decor", slug: "gardening-decor", image: categoryDecor },
 ] as const;
 
 export const Route = createFileRoute("/")({
@@ -81,8 +81,8 @@ function HomePage() {
                 <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm">{cat.name}</h2>
               </Link>
             ))}
-            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, q, image }, index) => (
-              <Link key={name} to="/plants" search={{ q }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
+            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }, index) => (
+              <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
                 <div className={`mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-background p-2 transition-colors duration-200 sm:p-2.5 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
                   <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain transition-transform duration-300 group-hover:scale-105" />
                 </div>
