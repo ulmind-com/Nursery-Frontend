@@ -249,7 +249,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
   );
 }
 
-function ReviewsSection({ reviews, rating, count }: { reviews: Review[]; rating?: number; count?: number }) {
+function ReviewsSection({ reviews, rating, count }: { reviews: Review[]; rating: number | undefined; count: number | undefined }) {
   return (
     <section className="border-t border-border bg-background py-12">
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
