@@ -43,7 +43,14 @@ function CheckoutPage() {
   const { isAuthenticated } = useAuth();
   const [quote, setQuote] = useState<OrderQuote | null>(null);
   const [address, setAddress] = useState<Address | null>(null);
-  const [coupon, setCoupon] = useState("");
+  const [coupon, setCoupon] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return window.localStorage.getItem("plant-nursery-coupon") ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [isGift, setIsGift] = useState(false);
   const [giftNote, setGiftNote] = useState("");
   const [payment, setPayment] = useState("cod");
