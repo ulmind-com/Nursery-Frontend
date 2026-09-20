@@ -249,7 +249,7 @@ function ProductPage() {
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
+      <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>
         {stock > 0 ? (
           <Button className="flex-1" size="lg" onClick={add}><ShoppingBag />Add to cart — {money(price)}</Button>
