@@ -1,2 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router"; import { CataloguePage } from "@/components/product/catalogue-page";
-export const Route=createFileRoute("/plants")({validateSearch:(s:Record<string,unknown>)=>({q:typeof s.q==="string"?s.q:undefined}),head:()=>({meta:[{title:"Plants | Plant Nursery"},{name:"description",content:"Explore healthy indoor and outdoor plants for Indian homes."},{property:"og:title",content:"Plants | Plant Nursery"},{property:"og:description",content:"Explore healthy indoor and outdoor plants for Indian homes."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:()=>{const s=Route.useSearch();return <CataloguePage title="Plants" params={{q:s.q}}/>}});
+import { createFileRoute } from "@tanstack/react-router";
+import { CataloguePage } from "@/components/product/catalogue-page";
+
+export const Route = createFileRoute("/plants")({
+  validateSearch: (s: Record<string, unknown>): { q?: string } => (typeof s["q"] === "string" && s["q"] ? { q: s["q"] } : {}),
+  head: () => ({
+    meta: [
+      { title: "Plants | Plant Nursery" },
+      { name: "description", content: "Explore healthy indoor and outdoor plants for Indian homes." },
+      { property: "og:title", content: "Plants | Plant Nursery" },
+      { property: "og:description", content: "Explore healthy indoor and outdoor plants for Indian homes." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: PlantsPage,
+});
+
+function PlantsPage() {
+  const s = Route.useSearch();
+  return <CataloguePage title="Plants" {...(s.q ? { params: { q: s.q } } : {})} />;
+}
