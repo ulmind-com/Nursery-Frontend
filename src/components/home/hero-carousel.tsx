@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/botanical-hero.jpg";
+import heroImage from "@/assets/nursery-banner-reference.jpg";
 import type { Banner } from "@/types/api";
 
 export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopName: string }) {
@@ -11,15 +11,15 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
 
   useEffect(() => {
     if (slides.length < 2) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % slides.length), 6000);
+    const id = setInterval(() => setIndex((i) => (i + 1) % slides.length), 5000);
     return () => clearInterval(id);
   }, [slides.length]);
 
   const active = slides[index % (slides.length || 1)];
 
   return (
-    <section className="relative overflow-hidden bg-primary-tint">
-      <div className="relative min-h-[66vh] sm:min-h-[70vh]">
+    <section className="bg-storefront-wash px-3 pt-3 sm:px-6 sm:pt-4 lg:px-9">
+      <div className="relative mx-auto aspect-[16/7] min-h-[250px] max-w-[1480px] overflow-hidden rounded-xl sm:aspect-[16/5] sm:min-h-[290px]">
         {active ? (
           active.video ? (
             <video key={active.id} src={active.video} poster={active.poster} autoPlay muted loop playsInline className="absolute inset-0 size-full object-cover" />
@@ -27,32 +27,32 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
             <img key={active.id} src={active.image} alt={active.title || shopName} className="absolute inset-0 size-full object-cover" />
           )
         ) : (
-          <img src={heroImage} alt="Sunlit collection of thriving indoor plants" className="absolute inset-0 size-full object-cover" />
+          <img src={heroImage} alt="Sunlit collection of thriving indoor plants" width={1920} height={720} className="absolute inset-0 size-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-forest/85 via-forest/45 to-transparent" />
-        <div className="relative mx-auto flex min-h-[66vh] max-w-[1480px] items-center px-5 py-20 sm:min-h-[70vh] sm:px-6 lg:px-10">
-          <div className="max-w-xl text-forest-foreground">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em]">Grown for Indian homes</p>
-            <h1 className="text-4xl leading-[1.08] sm:text-5xl lg:text-6xl">{active?.title || "Bring home something living."}</h1>
-            <p className="mt-5 max-w-md text-sm leading-7 text-forest-foreground/85 sm:text-base">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/5 to-background/92" />
+        <div className="relative flex h-full items-center justify-end px-5 py-8 sm:px-10 lg:px-16">
+          <div className="w-[54%] max-w-xl text-forest sm:w-[48%]">
+            <p className="mb-2 hidden text-[11px] font-bold uppercase text-primary sm:block">Grown for Indian homes</p>
+            <h1 className="text-2xl leading-[1.08] sm:text-4xl lg:text-5xl">{active?.title || "Bring life to your space"}</h1>
+            <p className="mt-3 line-clamp-2 max-w-md text-xs leading-5 text-foreground/70 sm:text-sm sm:leading-6">
               {active?.subtitle || "Healthy plants, considered planters, and honest care guidance — packed by people who know plants."}
             </p>
             {active?.promo_code && (
-              <p className="mt-5 inline-block rounded-full border border-forest-foreground/30 px-4 py-1.5 text-xs font-bold tracking-wide">
+              <p className="mt-3 inline-block rounded-full border border-primary/30 px-3 py-1 text-[10px] font-bold">
                 Use code {active.promo_code}
               </p>
             )}
-            <div className="mt-8">
+            <div className="mt-4 sm:mt-5">
               {active?.cta_url ? (
-                <Button asChild size="lg"><a href={active.cta_url}>{active.cta_label || "Shop now"} <ArrowRight /></a></Button>
+                <Button asChild size="sm"><a href={active.cta_url}>{active.cta_label || "Shop now"} <ArrowRight /></a></Button>
               ) : (
-                <Button asChild size="lg"><Link to="/plants" search={{}}>Shop plants <ArrowRight /></Link></Button>
+                <Button asChild size="sm"><Link to="/plants" search={{}}>Shop plants <ArrowRight /></Link></Button>
               )}
             </div>
           </div>
         </div>
         {slides.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
@@ -60,7 +60,7 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
                 aria-label={`Show slide ${i + 1}`}
                 aria-current={i === index}
                 onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all duration-200 ${i === index ? "w-7 bg-primary" : "w-3 bg-forest-foreground/50"}`}
+                className={`h-1.5 rounded-full transition-all duration-200 ${i === index ? "w-7 bg-primary" : "w-3 bg-foreground/30"}`}
               />
             ))}
           </div>

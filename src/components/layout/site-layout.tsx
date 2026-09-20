@@ -1,6 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Home, LayoutGrid, Menu, MessageCircle, Search, ShoppingBag, UserRound } from "lucide-react";
+import { Heart, Home, LayoutGrid, Leaf, Menu, MessageCircle, Search, ShoppingBag, UserRound } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { categoriesApi, queryKeys, settingsApi } from "@/api/services";
 import { brand } from "@/config/brand";
@@ -39,6 +39,8 @@ function useRotatingAnnouncement(announcements: string[] | undefined) {
 export function SiteLayout({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (state) => state.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
   const { count } = useCart();
   const { data: settings } = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   const { data: categories = [] } = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list, staleTime: 300_000 });
@@ -53,8 +55,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <span key={announcement} className="rise-in inline-block">{announcement}</span>
         </div>
       )}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1480px] items-center justify-between gap-3 px-4 sm:px-6 lg:h-[76px] lg:px-10">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/98 backdrop-blur-md">
+        <div className="mx-auto grid h-16 max-w-[1480px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:h-[72px] lg:gap-8 lg:px-9">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu"><Menu /></Button>
@@ -76,14 +78,19 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               )}
             </SheetContent>
           </Sheet>
-          <Link to="/" className="font-display text-[1.45rem] font-extrabold text-forest lg:text-2xl">
-            {settings?.shop.name || brand.brandName}
+          <Link to="/" className="flex items-center gap-2 font-display text-lg font-extrabold text-forest sm:text-[1.4rem] lg:min-w-48 lg:text-2xl">
+            <Leaf className="hidden size-7 fill-primary-soft text-primary sm:block" />
+            <span className="truncate">{settings?.shop.name || brand.brandName}</span>
           </Link>
-          <nav className="hidden items-center gap-7 lg:flex">
-            <NavLinks className="text-[13px] font-semibold text-foreground/75 transition-colors duration-200 hover:text-primary" activeClassName="text-primary" />
-          </nav>
+          <form
+            className="relative hidden min-w-0 lg:block"
+            onSubmit={(event) => { event.preventDefault(); const q = search.trim(); if (q) void navigate({ to: "/search", search: { q } }); }}
+          >
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-forest" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search products" placeholder="Search plants, pots and more" className="h-11 w-full rounded-lg bg-search-surface pl-11 pr-4 text-sm outline-none ring-primary transition-shadow duration-200 placeholder:text-muted-foreground focus:ring-1" />
+          </form>
           <div className="flex items-center gap-0.5">
-            <Button variant="ghost" size="icon" asChild><Link to="/search" search={{}} aria-label="Search"><Search /></Link></Button>
+            <Button variant="ghost" size="icon" asChild className="lg:hidden"><Link to="/search" search={{}} aria-label="Search"><Search /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/account" aria-label="Account"><UserRound /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/wishlist" aria-label="Wishlist"><Heart /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="relative">
@@ -94,6 +101,12 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </div>
+        <nav className="mx-auto hidden h-11 max-w-[1480px] items-center justify-center gap-8 overflow-hidden px-9 lg:flex">
+          {categories.slice(0, 7).map((category) => (
+            <Link key={category.id} to="/category/$slug" params={{ slug: category.slug || category.id }} className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary">{category.name}</Link>
+          ))}
+          {categories.length === 0 && <NavLinks className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary" activeClassName="text-primary" />}
+        </nav>
       </header>
       <main className={isCheckout ? "" : "pb-16 lg:pb-0"}>{children}</main>
       {!isCheckout && <Footer settings={settings} />}
