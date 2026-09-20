@@ -105,14 +105,14 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
             <h1 className="mt-3 text-4xl leading-[1.08] text-forest sm:text-5xl lg:text-[3.5rem]">{preview.title}</h1>
             <p className="mt-4 text-lg text-foreground/85 sm:text-xl">{preview.subtitle ?? "Premium nursery product preview"}</p>
 
-            <div className="mt-10">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="text-xl text-forest sm:text-2xl">Select Plant Size</h2>
+            <div className="mt-8">
+              <div className="mb-3 flex items-center justify-between gap-4">
+                <h2 className="text-lg text-forest sm:text-xl">Select Plant Size</h2>
                 <span className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</span>
               </div>
-              <div className="grid max-w-lg grid-cols-2 gap-3">
+              <div className="grid max-w-[286px] grid-cols-2 gap-2.5">
                 {(["Small", "Medium"] as const).map((size) => (
-                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-24 rounded-lg text-lg font-semibold sm:h-32 sm:text-xl ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
+                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-[72px] rounded-lg px-4 text-sm font-semibold sm:text-base ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
                 ))}
               </div>
             </div>
@@ -225,11 +225,11 @@ function LiveProductPage({ product: p }: { product: Product }) {
                   <h2 className="text-lg text-foreground">Select Size</h2>
                   {heights.length > 0 && <button type="button" onClick={() => setSizeGuideOpen(true)} className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</button>}
                 </div>
-                <div className="grid max-w-md grid-cols-2 gap-2.5 sm:grid-cols-3">
+                <div className="grid max-w-[430px] grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {sizeNames.map((name) => {
                     const indices = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === name);
                     const unavailable = indices.every(({ item }) => item.stock < 1);
-                    return <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedSize} onClick={() => selectSize(name)} className={`min-h-16 rounded-lg border px-5 py-3 text-sm font-semibold transition-colors duration-200 ${name === selectedSize ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>{name}</button>;
+                    return <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedSize} onClick={() => selectSize(name)} className={`h-[72px] rounded-lg border px-4 text-sm font-semibold transition-colors duration-200 ${name === selectedSize ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>{name}</button>;
                   })}
                 </div>
               </div>
