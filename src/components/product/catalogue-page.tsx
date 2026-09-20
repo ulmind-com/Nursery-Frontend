@@ -24,6 +24,8 @@ export type CatalogueFilters = {
   sort_by?: string;
 };
 
+type FilterPatch = { [K in keyof CatalogueFilters]?: CatalogueFilters[K] | undefined };
+
 const SORTS: Array<{ label: string; value: string }> = [
   { label: "Recommended", value: "" },
   { label: "Newest", value: "newest" },
@@ -74,7 +76,7 @@ export function CataloguePage({
   const queryParams = { ...params, ...active, limit };
   const query = useQuery({ queryKey: ["products", queryParams], queryFn: () => productsApi.list(queryParams) });
 
-  const set = (patch: CatalogueFilters) => {
+  const set = (patch: FilterPatch) => {
     if (!onFiltersChange) return;
     const next: CatalogueFilters = { ...active, ...patch };
     (Object.keys(next) as Array<keyof CatalogueFilters>).forEach((key) => {
@@ -108,7 +110,7 @@ export function CataloguePage({
                   key={option}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => set({ [group.key]: selected ? undefined : option } as CatalogueFilters)}
+                  onClick={() => set({ [group.key]: selected ? undefined : option } as FilterPatch)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-200 ${selected ? "border-primary bg-primary-soft text-primary-soft-foreground" : "hover:border-primary hover:text-primary"}`}
                 >
                   {option}
@@ -147,7 +149,7 @@ export function CataloguePage({
                 key={String(toggle.key)}
                 type="button"
                 aria-pressed={selected}
-                onClick={() => set({ [toggle.key]: !selected } as CatalogueFilters)}
+                onClick={() => set({ [toggle.key]: !selected } as FilterPatch)}
                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-200 ${selected ? "border-primary bg-primary-soft text-primary-soft-foreground" : "hover:border-primary hover:text-primary"}`}
               >
                 {toggle.label}
@@ -204,7 +206,7 @@ export function CataloguePage({
                 <button
                   key={String(pill.key)}
                   type="button"
-                  onClick={() => set(pill.key === "min_price" || pill.key === "max_price" ? { min_price: undefined, max_price: undefined } : ({ [pill.key]: undefined } as CatalogueFilters))}
+                  onClick={() => set(pill.key === "min_price" || pill.key === "max_price" ? { min_price: undefined, max_price: undefined } : ({ [pill.key]: undefined } as FilterPatch))}
                   className="flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary-soft-foreground"
                 >
                   {pill.label}<X className="size-3" />
