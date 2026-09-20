@@ -35,18 +35,19 @@ function swatchClass(color: string) {
   return "bg-muted-foreground/55";
 }
 
-function readStored(key: string, fallback: string) {
-  if (typeof window === "undefined") return fallback;
-  try { return window.localStorage.getItem(key) ?? fallback; } catch { return fallback; }
-}
-
 function settingText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
 export function PurchaseExtras({ colors = [], selectedColor, onColorChange, price, mrp, quantity, stock, onQuantityChange, onAdd, preview = false, settings }: PurchaseExtrasProps) {
-  const [isGift, setIsGift] = React.useState(() => readStored(GIFT_ORDER_KEY, "false") === "true");
-  const [giftNote, setGiftNote] = React.useState(() => readStored(GIFT_NOTE_KEY, ""));
+  const [isGift, setIsGift] = React.useState(false);
+  const [giftNote, setGiftNote] = React.useState("");
+  React.useEffect(() => {
+    try {
+      setIsGift(window.localStorage.getItem(GIFT_ORDER_KEY) === "true");
+      setGiftNote(window.localStorage.getItem(GIFT_NOTE_KEY) ?? "");
+    } catch { /* storage unavailable */ }
+  }, []);
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const deliveryTitle = settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
   const supportTitle = settingText(settings?.support?.title);

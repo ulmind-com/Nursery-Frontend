@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Gift, ShieldCheck } from "lucide-react";
 import { ordersApi } from "@/api/services";
@@ -52,17 +52,18 @@ function CheckoutPage() {
       return "";
     }
   });
-  const [isGift, setIsGift] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem(GIFT_ORDER_KEY) === "true"; } catch { return false; }
-  });
-  const [giftNote, setGiftNote] = useState(() => {
-    if (typeof window === "undefined") return "";
-    try { return window.localStorage.getItem(GIFT_NOTE_KEY) ?? ""; } catch { return ""; }
-  });
+  const [isGift, setIsGift] = useState(false);
+  const [giftNote, setGiftNote] = useState("");
   const [payment, setPayment] = useState("cod");
   const [busy, setBusy] = useState(false);
   const nav = useNavigate();
+
+  useEffect(() => {
+    try {
+      setIsGift(window.localStorage.getItem(GIFT_ORDER_KEY) === "true");
+      setGiftNote(window.localStorage.getItem(GIFT_NOTE_KEY) ?? "");
+    } catch { /* storage unavailable */ }
+  }, []);
 
   if (!items.length) {
     return (
