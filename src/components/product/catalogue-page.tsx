@@ -63,12 +63,14 @@ export function CataloguePage({
   params = {},
   filters,
   onFiltersChange,
+  hideHeader = false,
 }: {
   title: string;
   description?: string;
   params?: Record<string, string | number | boolean | undefined>;
   filters?: CatalogueFilters;
   onFiltersChange?: (next: CatalogueFilters) => void;
+  hideHeader?: boolean;
 }) {
   const [limit, setLimit] = useState(24);
   const active = filters ?? {};
@@ -162,14 +164,14 @@ export function CataloguePage({
   );
 
   return (
-    <div className="mx-auto max-w-[1480px] px-4 py-10 sm:px-6 lg:px-10">
-      <header className="mb-8">
+    <div className={`mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10 ${hideHeader ? "pb-12 pt-5 lg:pb-16" : "py-10"}`}>
+      {!hideHeader && <header className="mb-8">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">The nursery edit</p>
         <h1 className="mt-2 text-3xl sm:text-4xl">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
           {description || "Thoughtfully selected plants and garden essentials for every kind of home."}
         </p>
-      </header>
+      </header>}
 
       <div className={editable ? "grid gap-8 lg:grid-cols-[250px_1fr]" : ""}>
         {editable && <aside className="hidden h-fit lg:sticky lg:top-28 lg:block">{filterPanel}</aside>}
