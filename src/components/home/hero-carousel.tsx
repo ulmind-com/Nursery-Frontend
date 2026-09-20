@@ -29,11 +29,11 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
         ) : (
           <img src={heroImage} alt="Sunlit collection of thriving indoor plants" width={1920} height={720} className="absolute inset-0 size-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/5 to-background/92" />
-        <div className="relative flex h-full items-center justify-end px-5 py-8 sm:px-10 lg:px-16">
-          <div className="w-[54%] max-w-xl text-forest sm:w-[48%]">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/10 to-background/95" />
+        <div className="relative flex h-full min-w-0 items-center justify-end px-4 py-8 sm:px-10 lg:px-16">
+          <div className="min-w-0 w-[52%] max-w-xl text-forest sm:w-[48%]">
             <p className="mb-2 hidden text-[11px] font-bold uppercase text-primary sm:block">Grown for Indian homes</p>
-            <h1 className="text-2xl leading-[1.08] sm:text-4xl lg:text-5xl">{active?.title || "Bring life to your space"}</h1>
+            <h1 className="text-xl leading-[1.08] sm:text-4xl lg:text-5xl">{active?.title || "Bring life to your space"}</h1>
             <p className="mt-3 line-clamp-2 max-w-md text-xs leading-5 text-foreground/70 sm:text-sm sm:leading-6">
               {active?.subtitle || "Healthy plants, considered planters, and honest care guidance — packed by people who know plants."}
             </p>

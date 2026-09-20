@@ -53,8 +53,8 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="bg-storefront-wash px-3 pb-7 pt-5 sm:px-6 sm:pb-9 lg:px-9">
-          <div className="mx-auto max-w-[1480px] overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <section className="min-w-0 overflow-hidden bg-storefront-wash px-3 pb-7 pt-5 sm:px-6 sm:pb-9 lg:px-9">
+          <div className="mx-auto w-full min-w-0 max-w-[1480px] overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex min-w-max justify-start gap-4 sm:gap-6 lg:w-full lg:justify-between lg:gap-5">
             {(categories.data ?? []).slice(0, 9).map((cat, index) => (
               <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[116px]">
