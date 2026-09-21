@@ -7,6 +7,7 @@ import sampleSnakePlant from "@/assets/sample-snake-plant.jpg";
 import peaceLilyDetailMain from "@/assets/peace-lily-detail-main.jpg";
 import peaceLilyDetailLeaves from "@/assets/peace-lily-detail-leaves.jpg";
 import peaceLilyDetailRoom from "@/assets/peace-lily-detail-room.jpg";
+import myGardenComparisonPlant from "@/assets/mygarden-comparison-plant.jpg";
 import potsTerracotta from "@/assets/sample-pots-terracotta.jpg";
 import potsCeramic from "@/assets/sample-pots-ceramic.jpg";
 import potsWooden from "@/assets/sample-pots-wooden.jpg";
@@ -21,6 +22,7 @@ import heroWatering from "@/assets/category-hero-watering.jpg";
 import heroPest from "@/assets/category-hero-pest-control.jpg";
 import heroDecor from "@/assets/category-hero-decor.jpg";
 import { normalizeCategorySlug } from "./category-hero";
+import type { ProductComparison } from "@/types/api";
 
 export type PreviewItem = {
   id: string;
@@ -40,6 +42,7 @@ export type PreviewItem = {
   reviews?: Array<{ id: string; user_name: string; rating: number; title?: string; comment: string; verified_buyer?: boolean; helpful_count?: number; created_at: string }>;
   reasonsToBuy?: string[];
   reasonsImage?: string;
+  comparison?: ProductComparison;
 };
 
 const plants: PreviewItem[] = [
@@ -82,6 +85,25 @@ const plants: PreviewItem[] = [
       "Pairs beautifully with ceramic and textured planters",
       "A graceful gift-ready plant for everyday homes",
     ],
+    comparison: {
+      title: "MyGarden vs the Rest",
+      brand_label: "MyGarden",
+      local_label: "Local Nurseries",
+      others_label: "Others",
+      image: myGardenComparisonPlant,
+      image_alt: "Healthy palm in an ivory self-watering planter",
+      image_title: "Every plant is packed",
+      image_subtitle: "with care for its journey to your doorstep.",
+      rows: [
+        { label: "Plant quality", local: { status: "negative", detail: "Quality may vary" }, brand: { status: "positive", title: "Healthy & nursery checked", badge: "Care inspected" }, others: { status: "mixed", detail: "May vary" } },
+        { label: "Pest care", local: { status: "negative", detail: "Not always checked" }, brand: { status: "positive", title: "Care checked" }, others: { status: "negative", detail: "May vary" } },
+        { label: "Repotting", local: { status: "mixed", detail: "Depends on seller" }, brand: { status: "positive", title: "Ready in its planter" }, others: { status: "mixed", detail: "May vary" } },
+        { label: "Soil", local: { status: "mixed", detail: "Standard mix" }, brand: { status: "positive", title: "Plant-suited mix" }, others: { status: "mixed", detail: "Standard mix" } },
+        { label: "Growing conditions", local: { status: "mixed", detail: "May vary" }, brand: { status: "positive", title: "Nursery grown" }, others: { status: "mixed", detail: "May vary" } },
+        { label: "After-sale help", local: { status: "negative", detail: "Not always available" }, brand: { status: "positive", title: "Plant-care support" }, others: { status: "negative", detail: "Not always available" } },
+        { label: "Plant range", local: { status: "mixed", detail: "Store dependent" }, brand: { status: "positive", title: "Curated collection" }, others: { status: "mixed", detail: "May vary" } },
+      ],
+    },
   },
   { id: "preview-plants-1", category: "plants", title: "Anthurium Red Plant", image: sampleAnthurium, price: 699, mrp: 800, bestseller: true },
   { id: "preview-plants-2", category: "plants", title: "Jade Mini Plant", image: sampleJade, price: 249, mrp: 300 },

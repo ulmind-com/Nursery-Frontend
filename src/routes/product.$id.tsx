@@ -13,6 +13,7 @@ import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
 import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
 import { ReviewsSection } from "@/components/product/reviews-section";
+import { ComparisonSection } from "@/components/product/comparison-section";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -383,6 +384,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
       </div>
       <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
       <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} />
+      <ComparisonSection comparison={preview.comparison} />
     </div>
   );
 }
@@ -547,6 +549,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
 
       <ReviewsSection productId={p.id} rating={p.rating} count={p.review_count} />
       <ReasonsToBuySection image={reasonsImage} title={p.title} reasons={reasons} />
+      <ComparisonSection comparison={p.comparison} />
       {similar.data && similar.data.length > 0 && <div className="bg-primary-tint"><ProductRail eyebrow="You may also like" title="Similar products" products={similar.data} /></div>}
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
