@@ -309,6 +309,10 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const previewCare = preview.careInstructions ?? [];
   const isPlantPreview = preview.category === "plants";
   const previewNoun = isPlantPreview ? "plant" : "product";
+  const sameCategory = previewItemsFor(preview.category).filter((item) => item.id !== preview.id);
+  const alsoLikeItems = (sameCategory.length >= 3 ? sameCategory : [...sameCategory, ...previewItemsFor("plants").filter((item) => item.id !== preview.id)])
+    .slice(0, 8)
+    .map(alsoLikeFromPreview);
   const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
