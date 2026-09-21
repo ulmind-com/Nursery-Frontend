@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
-import { PurchaseExtras } from "@/components/product/purchase-extras";
+import { PurchaseInfo, PurchaseActions } from "@/components/product/purchase-extras";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -261,6 +261,21 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
+            <PurchaseInfo
+              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
+              selectedColor={selectedColor}
+              onColorChange={setSelectedColor}
+              price={preview.price + planterPrice}
+              mrp={preview.mrp + planterPrice}
+              quantity={quantity}
+              stock={0}
+              onQuantityChange={setQuantity}
+              preview
+              settings={settings.data}
+              sku="PREVIEW-PLANT"
+              sizeLabel={selectedSize}
+            />
+
             <div className="mt-6">
               <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
@@ -277,21 +292,14 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
-            <PurchaseExtras
-              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
-              selectedColor={selectedColor}
-              onColorChange={setSelectedColor}
+            <PurchaseActions
               price={preview.price + planterPrice}
-              mrp={preview.mrp + planterPrice}
               quantity={quantity}
               stock={0}
-              onQuantityChange={setQuantity}
-              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
-              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
               preview
               settings={settings.data}
-              sku="PREVIEW-PLANT"
-              sizeLabel={selectedSize}
+              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
             />
           </section>
         </div>
@@ -407,6 +415,20 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
+            <PurchaseInfo
+              colors={colorNames.map((name) => ({ label: name, available: colorVariants.some(({ item }) => item.pot_color === name && item.stock > 0) }))}
+              selectedColor={v?.pot_color ?? colorNames[0]}
+              onColorChange={selectColor}
+              price={price}
+              mrp={mrp}
+              quantity={quantity}
+              stock={stock}
+              onQuantityChange={setQuantity}
+              settings={settings.data}
+              sku={v?.sku ?? p.sku}
+              sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
+            />
+
             {planterNames.length > 0 && (
               <div className="mt-6">
                 <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
@@ -425,20 +447,13 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
-            <PurchaseExtras
-              colors={colorNames.map((name) => ({ label: name, available: colorVariants.some(({ item }) => item.pot_color === name && item.stock > 0) }))}
-              selectedColor={v?.pot_color ?? colorNames[0]}
-              onColorChange={selectColor}
+            <PurchaseActions
               price={price}
-              mrp={mrp}
               quantity={quantity}
               stock={stock}
-              onQuantityChange={setQuantity}
+              settings={settings.data}
               onAdd={stock > 0 ? add : () => void notifyMe()}
               onBuyNow={stock > 0 ? () => void buyNow() : undefined}
-              settings={settings.data}
-              sku={v?.sku ?? p.sku}
-              sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
             />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
