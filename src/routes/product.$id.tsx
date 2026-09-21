@@ -471,10 +471,12 @@ function LiveProductPage({ product: p }: { product: Product }) {
             )}
 
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
+
+            <div className="mt-6"><ProductFactsGrid facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use" as const, label, value }))} /></div>
           </section>
         </div>
 
-        <FactsAndDescription facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} description={description} />
+        <ProductDescriptionSection description={description} />
 
         {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
