@@ -93,7 +93,7 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
       void queryClient.invalidateQueries({ queryKey: ["reviews", "can-review", productId] });
       void queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
-    onError: (error) => toast.error(normalizeApiError(error)),
+    onError: (error) => toast.error(normalizeApiError(error).message),
   });
 
   const vote = useMutation({
@@ -102,7 +102,7 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
       toast.success("Marked as helpful");
       void queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
     },
-    onError: (error) => toast.error(normalizeApiError(error)),
+    onError: (error) => toast.error(normalizeApiError(error).message),
   });
 
   const submit = () => {
