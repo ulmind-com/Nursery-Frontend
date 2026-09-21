@@ -150,7 +150,7 @@ function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
 function DetailAccordion({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <section className="surface-card rounded-md bg-card">
+    <section className="rounded-md">
       <Button type="button" variant="ghost" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex h-auto w-full justify-between rounded-md px-6 py-6 text-left text-xl font-bold text-foreground hover:bg-card">
         <span>{title}</span>
         <ChevronDown className={`size-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -164,7 +164,7 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   const [zip, setZip] = useState("");
   const [estimated, setEstimated] = useState(false);
   return (
-    <section className="surface-card rounded-md bg-card p-6">
+    <section className="rounded-md p-0">
       <h2 className="text-xl text-foreground">Estimate shipping</h2>
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <label className="text-sm font-semibold text-foreground">Country
@@ -192,7 +192,7 @@ function ProductInfoSection({ description, care, facts, deliveryLabel }: { descr
         {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
         <ShippingEstimator deliveryLabel={deliveryLabel} />
       </div>
-      <div className="surface-card rounded-md bg-card p-6">
+      <div className="rounded-md p-0">
         <ProductFactsGrid facts={facts} />
         {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
       </div>
