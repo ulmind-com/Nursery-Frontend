@@ -1,12 +1,12 @@
-import categoryDecorHero from "@/assets/category-hero-decor.jpg";
-import categoryFertilisersHero from "@/assets/category-hero-fertilisers.jpg";
-import categoryPestControlHero from "@/assets/category-hero-pest-control.jpg";
-import categoryPlantsHero from "@/assets/category-hero-plants.jpg";
-import categoryPotsHero from "@/assets/category-hero-pots.jpg";
-import categorySeedsHero from "@/assets/category-hero-seeds.jpg";
-import categorySoilHero from "@/assets/category-hero-soil.jpg";
-import categoryToolsHero from "@/assets/category-hero-tools.jpg";
-import categoryWateringHero from "@/assets/category-hero-watering.jpg";
+const categoryDecorHero = "/images/category-hero-decor.jpg";
+const categoryFertilisersHero = "/images/category-hero-fertilisers.jpg";
+const categoryPestControlHero = "/images/category-hero-pest-control.jpg";
+const categoryPlantsHero = "/images/category-hero-plants.jpg";
+const categoryPotsHero = "/images/category-hero-pots.jpg";
+const categorySeedsHero = "/images/category-hero-seeds.jpg";
+const categorySoilHero = "/images/category-hero-soil.jpg";
+const categoryToolsHero = "/images/category-hero-tools.jpg";
+const categoryWateringHero = "/images/category-hero-watering.jpg";
 
 type CategoryHeroDetails = {
   image: string;

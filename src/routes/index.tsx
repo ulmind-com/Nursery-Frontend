@@ -8,15 +8,15 @@ import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
-import categoryPlants from "@/assets/category-plants.png";
-import categoryPots from "@/assets/category-pots.png";
-import categorySoil from "@/assets/category-soil.png";
-import categoryFertilisers from "@/assets/category-fertilisers.png";
-import categorySeeds from "@/assets/category-seeds.png";
-import categoryTools from "@/assets/category-tools.png";
-import categoryWatering from "@/assets/category-watering.png";
-import categoryPestControl from "@/assets/category-pest-control.png";
-import categoryDecor from "@/assets/category-decor.png";
+const categoryPlants = "/images/category-plants.png";
+const categoryPots = "/images/category-pots.png";
+const categorySoil = "/images/category-soil.png";
+const categoryFertilisers = "/images/category-fertilisers.png";
+const categorySeeds = "/images/category-seeds.png";
+const categoryTools = "/images/category-tools.png";
+const categoryWatering = "/images/category-watering.png";
+const categoryPestControl = "/images/category-pest-control.png";
+const categoryDecor = "/images/category-decor.png";
 
 const browseShortcuts = [
   { name: "Plants", slug: "plants", image: categoryPlants },

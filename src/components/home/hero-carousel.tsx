@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroImage from "@/assets/home-hero-no-people.jpg";
+const heroImage = "/images/home-hero-no-people.jpg";
 import type { Banner } from "@/types/api";
 
 export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopName: string }) {

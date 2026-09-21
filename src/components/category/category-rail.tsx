@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import categoryDecor from "@/assets/category-decor.png";
-import categoryFertilisers from "@/assets/category-fertilisers.png";
-import categoryPestControl from "@/assets/category-pest-control.png";
-import categoryPlants from "@/assets/category-plants.png";
-import categoryPots from "@/assets/category-pots.png";
-import categorySeeds from "@/assets/category-seeds.png";
-import categorySoil from "@/assets/category-soil.png";
-import categoryTools from "@/assets/category-tools.png";
-import categoryWatering from "@/assets/category-watering.png";
+const categoryDecor = "/images/category-decor.png";
+const categoryFertilisers = "/images/category-fertilisers.png";
+const categoryPestControl = "/images/category-pest-control.png";
+const categoryPlants = "/images/category-plants.png";
+const categoryPots = "/images/category-pots.png";
+const categorySeeds = "/images/category-seeds.png";
+const categorySoil = "/images/category-soil.png";
+const categoryTools = "/images/category-tools.png";
+const categoryWatering = "/images/category-watering.png";
 import { normalizeCategorySlug } from "./category-hero";
 
 export const categoryShortcuts = [
