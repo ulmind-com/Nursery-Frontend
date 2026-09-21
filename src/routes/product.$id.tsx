@@ -434,6 +434,12 @@ function LiveProductPage({ product: p }: { product: Product }) {
               sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
             />
 
+            <PurchaseButtons
+              stock={stock}
+              onAdd={stock > 0 ? add : () => void notifyMe()}
+              onBuyNow={stock > 0 ? () => void buyNow() : undefined}
+            />
+
             {planterNames.length > 0 && (
               <div className="mt-6">
                 <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
@@ -457,8 +463,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
               quantity={quantity}
               stock={stock}
               settings={settings.data}
-              onAdd={stock > 0 ? add : () => void notifyMe()}
-              onBuyNow={stock > 0 ? () => void buyNow() : undefined}
             />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
