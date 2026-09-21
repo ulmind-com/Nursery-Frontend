@@ -49,6 +49,28 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const whatsapp = settings?.support?.whatsapp;
   const isCheckout = path.startsWith("/checkout");
 
+  if (isCheckout) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="border-b border-border bg-background">
+          <div className="mx-auto grid h-[74px] max-w-[1180px] grid-cols-3 items-center px-4 sm:h-[86px] sm:px-6">
+            <span aria-hidden="true" />
+            <Link to="/" className="flex items-center justify-center gap-2 font-display text-xl font-extrabold text-forest sm:text-2xl">
+              <Leaf className="size-7 fill-primary-soft text-primary" />
+              <span>{settings?.shop.name || brand.brandName}</span>
+            </Link>
+            <Button variant="ghost" size="icon" className="relative justify-self-end" onClick={openCart} aria-label={`Cart with ${count} items`}>
+              <ShoppingBag />
+              {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
+            </Button>
+          </div>
+        </header>
+        <main>{children}</main>
+        <CartDrawer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {announcement && (
@@ -107,10 +129,10 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           {categories.length === 0 && <NavLinks className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary" activeClassName="text-primary" />}
         </nav>
       </header>
-      <main className={isCheckout ? "" : "pb-16 lg:pb-0"}>{children}</main>
-      {!isCheckout && <Footer settings={settings} />}
-      {!isCheckout && <MobileTabBar />}
-      {!isCheckout && whatsapp && (
+      <main className="pb-16 lg:pb-0">{children}</main>
+      <Footer settings={settings} />
+      <MobileTabBar />
+      {whatsapp && (
         <a
           href={`https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`}
           target="_blank"

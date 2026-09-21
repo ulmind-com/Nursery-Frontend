@@ -467,7 +467,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
     toast.success(`${quantity} × ${p.title} added to cart`);
   };
   const buyNow = async () => {
-    add();
+    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: quantity, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) }, { openDrawer: false });
     await nav({ to: "/checkout" });
   };
   const notifyMe = async () => {
