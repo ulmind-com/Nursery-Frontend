@@ -324,7 +324,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const previewCartItem = () => ({
     product_id: preview.id,
     title: preview.title,
-    image: gallery[0],
+    ...(gallery[0] ? { image: gallery[0] } : {}),
     qty: quantity,
     size_variant: selectedSize,
     pot_type: `${selectedPlanter} · ${selectedColor}`,
