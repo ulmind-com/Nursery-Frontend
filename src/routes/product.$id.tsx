@@ -242,35 +242,35 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
     <div className="bg-storefront-wash pb-24 lg:pb-16">
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={preview.title} category={preview.category} />
-        <div className="grid gap-7 lg:grid-cols-[1.03fr_1fr] lg:gap-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-7">
+          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
-            <h1 className="mt-3 text-3xl leading-tight text-foreground sm:text-4xl">{preview.title}</h1>
-            <p className="mt-3 text-base text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
+            <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
+            <p className="mt-2 text-sm text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
 
-            <div className="mt-8">
-              <div className="mb-3 flex items-center justify-between gap-4">
-                <h2 className="text-base font-bold text-foreground">Select Plant Size</h2>
-                <span className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</span>
+            <div className="mt-6">
+              <div className="mb-2.5 flex items-center justify-between gap-4">
+                <h2 className="text-sm font-bold text-foreground">Select Plant Size</h2>
+                <span className="text-xs font-semibold text-forest underline underline-offset-4">Size Guide</span>
               </div>
-              <div className="grid max-w-[286px] grid-cols-2 gap-2.5">
+              <div className="grid max-w-[250px] grid-cols-2 gap-2">
                 {(["Small", "Medium"] as const).map((size) => (
-                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-[72px] rounded-lg px-4 text-sm font-semibold sm:text-base ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
+                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-12 rounded-md px-4 text-sm font-semibold ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
                 ))}
               </div>
             </div>
 
-            <div className="mt-9">
-              <h2 className="mb-4 text-base font-bold text-foreground">Select Planter</h2>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="mt-6">
+              <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                 {previewPlanters.map((planter) => {
                   const active = planter.name === selectedPlanter;
                   return (
-                    <Button key={planter.name} type="button" variant="outline" aria-pressed={active} onClick={() => setSelectedPlanter(planter.name)} className={`h-32 min-w-0 flex-col gap-1 rounded-lg px-2 py-3 ${active ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>
+                    <Button key={planter.name} type="button" variant="outline" aria-pressed={active} onClick={() => setSelectedPlanter(planter.name)} className={`h-24 min-w-0 flex-col gap-0.5 rounded-md px-1.5 py-2 ${active ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>
                       <span aria-hidden="true" data-pot-shape={planter.shape} className="preview-pot-icon"><span /></span>
-                      <span className="max-w-full truncate text-sm font-semibold">{planter.name}</span>
-                      <span className="price-num text-sm">{money(planter.prices[selectedSize])}</span>
+                      <span className="max-w-full truncate text-xs font-semibold">{planter.name}</span>
+                      <span className="price-num text-xs">{money(planter.prices[selectedSize])}</span>
                     </Button>
                   );
                 })}
@@ -384,39 +384,39 @@ function LiveProductPage({ product: p }: { product: Product }) {
     <div className="bg-storefront-wash pb-24 lg:pb-0">
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={p.title} />
-        <div className="grid gap-7 lg:grid-cols-[1.03fr_1fr] lg:gap-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-7">
+          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
-            <h1 className="mt-3 text-3xl leading-tight text-foreground sm:text-4xl">{p.title}</h1>
-            <p className="mt-3 text-base text-foreground/85 sm:text-lg">{p.short_description || p.description}</p>
+            <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{p.title}</h1>
+            <p className="mt-2 text-sm text-foreground/85">{p.short_description || p.description}</p>
 
             {sizeNames.length > 0 && (
-              <div className="mt-9">
-                <div className="mb-3 flex items-center justify-between gap-4">
-                  <h2 className="text-base font-bold text-foreground">Select Plant Size</h2>
-                  {heights.length > 0 && <button type="button" onClick={() => setSizeGuideOpen(true)} className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</button>}
+              <div className="mt-6">
+                <div className="mb-2.5 flex items-center justify-between gap-4">
+                  <h2 className="text-sm font-bold text-foreground">Select Plant Size</h2>
+                  {heights.length > 0 && <button type="button" onClick={() => setSizeGuideOpen(true)} className="text-xs font-semibold text-forest underline underline-offset-4">Size Guide</button>}
                 </div>
-                <div className="grid max-w-[430px] grid-cols-2 gap-2.5 sm:grid-cols-3">
+                <div className="grid max-w-[360px] grid-cols-2 gap-2 sm:grid-cols-3">
                   {sizeNames.map((name) => {
                     const indices = variants.map((item, index) => ({ item, index })).filter(({ item }) => item.name === name);
                     const unavailable = indices.every(({ item }) => item.stock < 1);
-                    return <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedSize} onClick={() => selectSize(name)} className={`h-[72px] rounded-lg border px-4 text-sm font-semibold transition-colors duration-200 ${name === selectedSize ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>{name}</button>;
+                    return <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedSize} onClick={() => selectSize(name)} className={`h-12 rounded-md border px-3 text-sm font-semibold transition-colors duration-200 ${name === selectedSize ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>{name}</button>;
                   })}
                 </div>
               </div>
             )}
 
             {planterNames.length > 0 && (
-              <div className="mt-7">
-                <h2 className="mb-3 text-base font-bold text-foreground">Select Planter</h2>
+              <div className="mt-6">
+                <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
                 <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                   {planterNames.map((name) => {
                     const options = sizeVariants.filter(({ item }) => item.pot_type === name);
                     const representative = options.find(({ item }) => item.stock > 0)?.item ?? options[0]?.item;
                     const unavailable = options.every(({ item }) => item.stock < 1);
-                    return representative ? <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedPlanter} onClick={() => selectPlanter(name)} className={`relative flex min-h-24 flex-col items-center justify-center rounded-md border px-2 py-2 text-center transition-colors duration-200 ${name === selectedPlanter ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>
-                      <PackageOpen className="mb-1 size-7 stroke-1" />
+                    return representative ? <button key={name} type="button" disabled={unavailable} aria-pressed={name === selectedPlanter} onClick={() => selectPlanter(name)} className={`relative flex min-h-20 flex-col items-center justify-center rounded-md border px-1.5 py-1.5 text-center transition-colors duration-200 ${name === selectedPlanter ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background hover:border-primary"} disabled:cursor-not-allowed disabled:opacity-45`}>
+                      <PackageOpen className="mb-0.5 size-5 stroke-1" />
                       <span className="line-clamp-1 text-xs font-semibold">{name}</span>
                       <span className="price-num mt-1 text-xs">{money(representative.price)}</span>
                     </button> : null;
