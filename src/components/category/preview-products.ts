@@ -37,6 +37,7 @@ export type PreviewItem = {
   description?: string;
   careInstructions?: string[];
   facts?: Array<{ label: string; value: string; icon: "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun" }>;
+  reviews?: Array<{ id: string; user_name: string; rating: number; title?: string; comment: string; verified_buyer?: boolean; helpful_count?: number; created_at: string }>;
 };
 
 const plants: PreviewItem[] = [
@@ -63,6 +64,13 @@ const plants: PreviewItem[] = [
       { icon: "pot", value: "Yes", label: "With Pots" },
       { icon: "sun", value: "Outdoor Shade, Outdoor Sun", label: "Sunlight Requirement" },
       { icon: "use", value: "Hedge, Low Maintenance, Medicinal, Outdoor", label: "Use" },
+    ],
+    reviews: [
+      { id: "preview-review-1", user_name: "Arya .", rating: 5, title: "The plant looks healthy and good condition", comment: "The plant looks healthy and good condition. Packaging was neat and it reached without a single broken leaf.", verified_buyer: true, helpful_count: 12, created_at: "2026-09-12T10:00:00Z" },
+      { id: "preview-review-2", user_name: "Rhea S.", rating: 5, title: "Beautiful blooms", comment: "Started flowering within three weeks on my balcony. Very happy with the size I received.", verified_buyer: true, helpful_count: 7, created_at: "2026-08-30T10:00:00Z" },
+      { id: "preview-review-3", user_name: "Imran K.", rating: 4, title: "Good plant, slow start", comment: "Took a little time to settle after repotting but it is growing well now. Care card was helpful.", verified_buyer: true, helpful_count: 3, created_at: "2026-08-14T10:00:00Z" },
+      { id: "preview-review-4", user_name: "Meera D.", rating: 5, comment: "Lovely fragrance in the evening. Delivery was quick and the pot option looks premium.", verified_buyer: true, created_at: "2026-07-28T10:00:00Z" },
+      { id: "preview-review-5", user_name: "Sourav B.", rating: 2, title: "Leaves were damaged", comment: "A few leaves arrived yellowed, but support responded quickly and guided me on recovery.", helpful_count: 1, created_at: "2026-07-02T10:00:00Z" },
     ],
   },
   { id: "preview-plants-1", category: "plants", title: "Anthurium Red Plant", image: sampleAnthurium, price: 699, mrp: 800, bestseller: true },
