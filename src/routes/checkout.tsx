@@ -189,7 +189,6 @@ function CheckoutPage() {
         name: settings?.shop.name || "MyGarden",
         description: `Order ${order.order_number || order.id}`,
         prefill: { name: address.name, ...(user?.email ? { email: user.email } : {}), contact: address.phone },
-        theme: { color: "#16a34a" },
         modal: { confirm_close: true, ondismiss: () => setBusy(false) },
         handler: (response) => void verifyPayment(order.id, response),
       }, (message) => { setBusy(false); toast.error(message); });
@@ -208,10 +207,10 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-[calc(100vh-74px)] bg-background sm:min-h-[calc(100vh-86px)]">
-      <button type="button" onClick={() => setSummaryOpen((value) => !value)} className="flex w-full items-center justify-between border-b border-border bg-storefront-wash px-4 py-4 text-sm font-semibold lg:hidden" aria-expanded={summaryOpen}>
+      <Button type="button" variant="ghost" onClick={() => setSummaryOpen((value) => !value)} className="flex h-auto w-full items-center justify-between rounded-none border-b border-border bg-storefront-wash px-4 py-4 text-sm font-semibold lg:hidden" aria-expanded={summaryOpen}>
         <span className="flex items-center gap-2 text-forest">Order summary <ChevronDown className={`size-4 transition-transform ${summaryOpen ? "rotate-180" : ""}`} /></span>
         <span className="price-num">{quote ? inr(quote.total) : "Total after address"}</span>
-      </button>
+      </Button>
       <div className="mx-auto grid max-w-[1180px] lg:grid-cols-[minmax(0,1.08fr)_minmax(390px,.92fr)]">
         <main className="px-4 py-8 sm:px-8 sm:py-10 lg:px-14 lg:py-12">
           <form id="checkout-form" onSubmit={submitDelivery} className="mx-auto max-w-[590px] space-y-9">
