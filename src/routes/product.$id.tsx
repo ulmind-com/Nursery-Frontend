@@ -253,7 +253,10 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={preview.title} category={preview.category} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
-          <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+          <div className="min-w-0">
+            <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} />
+          </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
