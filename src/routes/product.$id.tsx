@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
-import { PurchaseInfo, PurchaseActions } from "@/components/product/purchase-extras";
+import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -276,6 +276,13 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               sizeLabel={selectedSize}
             />
 
+            <PurchaseButtons
+              stock={0}
+              preview
+              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
+            />
+
             <div className="mt-6">
               <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
@@ -298,8 +305,6 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               stock={0}
               preview
               settings={settings.data}
-              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
-              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
             />
           </section>
         </div>
@@ -429,6 +434,12 @@ function LiveProductPage({ product: p }: { product: Product }) {
               sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
             />
 
+            <PurchaseButtons
+              stock={stock}
+              onAdd={stock > 0 ? add : () => void notifyMe()}
+              onBuyNow={stock > 0 ? () => void buyNow() : undefined}
+            />
+
             {planterNames.length > 0 && (
               <div className="mt-6">
                 <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
@@ -452,8 +463,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
               quantity={quantity}
               stock={stock}
               settings={settings.data}
-              onAdd={stock > 0 ? add : () => void notifyMe()}
-              onBuyNow={stock > 0 ? () => void buyNow() : undefined}
             />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
