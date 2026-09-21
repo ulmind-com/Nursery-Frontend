@@ -95,7 +95,7 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
   return (
-    <div className={`surface-card grid min-w-0 self-start rounded-md p-4 sm:p-6 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`grid min-w-0 self-start p-0 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
       {hasThumbnails && (
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
@@ -150,7 +150,7 @@ function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
 function DetailAccordion({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <section className="surface-card rounded-md bg-card">
+    <section className="rounded-md">
       <Button type="button" variant="ghost" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex h-auto w-full justify-between rounded-md px-6 py-6 text-left text-xl font-bold text-foreground hover:bg-card">
         <span>{title}</span>
         <ChevronDown className={`size-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -164,7 +164,7 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   const [zip, setZip] = useState("");
   const [estimated, setEstimated] = useState(false);
   return (
-    <section className="surface-card rounded-md bg-card p-6">
+    <section className="rounded-md p-0">
       <h2 className="text-xl text-foreground">Estimate shipping</h2>
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <label className="text-sm font-semibold text-foreground">Country
@@ -192,7 +192,7 @@ function ProductInfoSection({ description, care, facts, deliveryLabel }: { descr
         {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
         <ShippingEstimator deliveryLabel={deliveryLabel} />
       </div>
-      <div className="surface-card rounded-md bg-card p-6">
+      <div className="rounded-md p-0">
         <ProductFactsGrid facts={facts} />
         {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
       </div>
@@ -244,7 +244,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <Breadcrumbs title={preview.title} category={preview.category} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
+          <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
             <p className="mt-2 text-sm text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
@@ -386,7 +386,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
         <Breadcrumbs title={p.title} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
+          <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{p.title}</h1>
             <p className="mt-2 text-sm text-foreground/85">{p.short_description || p.description}</p>
@@ -446,7 +446,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
 
         <ProductInfoSection description={description} care={[...care, ...tips]} facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} deliveryLabel={deliveryLabel} />
 
-        {includes.length > 0 && <section className="mt-8 surface-card rounded-md bg-card p-6"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
+        {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
 
       {reviewItems.length > 0 && <ReviewsSection reviews={reviewItems} rating={p.rating} count={p.review_count} />}
