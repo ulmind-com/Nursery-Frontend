@@ -95,7 +95,7 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
   return (
-    <div className={`surface-card grid min-w-0 gap-4 rounded-md p-4 sm:p-6 ${hasThumbnails ? "lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`surface-card grid min-w-0 self-start rounded-md p-4 sm:p-6 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
       {hasThumbnails && (
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
@@ -136,7 +136,7 @@ function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
             <div key={`${label}-${value}-${index}`} className="flex min-w-0 items-start gap-3">
               <Icon className="mt-0.5 size-11 shrink-0 stroke-[1.5] text-primary" />
               <div className="min-w-0">
-                <p className="break-words text-xl font-bold leading-tight text-foreground/65 sm:text-2xl">{value}</p>
+                <p className={`break-words font-bold leading-tight text-foreground/65 ${value.length > 18 ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"}`}>{value}</p>
                 <p className="mt-1 break-words text-sm text-muted-foreground sm:text-base">{label}</p>
               </div>
             </div>
