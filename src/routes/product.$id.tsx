@@ -183,8 +183,8 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function BelowImageInfo({ description, care, deliveryLabel }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined }) {
-  if (!description && care.length === 0) {
+function BelowImageInfo({ description, care, deliveryLabel, actions }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined; actions?: ReactNode }) {
+  if (!description && care.length === 0 && !actions) {
     return (
       <div className="mt-8 space-y-6">
         <ShippingEstimator deliveryLabel={deliveryLabel} />
@@ -196,6 +196,7 @@ function BelowImageInfo({ description, care, deliveryLabel }: { description?: st
       {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
       {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
       <ShippingEstimator deliveryLabel={deliveryLabel} />
+      {actions}
     </div>
   );
 }
@@ -255,7 +256,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <div className="min-w-0">
             <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} />
+            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={preview.price + planterPrice} quantity={quantity} stock={0} preview settings={settings.data} />} />
           </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
@@ -312,13 +313,6 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
-            <PurchaseActions
-              price={preview.price + planterPrice}
-              quantity={quantity}
-              stock={0}
-              preview
-              settings={settings.data}
-            />
           </section>
         </div>
         <FactsAndDescription facts={previewFacts} description={preview.description} />
@@ -413,7 +407,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <div className="min-w-0">
             <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} />
+            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={price} quantity={quantity} stock={stock} settings={settings.data} />} />
           </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
@@ -474,12 +468,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
-            <PurchaseActions
-              price={price}
-              quantity={quantity}
-              stock={stock}
-              settings={settings.data}
-            />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
         </div>
