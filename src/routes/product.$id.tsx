@@ -411,7 +411,10 @@ function LiveProductPage({ product: p }: { product: Product }) {
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={p.title} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
-          <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
+          <div className="min-w-0">
+            <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
+            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} />
+          </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{p.title}</h1>
