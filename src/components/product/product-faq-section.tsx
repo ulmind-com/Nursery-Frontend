@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import type { ProductFaq } from "@/types/api";
 
-export function ProductFaqSection({ faq, fallbackImage }: { faq?: ProductFaq; fallbackImage?: string }) {
+export function ProductFaqSection({ faq, fallbackImage }: { faq?: ProductFaq | undefined; fallbackImage?: string | undefined }) {
   const items = faq?.items.filter((item) => item.question.trim() && item.answer.trim()) ?? [];
   const image = faq?.image || fallbackImage;
 
