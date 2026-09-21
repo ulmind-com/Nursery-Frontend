@@ -415,6 +415,20 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
+            <PurchaseInfo
+              colors={colorNames.map((name) => ({ label: name, available: colorVariants.some(({ item }) => item.pot_color === name && item.stock > 0) }))}
+              selectedColor={v?.pot_color ?? colorNames[0]}
+              onColorChange={selectColor}
+              price={price}
+              mrp={mrp}
+              quantity={quantity}
+              stock={stock}
+              onQuantityChange={setQuantity}
+              settings={settings.data}
+              sku={v?.sku ?? p.sku}
+              sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
+            />
+
             {planterNames.length > 0 && (
               <div className="mt-6">
                 <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
@@ -433,20 +447,13 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
-            <PurchaseExtras
-              colors={colorNames.map((name) => ({ label: name, available: colorVariants.some(({ item }) => item.pot_color === name && item.stock > 0) }))}
-              selectedColor={v?.pot_color ?? colorNames[0]}
-              onColorChange={selectColor}
+            <PurchaseActions
               price={price}
-              mrp={mrp}
               quantity={quantity}
               stock={stock}
-              onQuantityChange={setQuantity}
+              settings={settings.data}
               onAdd={stock > 0 ? add : () => void notifyMe()}
               onBuyNow={stock > 0 ? () => void buyNow() : undefined}
-              settings={settings.data}
-              sku={v?.sku ?? p.sku}
-              sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
             />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
