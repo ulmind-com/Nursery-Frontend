@@ -276,6 +276,13 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               sizeLabel={selectedSize}
             />
 
+            <PurchaseButtons
+              stock={0}
+              preview
+              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
+            />
+
             <div className="mt-6">
               <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
@@ -298,8 +305,6 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               stock={0}
               preview
               settings={settings.data}
-              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
-              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
             />
           </section>
         </div>
