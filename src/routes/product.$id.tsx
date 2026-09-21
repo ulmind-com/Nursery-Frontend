@@ -128,16 +128,16 @@ function RatingLine({ rating, count, suffix }: { rating?: number | undefined; co
 function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
   if (!facts.length) return null;
   return (
-    <section aria-label="Product facts" className="border-y border-foreground/75 py-5">
-      <div className="grid gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
+    <section aria-label="Product facts" className="border-y border-foreground/75 py-4">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:gap-x-5 lg:grid-cols-3 lg:gap-x-4">
         {facts.map(({ icon, label, value }, index) => {
           const Icon = factIcons[icon];
           return (
-            <div key={`${label}-${value}-${index}`} className="flex min-w-0 items-start gap-3">
-              <Icon className="mt-0.5 size-11 shrink-0 stroke-[1.5] text-primary" />
+            <div key={`${label}-${value}-${index}`} className="flex min-w-0 items-start gap-2.5">
+              <Icon className="mt-0.5 size-8 shrink-0 stroke-[1.5] text-primary" />
               <div className="min-w-0">
-                <p className={`break-words font-bold leading-tight text-foreground/65 ${value.length > 18 ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"}`}>{value}</p>
-                <p className="mt-1 break-words text-sm text-muted-foreground sm:text-base">{label}</p>
+                <p className={`break-words font-bold leading-snug text-foreground/65 ${value.length > 26 ? "text-xs" : "text-sm"}`}>{value}</p>
+                <p className="mt-0.5 break-words text-[11px] leading-snug text-muted-foreground">{label}</p>
               </div>
             </div>
           );
