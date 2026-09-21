@@ -313,9 +313,11 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
+            <div className="mt-6"><ProductFactsGrid facts={previewFacts} /></div>
+
           </section>
         </div>
-        <FactsAndDescription facts={previewFacts} description={preview.description} />
+        <ProductDescriptionSection description={preview.description} />
       </div>
     </div>
   );
