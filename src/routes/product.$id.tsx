@@ -95,7 +95,7 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
   return (
-    <div className={`surface-card grid min-w-0 self-start rounded-md p-4 sm:p-6 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`grid min-w-0 self-start p-0 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
       {hasThumbnails && (
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
