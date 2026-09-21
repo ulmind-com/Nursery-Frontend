@@ -188,7 +188,7 @@ function CheckoutPage() {
         order_id: order.razorpay_order_id,
         name: settings?.shop.name || "MyGarden",
         description: `Order ${order.order_number || order.id}`,
-        prefill: { name: address.name, email: user?.email, contact: address.phone },
+        prefill: { name: address.name, ...(user?.email ? { email: user.email } : {}), contact: address.phone },
         theme: { color: "#16a34a" },
         modal: { confirm_close: true, ondismiss: () => setBusy(false) },
         handler: (response) => void verifyPayment(order.id, response),
@@ -297,7 +297,7 @@ function CheckoutPage() {
               <div className="flex items-end justify-between border-t border-border pt-4"><span className="text-lg font-bold">Total</span><div className="text-right"><span className="mr-2 text-xs text-muted-foreground">INR</span><span className="price-num text-2xl">{quote ? inr(quote.total) : "—"}</span></div></div>
             </div>
 
-            <TrustList guarantee={settings?.plant_guarantee} deliveryConfigured={Boolean(settings?.delivery)} supportConfigured={Boolean(settings?.support?.title || settings?.support?.note || settings?.support?.phone)} />
+            <TrustList guarantee={settings?.plant_guarantee} deliveryConfigured={Boolean(settings?.delivery)} supportConfigured={Boolean(settings?.support?.title || settings?.support?.note || settings?.support?.["phone"])} />
             <p className="mt-7 flex items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-3.5 text-primary" />Payments are secured by Razorpay</p>
           </div>
         </aside>
