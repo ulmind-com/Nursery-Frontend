@@ -261,6 +261,21 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
+            <PurchaseInfo
+              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
+              selectedColor={selectedColor}
+              onColorChange={setSelectedColor}
+              price={preview.price + planterPrice}
+              mrp={preview.mrp + planterPrice}
+              quantity={quantity}
+              stock={0}
+              onQuantityChange={setQuantity}
+              preview
+              settings={settings.data}
+              sku="PREVIEW-PLANT"
+              sizeLabel={selectedSize}
+            />
+
             <div className="mt-6">
               <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
@@ -277,21 +292,14 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
-            <PurchaseExtras
-              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
-              selectedColor={selectedColor}
-              onColorChange={setSelectedColor}
+            <PurchaseActions
               price={preview.price + planterPrice}
-              mrp={preview.mrp + planterPrice}
               quantity={quantity}
               stock={0}
-              onQuantityChange={setQuantity}
-              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
-              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
               preview
               settings={settings.data}
-              sku="PREVIEW-PLANT"
-              sizeLabel={selectedSize}
+              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
             />
           </section>
         </div>
