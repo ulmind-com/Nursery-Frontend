@@ -407,7 +407,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <div className="min-w-0">
             <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} />
+            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={price} quantity={quantity} stock={stock} settings={settings.data} />} />
           </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
