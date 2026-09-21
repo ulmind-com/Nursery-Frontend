@@ -286,6 +286,8 @@ function Breadcrumbs({ title, category }: { title: string; category?: string }) 
 }
 
 function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeof findPreviewItem>> }) {
+  const nav = useNavigate();
+  const { addItem } = useCart();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<"Small" | "Medium">("Small");
   const [selectedPlanter, setSelectedPlanter] = useState("Yoda");
@@ -318,6 +320,26 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
     setActiveImage(size === "Medium" && gallery.length > 1 ? gallery.length - 1 : 0);
+  };
+  const previewCartItem = () => ({
+    product_id: preview.id,
+    title: preview.title,
+    ...(gallery[0] ? { image: gallery[0] } : {}),
+    qty: quantity,
+    size_variant: selectedSize,
+    pot_type: `${selectedPlanter} · ${selectedColor}`,
+    unit_price: preview.price + planterPrice,
+    mrp: preview.mrp + planterPrice,
+    stock: 99,
+    sku: `PREVIEW-${preview.id}`,
+  });
+  const addPreviewToCart = () => {
+    addItem(previewCartItem());
+    toast.success(`${quantity} × ${preview.title} added to cart`);
+  };
+  const buyPreviewNow = async () => {
+    addItem(previewCartItem(), { openDrawer: false });
+    await nav({ to: "/checkout" });
   };
   return (
     <div className="bg-storefront-wash pb-24 lg:pb-16">
@@ -352,19 +374,17 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               price={preview.price + planterPrice}
               mrp={preview.mrp + planterPrice}
               quantity={quantity}
-              stock={0}
+              stock={99}
               onQuantityChange={setQuantity}
-              preview
               settings={settings.data}
               sku="PREVIEW-PLANT"
               sizeLabel={selectedSize}
             />
 
             <PurchaseButtons
-              stock={0}
-              preview
-              onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
-              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
+              stock={99}
+              onAdd={addPreviewToCart}
+              onBuyNow={() => void buyPreviewNow()}
             />
 
             <div className="mt-6">
