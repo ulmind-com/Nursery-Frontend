@@ -244,7 +244,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <Breadcrumbs title={preview.title} category={preview.category} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
+          <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
             <p className="mt-2 text-sm text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
@@ -386,7 +386,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
         <Breadcrumbs title={p.title} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-6">
+          <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{p.title}</h1>
             <p className="mt-2 text-sm text-foreground/85">{p.short_description || p.description}</p>
@@ -446,7 +446,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
 
         <ProductInfoSection description={description} care={[...care, ...tips]} facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} deliveryLabel={deliveryLabel} />
 
-        {includes.length > 0 && <section className="mt-8 surface-card rounded-md bg-card p-6"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
+        {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
 
       {reviewItems.length > 0 && <ReviewsSection reviews={reviewItems} rating={p.rating} count={p.review_count} />}
