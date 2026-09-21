@@ -385,7 +385,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <ProductDescriptionSection description={preview.description} />
       </div>
       <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
-      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} />
+      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} noun={previewNoun} />
       <ComparisonSection comparison={preview.comparison} />
     </div>
   );
