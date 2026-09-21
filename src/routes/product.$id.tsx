@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { BellRing, ChevronDown, ChevronRight, Droplets, Flower2, Heart, Leaf, PackageOpen, Palette, PawPrint, Ruler, ScanSearch, ShoppingBag, Sparkles, Sprout, Star, Sun, Wind, X } from "lucide-react";
 import { toast } from "sonner";
 import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi, reviewsApi } from "@/api/services";
@@ -65,17 +65,17 @@ const fact = (icon: FactIcon, value: unknown, label: string): ProductFact | null
 
 function productFacts(product: Product, variant: ProductSize | undefined, selectedSize: string | undefined, selectedPlanter: string | undefined): ProductFact[] {
   const spec = product.plant_spec;
-  const primaryUse = textFromUnknown(spec?.use) ?? textFromUnknown(spec?.usage) ?? textFromUnknown(spec?.plant_type);
+  const primaryUse = textFromUnknown(spec?.["use"]) ?? textFromUnknown(spec?.["usage"]) ?? textFromUnknown(spec?.plant_type);
   const tagUse = product.tags && product.tags.length ? product.tags.join(", ") : undefined;
   return [
-    fact("water", spec?.water_requirement ?? spec?.watering ?? spec?.water_schedule, "Water Requirement"),
-    fact("flower", spec?.flower_color ?? spec?.flower_colour, "Flower Color"),
-    fact("fragrance", spec?.fragrance ?? (spec?.fragrant ? "Fragrant" : undefined), "Fragrance"),
+    fact("water", spec?.["water_requirement"] ?? spec?.watering ?? spec?.water_schedule, "Water Requirement"),
+    fact("flower", spec?.["flower_color"] ?? spec?.["flower_colour"], "Flower Color"),
+    fact("fragrance", spec?.["fragrance"] ?? (spec?.fragrant ? "Fragrant" : undefined), "Fragrance"),
     fact("use", primaryUse, "Use"),
-    fact("size", variant?.height ?? selectedSize ?? spec?.size, "Size"),
-    fact("genus", spec?.genus ?? spec?.scientific_name ?? spec?.botanical_name, "Genus"),
+    fact("size", variant?.height ?? selectedSize ?? spec?.["size"], "Size"),
+    fact("genus", spec?.["genus"] ?? spec?.["scientific_name"] ?? spec?.["botanical_name"], "Genus"),
     fact("pot", selectedPlanter ? "Yes" : undefined, "With Pots"),
-    fact("sun", spec?.sunlight ?? spec?.sunlight_requirement, "Sunlight Requirement"),
+    fact("sun", spec?.sunlight ?? spec?.["sunlight_requirement"], "Sunlight Requirement"),
     tagUse && tagUse !== primaryUse ? fact("use", tagUse, "Use") : null,
   ].filter((item): item is ProductFact => item !== null).slice(0, 9);
 }
@@ -113,7 +113,7 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   );
 }
 
-function RatingLine({ rating, count, suffix }: { rating?: number; count?: number; suffix?: string }) {
+function RatingLine({ rating, count, suffix }: { rating?: number | undefined; count?: number | undefined; suffix?: string | undefined }) {
   if (!rating && !count && !suffix) return null;
   return (
     <p className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/80">
@@ -147,7 +147,7 @@ function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
   );
 }
 
-function DetailAccordion({ title, children }: { title: string; children: React.ReactNode }) {
+function DetailAccordion({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <section className="surface-card rounded-md bg-card">
@@ -160,7 +160,7 @@ function DetailAccordion({ title, children }: { title: string; children: React.R
   );
 }
 
-function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string }) {
+function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefined }) {
   const [zip, setZip] = useState("");
   const [estimated, setEstimated] = useState(false);
   return (
@@ -183,7 +183,7 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string }) {
   );
 }
 
-function ProductInfoSection({ description, care, facts, deliveryLabel }: { description?: string; care: string[]; facts: ProductFact[]; deliveryLabel?: string }) {
+function ProductInfoSection({ description, care, facts, deliveryLabel }: { description?: string | undefined; care: string[]; facts: ProductFact[]; deliveryLabel?: string | undefined }) {
   if (!description && care.length === 0 && facts.length === 0) return null;
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[.95fr_1fr]">
