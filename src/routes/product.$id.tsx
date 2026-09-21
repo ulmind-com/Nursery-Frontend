@@ -319,6 +319,9 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         </div>
         <ProductDescriptionSection description={preview.description} />
       </div>
+      <ReviewsSection productId={preview.id} preview fallbackReviews={previewReviews(preview)} rating={preview.rating} count={preview.reviewCount} />
+      <div className="hidden">
+      </div>
     </div>
   );
 }
@@ -349,7 +352,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const colorVariants = sizeVariants.filter(({ item }) => selectedPlanter ? item.pot_type === selectedPlanter : true);
   const colorNames = [...new Set(colorVariants.map(({ item }) => item.pot_color).filter((name): name is string => Boolean(name)))];
   const heights = variants.filter((item) => item.height).map((item) => ({ name: item.name, height: item.height }));
-  const reviewItems = reviews.data ? (Array.isArray(reviews.data) ? reviews.data : reviews.data.items) : [];
 
   const specRows = [
     spec?.plant_type ? { icon: Leaf, label: "Plant type", value: String(spec.plant_type) } : null,
@@ -481,7 +483,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
         {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
 
-      {reviewItems.length > 0 && <ReviewsSection reviews={reviewItems} rating={p.rating} count={p.review_count} />}
+      <ReviewsSection productId={p.id} rating={p.rating} count={p.review_count} />
       {similar.data && similar.data.length > 0 && <div className="bg-primary-tint"><ProductRail eyebrow="You may also like" title="Similar products" products={similar.data} /></div>}
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
@@ -498,16 +500,5 @@ function LiveProductPage({ product: p }: { product: Product }) {
         </div>
       )}
     </div>
-  );
-}
-
-function ReviewsSection({ reviews, rating, count }: { reviews: Review[]; rating: number | undefined; count: number | undefined }) {
-  return (
-    <section className="border-t border-border bg-background py-12">
-      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
-        <div className="flex items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase text-primary">Customer reviews</p><h2 className="mt-1 text-2xl text-forest">What plant parents say</h2></div>{Boolean(rating) && <p className="price-num text-xl text-forest">{rating?.toFixed(1)} <Star className="inline size-4 fill-star text-star" /> <span className="text-sm font-normal text-muted-foreground">({count || reviews.length})</span></p>}</div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">{reviews.slice(0, 3).map((review) => <article key={review.id} className="rounded-xl border border-border p-5"><p className="flex gap-0.5">{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-3.5 ${index < review.rating ? "fill-star text-star" : "text-border"}`} />)}</p>{review.title && <h3 className="mt-3 text-base">{review.title}</h3>}<p className="mt-2 line-clamp-4 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-4 text-xs font-semibold">{review.user_name || "Verified customer"}</p></article>)}</div>
-      </div>
-    </section>
   );
 }
