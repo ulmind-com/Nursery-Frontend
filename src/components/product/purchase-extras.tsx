@@ -12,23 +12,6 @@ export const GIFT_NOTE_KEY = "plant-nursery-gift-note";
 
 type ColorOption = { label: string; available: boolean };
 
-type PurchaseExtrasProps = {
-  colors?: ColorOption[];
-  selectedColor?: string | undefined;
-  onColorChange?: (color: string) => void;
-  price: number;
-  mrp?: number | null | undefined;
-  quantity: number;
-  stock: number;
-  onQuantityChange: (quantity: number) => void;
-  onAdd: () => void;
-  onBuyNow?: (() => void) | undefined;
-  preview?: boolean;
-  settings?: Settings | undefined;
-  sku?: string | null | undefined;
-  sizeLabel?: string | undefined;
-};
-
 function swatchClass(color: string) {
   const value = color.toLowerCase();
   if (value.includes("ivory") || value.includes("cream") || value.includes("white")) return "bg-primary-tint";
@@ -42,7 +25,22 @@ function settingText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
-export function PurchaseExtras({ colors = [], selectedColor, onColorChange, price, mrp, quantity, stock, onQuantityChange, onAdd, onBuyNow, preview = false, settings, sku, sizeLabel }: PurchaseExtrasProps) {
+type InfoProps = {
+  colors?: ColorOption[];
+  selectedColor?: string | undefined;
+  onColorChange?: (color: string) => void;
+  price: number;
+  mrp?: number | null | undefined;
+  quantity: number;
+  stock: number;
+  onQuantityChange: (quantity: number) => void;
+  preview?: boolean;
+  settings?: Settings | undefined;
+  sku?: string | null | undefined;
+  sizeLabel?: string | undefined;
+};
+
+export function PurchaseInfo({ colors = [], selectedColor, onColorChange, price, mrp, quantity, stock, onQuantityChange, preview = false, settings, sku, sizeLabel }: InfoProps) {
   const [isGift, setIsGift] = React.useState(false);
   const [giftNote, setGiftNote] = React.useState("");
   React.useEffect(() => {
@@ -53,10 +51,6 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
   }, []);
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const deliveryTitle = settingText(settings?.delivery?.["time"]) ?? settingText(settings?.delivery?.["delivery_time"]) ?? settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
-  const supportTitle = settingText(settings?.support?.title);
-  const supportDetail = settingText(settings?.support?.note) ?? settingText(settings?.support?.hours);
-  const freeAbove = typeof settings?.delivery?.free_above === "number" ? settings.delivery.free_above : undefined;
-  const currency = settings?.currency ?? "₹";
 
   const saveGift = (checked: boolean) => {
     setIsGift(checked);
@@ -116,8 +110,30 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
       </div>
 
       {deliveryTitle && <p className="mt-3.5 text-xs font-bold text-forest">Delivery time: {deliveryTitle}</p>}
+    </div>
+  );
+}
 
-      <div className="mt-3.5 grid gap-2.5 sm:grid-cols-2">
+type ActionsProps = {
+  price: number;
+  quantity: number;
+  stock: number;
+  preview?: boolean;
+  settings?: Settings | undefined;
+  onAdd: () => void;
+  onBuyNow?: (() => void) | undefined;
+};
+
+export function PurchaseActions({ price, quantity, stock, preview = false, settings, onAdd, onBuyNow }: ActionsProps) {
+  const supportTitle = settingText(settings?.support?.title);
+  const supportDetail = settingText(settings?.support?.note) ?? settingText(settings?.support?.hours);
+  const freeAbove = typeof settings?.delivery?.free_above === "number" ? settings.delivery.free_above : undefined;
+  const deliveryTitle = settingText(settings?.delivery?.["time"]) ?? settingText(settings?.delivery?.["delivery_time"]) ?? settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
+  const currency = settings?.currency ?? "₹";
+
+  return (
+    <div className="mt-5">
+      <div className="grid gap-2.5 sm:grid-cols-2">
         <Button type="button" className="h-11 rounded-md bg-star text-xs font-bold text-foreground hover:bg-star/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add to cart" : "Notify me"}</Button>
         <Button type="button" className="h-11 rounded-md bg-forest text-xs font-bold text-forest-foreground hover:bg-forest/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
       </div>
