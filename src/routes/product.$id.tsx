@@ -183,19 +183,29 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function ProductInfoSection({ description, care, facts, deliveryLabel }: { description?: string | undefined; care: string[]; facts: ProductFact[]; deliveryLabel?: string | undefined }) {
-  if (!description && care.length === 0 && facts.length === 0) return null;
-  return (
-    <div className="mt-8 grid gap-8 lg:grid-cols-[.95fr_1fr]">
-      <div className="space-y-6">
-        {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
-        {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+function BelowImageInfo({ description, care, deliveryLabel }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined }) {
+  if (!description && care.length === 0) {
+    return (
+      <div className="mt-8 space-y-6">
         <ShippingEstimator deliveryLabel={deliveryLabel} />
       </div>
-      <div className="rounded-md p-0">
-        <ProductFactsGrid facts={facts} />
-        {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
-      </div>
+    );
+  }
+  return (
+    <div className="mt-8 space-y-6">
+      {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
+      {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+      <ShippingEstimator deliveryLabel={deliveryLabel} />
+    </div>
+  );
+}
+
+function FactsAndDescription({ facts, description }: { facts: ProductFact[]; description?: string | undefined }) {
+  if (facts.length === 0 && !description) return null;
+  return (
+    <div className="mt-8">
+      <ProductFactsGrid facts={facts} />
+      {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
     </div>
   );
 }
