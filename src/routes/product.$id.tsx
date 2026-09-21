@@ -248,7 +248,7 @@ function ProductDescriptionSection({ description }: { description?: string | und
   );
 }
 
-function ReasonsToBuySection({ image, title, reasons }: { image?: string | undefined; title: string; reasons: string[] }) {
+function ReasonsToBuySection({ image, title, reasons, noun = "plant" }: { image?: string | undefined; title: string; reasons: string[]; noun?: string }) {
   if (!image || reasons.length === 0) return null;
   return (
     <section className="bg-forest py-5 sm:py-7 lg:py-9" aria-labelledby="reasons-title">
@@ -258,7 +258,7 @@ function ReasonsToBuySection({ image, title, reasons }: { image?: string | undef
         </div>
         <div className="py-2 lg:py-8">
           <h2 id="reasons-title" className="max-w-lg text-4xl leading-tight text-forest-foreground sm:text-5xl lg:text-6xl">
-            5 Reasons to<br /><em className="font-display italic">buy this plant.</em>
+            {reasons.length} Reasons to<br /><em className="font-display italic">buy this {noun}.</em>
           </h2>
           <ul className="mt-8 space-y-4">
             {reasons.map((reason) => (
