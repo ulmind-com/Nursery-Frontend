@@ -37,6 +37,7 @@ export type PreviewItem = {
   description?: string;
   careInstructions?: string[];
   facts?: Array<{ label: string; value: string; icon: "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun" }>;
+  reviews?: Array<{ id: string; user_name: string; rating: number; title?: string; comment: string; verified_buyer?: boolean; helpful_count?: number; created_at: string }>;
 };
 
 const plants: PreviewItem[] = [
