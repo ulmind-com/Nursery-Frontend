@@ -125,7 +125,7 @@ export function PurchaseButtons({ stock, preview = false, onAdd, onBuyNow }: But
   return (
     <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
       <Button type="button" className="h-11 rounded-md bg-star text-xs font-bold text-foreground hover:bg-star/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview || stock > 0 ? "Add to cart" : "Notify me"}</Button>
-      <Button type="button" className="h-11 rounded-md bg-primary text-xs font-bold text-primary-foreground hover:bg-primary/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
+      <Button type="button" className="h-11 rounded-md bg-forest text-xs font-bold text-forest-foreground hover:bg-forest/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
     </div>
   );
 }
