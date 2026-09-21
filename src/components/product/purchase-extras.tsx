@@ -22,7 +22,7 @@ type PurchaseExtrasProps = {
   stock: number;
   onQuantityChange: (quantity: number) => void;
   onAdd: () => void;
-  onBuyNow?: () => void;
+  onBuyNow?: (() => void) | undefined;
   preview?: boolean;
   settings?: Settings | undefined;
   sku?: string | null | undefined;
