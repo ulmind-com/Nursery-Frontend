@@ -220,7 +220,7 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function BelowImageInfo({ description, care, deliveryLabel, actions }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined; actions?: ReactNode }) {
+function BelowImageInfo({ description, care, careTitle = "Care Instruction", deliveryLabel, actions }: { description?: string | undefined; care: string[]; careTitle?: string; deliveryLabel?: string | undefined; actions?: ReactNode }) {
   if (!description && care.length === 0 && !actions) {
     return (
       <div className="mt-8 space-y-6">
@@ -231,7 +231,7 @@ function BelowImageInfo({ description, care, deliveryLabel, actions }: { descrip
   return (
     <div className="mt-8 space-y-6">
       {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
-      {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+      {care.length > 0 && <DetailAccordion title={careTitle}><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
       <ShippingEstimator deliveryLabel={deliveryLabel} />
       {actions}
     </div>
@@ -248,7 +248,7 @@ function ProductDescriptionSection({ description }: { description?: string | und
   );
 }
 
-function ReasonsToBuySection({ image, title, reasons }: { image?: string | undefined; title: string; reasons: string[] }) {
+function ReasonsToBuySection({ image, title, reasons, noun = "plant" }: { image?: string | undefined; title: string; reasons: string[]; noun?: string }) {
   if (!image || reasons.length === 0) return null;
   return (
     <section className="bg-forest py-5 sm:py-7 lg:py-9" aria-labelledby="reasons-title">
@@ -258,7 +258,7 @@ function ReasonsToBuySection({ image, title, reasons }: { image?: string | undef
         </div>
         <div className="py-2 lg:py-8">
           <h2 id="reasons-title" className="max-w-lg text-4xl leading-tight text-forest-foreground sm:text-5xl lg:text-6xl">
-            5 Reasons to<br /><em className="font-display italic">buy this plant.</em>
+            {reasons.length} Reasons to<br /><em className="font-display italic">buy this {noun}.</em>
           </h2>
           <ul className="mt-8 space-y-4">
             {reasons.map((reason) => (
@@ -307,6 +307,8 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const gallery = preview.gallery?.length ? preview.gallery : [preview.image];
   const previewFacts = preview.facts ?? [];
   const previewCare = preview.careInstructions ?? [];
+  const isPlantPreview = preview.category === "plants";
+  const previewNoun = isPlantPreview ? "plant" : "product";
   const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
@@ -319,7 +321,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <div className="min-w-0">
             <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={preview.price + planterPrice} quantity={quantity} stock={0} preview settings={settings.data} />} />
+            <BelowImageInfo description={preview.description} care={previewCare} careTitle={isPlantPreview ? "Care Instruction" : "Usage & Care"} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={preview.price + planterPrice} quantity={quantity} stock={0} preview settings={settings.data} />} />
           </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
@@ -383,7 +385,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <ProductDescriptionSection description={preview.description} />
       </div>
       <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
-      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} />
+      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} noun={previewNoun} />
       <ComparisonSection comparison={preview.comparison} />
     </div>
   );
