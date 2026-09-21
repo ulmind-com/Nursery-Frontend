@@ -484,7 +484,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
           </section>
         </div>
 
-        <ProductInfoSection description={description} care={[...care, ...tips]} facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} deliveryLabel={deliveryLabel} />
+        <FactsAndDescription facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} description={description} />
 
         {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
