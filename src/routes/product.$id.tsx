@@ -468,12 +468,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
               </div>
             )}
 
-            <PurchaseActions
-              price={price}
-              quantity={quantity}
-              stock={stock}
-              settings={settings.data}
-            />
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
         </div>
