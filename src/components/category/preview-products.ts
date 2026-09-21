@@ -38,6 +38,8 @@ export type PreviewItem = {
   careInstructions?: string[];
   facts?: Array<{ label: string; value: string; icon: "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun" }>;
   reviews?: Array<{ id: string; user_name: string; rating: number; title?: string; comment: string; verified_buyer?: boolean; helpful_count?: number; created_at: string }>;
+  reasonsToBuy?: string[];
+  reasonsImage?: string;
 };
 
 const plants: PreviewItem[] = [
@@ -71,6 +73,14 @@ const plants: PreviewItem[] = [
       { id: "preview-review-3", user_name: "Imran K.", rating: 4, title: "Good plant, slow start", comment: "Took a little time to settle after repotting but it is growing well now. Care card was helpful.", verified_buyer: true, helpful_count: 3, created_at: "2026-08-14T10:00:00Z" },
       { id: "preview-review-4", user_name: "Meera D.", rating: 5, comment: "Lovely fragrance in the evening. Delivery was quick and the pot option looks premium.", verified_buyer: true, created_at: "2026-07-28T10:00:00Z" },
       { id: "preview-review-5", user_name: "Sourav B.", rating: 2, title: "Leaves were damaged", comment: "A few leaves arrived yellowed, but support responded quickly and guided me on recovery.", helpful_count: 1, created_at: "2026-07-02T10:00:00Z" },
+    ],
+    reasonsImage: peaceLilyDetailRoom,
+    reasonsToBuy: [
+      "Elegant white blooms make corners feel fresh and calm",
+      "Glossy green leaves add a premium indoor look",
+      "Easy to style on desks, shelves, and bright balconies",
+      "Pairs beautifully with ceramic and textured planters",
+      "A graceful gift-ready plant for everyday homes",
     ],
   },
   { id: "preview-plants-1", category: "plants", title: "Anthurium Red Plant", image: sampleAnthurium, price: 699, mrp: 800, bestseller: true },
