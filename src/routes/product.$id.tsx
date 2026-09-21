@@ -307,6 +307,8 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const gallery = preview.gallery?.length ? preview.gallery : [preview.image];
   const previewFacts = preview.facts ?? [];
   const previewCare = preview.careInstructions ?? [];
+  const isPlantPreview = preview.category === "plants";
+  const previewNoun = isPlantPreview ? "plant" : "product";
   const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
