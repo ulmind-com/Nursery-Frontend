@@ -34,6 +34,9 @@ export type PreviewItem = {
   price: number;
   mrp: number;
   bestseller?: boolean;
+  description?: string;
+  careInstructions?: string[];
+  facts?: Array<{ label: string; value: string; icon: "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun" }>;
 };
 
 const plants: PreviewItem[] = [
@@ -48,6 +51,19 @@ const plants: PreviewItem[] = [
     reviewCount: 440,
     price: 299,
     mrp: 350,
+    description: "A graceful flowering plant for bright balconies and airy corners, shown here as a temporary preview until live catalogue details are added.",
+    careInstructions: ["Keep the soil lightly moist and avoid long dry spells.", "Place in outdoor shade or filtered outdoor sun.", "Trim tired leaves and remove spent blooms to keep the plant tidy."],
+    facts: [
+      { icon: "water", value: "Daily", label: "Water Requirement" },
+      { icon: "flower", value: "Pink", label: "Flower Color" },
+      { icon: "fragrance", value: "Fragrant", label: "Fragrance" },
+      { icon: "use", value: "Hedge", label: "Use" },
+      { icon: "size", value: "Large", label: "Size" },
+      { icon: "genus", value: "Nyctanthes", label: "Genus" },
+      { icon: "pot", value: "Yes", label: "With Pots" },
+      { icon: "sun", value: "Outdoor Shade, Outdoor Sun", label: "Sunlight Requirement" },
+      { icon: "use", value: "Hedge, Low Maintenance, Medicinal, Outdoor", label: "Use" },
+    ],
   },
   { id: "preview-plants-1", category: "plants", title: "Anthurium Red Plant", image: sampleAnthurium, price: 699, mrp: 800, bestseller: true },
   { id: "preview-plants-2", category: "plants", title: "Jade Mini Plant", image: sampleJade, price: 249, mrp: 300 },

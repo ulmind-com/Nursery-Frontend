@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Gift, MessageCircle, Minus, Plus, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
+import { CreditCard, Gift, MessageCircle, Minus, Plus, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { CouponBox } from "@/components/commerce/coupon-box";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,8 +22,11 @@ type PurchaseExtrasProps = {
   stock: number;
   onQuantityChange: (quantity: number) => void;
   onAdd: () => void;
+  onBuyNow?: () => void;
   preview?: boolean;
   settings?: Settings | undefined;
+  sku?: string | null | undefined;
+  sizeLabel?: string | undefined;
 };
 
 function swatchClass(color: string) {
@@ -39,7 +42,7 @@ function settingText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
-export function PurchaseExtras({ colors = [], selectedColor, onColorChange, price, mrp, quantity, stock, onQuantityChange, onAdd, preview = false, settings }: PurchaseExtrasProps) {
+export function PurchaseExtras({ colors = [], selectedColor, onColorChange, price, mrp, quantity, stock, onQuantityChange, onAdd, onBuyNow, preview = false, settings, sku, sizeLabel }: PurchaseExtrasProps) {
   const [isGift, setIsGift] = React.useState(false);
   const [giftNote, setGiftNote] = React.useState("");
   React.useEffect(() => {
@@ -49,7 +52,7 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
     } catch { /* storage unavailable */ }
   }, []);
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-  const deliveryTitle = settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
+  const deliveryTitle = settingText(settings?.delivery?.["time"]) ?? settingText(settings?.delivery?.["delivery_time"]) ?? settingText(settings?.delivery?.["title"]) ?? settingText(settings?.delivery?.["label"]);
   const supportTitle = settingText(settings?.support?.title);
   const supportDetail = settingText(settings?.support?.note) ?? settingText(settings?.support?.hours);
   const freeAbove = typeof settings?.delivery?.free_above === "number" ? settings.delivery.free_above : undefined;
@@ -65,13 +68,20 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-7">
+      {(sku || sizeLabel) && (
+        <div className="border-y border-border py-5 text-sm text-muted-foreground">
+          {sku && <p>SKU: <span className="font-medium text-foreground">{sku}</span></p>}
+          {sizeLabel && <p className={sku ? "mt-2" : ""}>Pot size: <span className="font-semibold text-foreground">{sizeLabel}</span></p>}
+        </div>
+      )}
+
       {colors.length > 0 && (
-        <section aria-labelledby="color-title">
-          <h2 id="color-title" className="text-xl text-forest">Color <span className="font-normal">– {selectedColor}</span></h2>
-          <div className="mt-4 flex flex-wrap gap-2.5">
+        <section aria-labelledby="color-title" className="mt-6">
+          <h2 id="color-title" className="text-base font-semibold text-foreground">Color <span className="font-normal">– {selectedColor}</span></h2>
+          <div className="mt-3 flex flex-wrap gap-2.5">
             {colors.map((color) => (
-              <Button key={color.label} type="button" variant="ghost" size="icon" disabled={!color.available} aria-label={`Select ${color.label}`} aria-pressed={selectedColor === color.label} onClick={() => onColorChange?.(color.label)} className={`size-12 rounded-full border bg-background p-1.5 ${selectedColor === color.label ? "border-primary ring-1 ring-primary" : "border-border"}`}>
+              <Button key={color.label} type="button" variant="ghost" size="icon" disabled={!color.available} aria-label={`Select ${color.label}`} aria-pressed={selectedColor === color.label} onClick={() => onColorChange?.(color.label)} className={`size-10 rounded-full border bg-background p-1 ${selectedColor === color.label ? "border-primary ring-1 ring-primary" : "border-border"}`}>
                 <span className={`size-full rounded-full ${swatchClass(color.label)}`} aria-hidden="true" />
               </Button>
             ))}
@@ -79,29 +89,37 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
         </section>
       )}
 
-      <div className={`${colors.length > 0 ? "mt-7" : ""} flex flex-wrap items-baseline gap-3`}>
-        <span className="price-num text-4xl text-forest">{money(price)}</span>
-        {mrp && mrp > price && <span className="price-num text-lg font-normal text-muted-foreground line-through">{money(mrp)}</span>}
+      <div className={`${colors.length > 0 || sku || sizeLabel ? "mt-6" : ""} flex flex-wrap items-baseline gap-3`}>
+        <span className="text-sm font-semibold text-foreground">Price:</span>
+        <span className="price-num text-3xl text-forest">{money(price)}</span>
+        {mrp && mrp > price && <span className="price-num text-base font-normal text-muted-foreground line-through">{money(mrp)}</span>}
         {discount > 0 && <span className="rounded-md bg-sale px-2 py-1 text-xs font-bold text-sale-foreground">{discount}% off</span>}
-        {settings?.tax_rate !== undefined && <span className="text-sm text-muted-foreground">Tax confirmed at checkout.</span>}
+        {settings?.tax_rate !== undefined && <span className="text-xs text-muted-foreground">Inclusive of taxes.</span>}
       </div>
 
-      <div className="mt-8">
-        <label className="flex cursor-pointer items-center gap-3 text-base text-foreground sm:text-lg">
-          <Checkbox checked={isGift} onCheckedChange={(checked) => saveGift(checked === true)} className="size-6 rounded-sm" />
-          <Gift className="size-5 text-primary" />
-          <span>Make this a gift · Add a handwritten note</span>
+      <div className="mt-6">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
+          <Checkbox checked={isGift} onCheckedChange={(checked) => saveGift(checked === true)} className="size-4 rounded-sm" />
+          <Gift className="size-4 text-primary" />
+          <span>Make this a gift · Add a hand-written note free</span>
         </label>
         {isGift && <Textarea value={giftNote} onChange={(event) => saveNote(event.target.value)} maxLength={300} rows={2} placeholder="Write your gift note" className="mt-3 bg-background" aria-label="Gift note" />}
       </div>
 
-      <div className="mt-7 grid grid-cols-[132px_minmax(0,1fr)] gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
-        <div className="grid h-14 grid-cols-3 items-center rounded-full border border-input bg-background px-2">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <span className="text-sm font-semibold text-foreground">Quantity:</span>
+        <div className="grid h-11 w-36 grid-cols-3 items-center overflow-hidden rounded-md border border-input bg-background">
           <Button type="button" variant="ghost" size="icon" className="rounded-full" disabled={quantity <= 1} onClick={() => onQuantityChange(quantity - 1)} aria-label="Decrease quantity"><Minus /></Button>
           <span className="price-num text-center text-base" aria-live="polite">{quantity}</span>
           <Button type="button" variant="ghost" size="icon" className="rounded-full" disabled={preview || stock < 1 || quantity >= stock} onClick={() => onQuantityChange(quantity + 1)} aria-label="Increase quantity"><Plus /></Button>
         </div>
-        <Button type="button" className="h-14 rounded-full bg-forest text-base text-forest-foreground hover:bg-forest/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add To Cart" : "Out of stock"}</Button>
+      </div>
+
+      {deliveryTitle && <p className="mt-5 text-sm font-bold text-forest">Delivery time: {deliveryTitle}</p>}
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Button type="button" className="h-12 rounded-md bg-star text-sm font-bold text-foreground hover:bg-star/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add to cart" : "Notify me"}</Button>
+        <Button type="button" className="h-12 rounded-md bg-forest text-sm font-bold text-forest-foreground hover:bg-forest/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
       </div>
 
       <div className="mt-8"><CouponBox subtotal={price * quantity} preview={preview} /></div>
