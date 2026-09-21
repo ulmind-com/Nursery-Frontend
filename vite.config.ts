@@ -6,9 +6,11 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Outside Lovable's own build (e.g. on Netlify CI) target the Netlify preset.
+const nitro = process.env["NETLIFY"] ? ({ preset: "netlify" } as const) : true;
+
 export default defineConfig({
-  // Outside Lovable's own build (e.g. on Netlify CI) target the Netlify preset.
-  nitro: process.env.NETLIFY ? { preset: "netlify" } : undefined,
+  nitro,
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
