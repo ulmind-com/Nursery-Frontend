@@ -321,7 +321,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
             />
           </section>
         </div>
-        <ProductInfoSection description={preview.description} care={previewCare} facts={previewFacts} deliveryLabel={deliveryLabel} />
+        <FactsAndDescription facts={previewFacts} description={preview.description} />
       </div>
     </div>
   );
