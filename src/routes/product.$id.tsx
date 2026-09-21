@@ -8,9 +8,9 @@ import { PageSkeleton, ErrorState } from "@/components/shared/page-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
-import { findPreviewItem } from "@/components/category/preview-products";
+import { findPreviewItem, previewItemsFor } from "@/components/category/preview-products";
+import { YouMayAlsoLike, alsoLikeFromPreview, alsoLikeFromProduct } from "@/components/product/you-may-also-like";
 import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
 import { ReviewsSection } from "@/components/product/reviews-section";
 import { ComparisonSection } from "@/components/product/comparison-section";
@@ -309,6 +309,10 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const previewCare = preview.careInstructions ?? [];
   const isPlantPreview = preview.category === "plants";
   const previewNoun = isPlantPreview ? "plant" : "product";
+  const sameCategory = previewItemsFor(preview.category).filter((item) => item.id !== preview.id);
+  const alsoLikeItems = (sameCategory.length >= 3 ? sameCategory : [...sameCategory, ...previewItemsFor("plants").filter((item) => item.id !== preview.id)])
+    .slice(0, 8)
+    .map(alsoLikeFromPreview);
   const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
@@ -387,6 +391,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
       <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
       <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} noun={previewNoun} />
       <ComparisonSection comparison={preview.comparison} />
+      <YouMayAlsoLike items={alsoLikeItems} />
     </div>
   );
 }
@@ -552,7 +557,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
       <ReviewsSection productId={p.id} rating={p.rating} count={p.review_count} />
       <ReasonsToBuySection image={reasonsImage} title={p.title} reasons={reasons} />
       <ComparisonSection comparison={p.comparison} />
-      {similar.data && similar.data.length > 0 && <div className="bg-primary-tint"><ProductRail eyebrow="You may also like" title="Similar products" products={similar.data} /></div>}
+      {similar.data && similar.data.length > 0 && <YouMayAlsoLike items={similar.data.map(alsoLikeFromProduct)} />}
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>
