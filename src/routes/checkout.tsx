@@ -213,7 +213,7 @@ function CheckoutPage() {
       </Button>
       <div className="mx-auto grid max-w-[1180px] lg:grid-cols-[minmax(0,1.08fr)_minmax(390px,.92fr)]">
         <main className="px-4 py-8 sm:px-8 sm:py-10 lg:px-14 lg:py-12">
-          <form id="checkout-form" onSubmit={submitDelivery} className="mx-auto max-w-[590px] space-y-9">
+          <form id="checkout-form" onSubmit={submitDelivery} onChange={(event) => { if ((event.target as HTMLInputElement).name) { setQuote(null); setAddress(null); } }} className="mx-auto max-w-[590px] space-y-9">
             <section>
               <div className="flex items-center justify-between"><h1 className="text-xl text-foreground">Contact</h1>{!isAuthenticated && <Link to="/login" className="text-sm font-semibold text-primary underline underline-offset-2">Sign in</Link>}</div>
               <Input type="email" name="email" defaultValue={user?.email ?? ""} placeholder="Email" required className="mt-4 h-12 rounded-lg" />
