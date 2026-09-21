@@ -45,6 +45,121 @@ export type PreviewItem = {
   comparison?: ProductComparison;
 };
 
+export type PreviewFacts = NonNullable<PreviewItem["facts"]>;
+type PreviewReviews = NonNullable<PreviewItem["reviews"]>;
+type ReviewSeed = { n: string; r: number; t?: string; c: string; h?: number };
+type PreviewContent = Pick<
+  PreviewItem,
+  "description" | "careInstructions" | "facts" | "reviews" | "reasonsToBuy" | "reasonsImage" | "comparison"
+>;
+
+const REVIEW_DATES = [
+  "2026-09-08T10:00:00Z",
+  "2026-08-22T10:00:00Z",
+  "2026-08-03T10:00:00Z",
+  "2026-07-15T10:00:00Z",
+  "2026-06-27T10:00:00Z",
+];
+
+function buildReviews(key: string, seeds: ReviewSeed[]): PreviewReviews {
+  return seeds.map((seed, index) => ({
+    id: `preview-${key}-review-${index + 1}`,
+    user_name: seed.n,
+    rating: seed.r,
+    ...(seed.t ? { title: seed.t } : {}),
+    comment: seed.c,
+    verified_buyer: index !== seeds.length - 1,
+    helpful_count: seed.h ?? Math.max(0, 11 - index * 3),
+    created_at: REVIEW_DATES[index] ?? REVIEW_DATES[REVIEW_DATES.length - 1] ?? "2026-06-01T10:00:00Z",
+  }));
+}
+
+function plantComparison(): ProductComparison {
+  return {
+    title: "MyGarden vs the Rest",
+    brand_label: "MyGarden",
+    local_label: "Local Nurseries",
+    others_label: "Others",
+    image: myGardenComparisonPlant,
+    image_alt: "Healthy palm in an ivory self-watering planter",
+    image_title: "Every plant is packed",
+    image_subtitle: "with care for its journey to your doorstep.",
+    rows: [
+      { label: "Plant quality", local: { status: "negative", detail: "Quality may vary" }, brand: { status: "positive", title: "Healthy & nursery checked", badge: "Care inspected" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "Pest care", local: { status: "negative", detail: "Not always checked" }, brand: { status: "positive", title: "Care checked" }, others: { status: "negative", detail: "May vary" } },
+      { label: "Repotting", local: { status: "mixed", detail: "Depends on seller" }, brand: { status: "positive", title: "Ready in its planter" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "Soil", local: { status: "mixed", detail: "Standard mix" }, brand: { status: "positive", title: "Plant-suited mix" }, others: { status: "mixed", detail: "Standard mix" } },
+      { label: "Growing conditions", local: { status: "mixed", detail: "May vary" }, brand: { status: "positive", title: "Nursery grown" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "After-sale help", local: { status: "negative", detail: "Not always available" }, brand: { status: "positive", title: "Plant-care support" }, others: { status: "negative", detail: "Not always available" } },
+      { label: "Plant range", local: { status: "mixed", detail: "Store dependent" }, brand: { status: "positive", title: "Curated collection" }, others: { status: "mixed", detail: "May vary" } },
+    ],
+  };
+}
+
+function goodsComparison(image: string, alt: string): ProductComparison {
+  return {
+    title: "MyGarden vs the Rest",
+    brand_label: "MyGarden",
+    local_label: "Local Stores",
+    others_label: "Others",
+    image,
+    image_alt: alt,
+    image_title: "Every order is packed",
+    image_subtitle: "with care for its journey to your doorstep.",
+    rows: [
+      { label: "Build quality", local: { status: "mixed", detail: "Varies by store" }, brand: { status: "positive", title: "Checked before dispatch", badge: "Quality checked" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "Finish", local: { status: "mixed", detail: "Often uneven" }, brand: { status: "positive", title: "Even, inspected finish" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "Packaging", local: { status: "negative", detail: "Minimal protection" }, brand: { status: "positive", title: "Protective packing" }, others: { status: "mixed", detail: "May vary" } },
+      { label: "Product details", local: { status: "negative", detail: "Ask in store" }, brand: { status: "positive", title: "Listed on the page" }, others: { status: "mixed", detail: "Limited detail" } },
+      { label: "Plant pairing help", local: { status: "mixed", detail: "Depends on seller" }, brand: { status: "positive", title: "Guidance available" }, others: { status: "negative", detail: "Not available" } },
+      { label: "After-sale help", local: { status: "negative", detail: "Not always available" }, brand: { status: "positive", title: "Support on chat & call" }, others: { status: "negative", detail: "Not always available" } },
+      { label: "Range", local: { status: "mixed", detail: "Store dependent" }, brand: { status: "positive", title: "Curated collection" }, others: { status: "mixed", detail: "May vary" } },
+    ],
+  };
+}
+
+function plantContent(opts: {
+  key: string;
+  name: string;
+  image: string;
+  description: string;
+  care: string[];
+  facts: PreviewFacts;
+  reasons: string[];
+  reviews: ReviewSeed[];
+}): PreviewContent {
+  return {
+    description: opts.description,
+    careInstructions: opts.care,
+    facts: opts.facts,
+    reviews: buildReviews(opts.key, opts.reviews),
+    reasonsToBuy: opts.reasons,
+    reasonsImage: opts.image,
+    comparison: plantComparison(),
+  };
+}
+
+function goodsContent(opts: {
+  key: string;
+  name: string;
+  image: string;
+  description: string;
+  usage: string[];
+  facts: PreviewFacts;
+  reasons: string[];
+  reviews: ReviewSeed[];
+}): PreviewContent {
+  return {
+    description: opts.description,
+    careInstructions: opts.usage,
+    facts: opts.facts,
+    reviews: buildReviews(opts.key, opts.reviews),
+    reasonsToBuy: opts.reasons,
+    reasonsImage: opts.image,
+    comparison: goodsComparison(opts.image, opts.name),
+  };
+}
+
 const plants: PreviewItem[] = [
   {
     id: "preview-plants-0",
