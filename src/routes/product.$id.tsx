@@ -12,6 +12,7 @@ import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
 import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
+import { ReviewsSection } from "@/components/product/reviews-section";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -319,9 +320,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         </div>
         <ProductDescriptionSection description={preview.description} />
       </div>
-      <ReviewsSection productId={preview.id} preview fallbackReviews={previewReviews(preview)} rating={preview.rating} count={preview.reviewCount} />
-      <div className="hidden">
-      </div>
+      <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
     </div>
   );
 }
@@ -330,7 +329,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const nav = useNavigate();
   const similar = useQuery({ queryKey: ["recommendations", "similar", p.id], queryFn: () => recommendationApi.similar(p.id) });
   const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
-  const reviews = useQuery({ queryKey: ["reviews", p.id], queryFn: () => reviewsApi.list({ product_id: p.id, limit: 6 }) });
   const [selected, setSelected] = useState(() => Math.max(0, p.sizes?.findIndex((size) => size.stock > 0) ?? 0));
   const [activeImage, setActiveImage] = useState(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
