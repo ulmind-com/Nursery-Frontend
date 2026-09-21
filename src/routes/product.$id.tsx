@@ -313,13 +313,6 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               </div>
             </div>
 
-            <PurchaseActions
-              price={preview.price + planterPrice}
-              quantity={quantity}
-              stock={0}
-              preview
-              settings={settings.data}
-            />
           </section>
         </div>
         <FactsAndDescription facts={previewFacts} description={preview.description} />
