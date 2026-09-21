@@ -231,7 +231,7 @@ function BelowImageInfo({ description, care, careTitle = "Care Instruction", del
   return (
     <div className="mt-8 space-y-6">
       {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
-      {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+      {care.length > 0 && <DetailAccordion title={careTitle}><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
       <ShippingEstimator deliveryLabel={deliveryLabel} />
       {actions}
     </div>
