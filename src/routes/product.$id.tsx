@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { BellRing, ChevronDown, ChevronRight, Droplets, Flower2, Heart, Leaf, PackageOpen, Palette, PawPrint, Ruler, ScanSearch, ShoppingBag, Sparkles, Sprout, Star, Sun, Wind, X } from "lucide-react";
+import { BellRing, Check, ChevronDown, ChevronRight, Droplets, Flower2, Heart, Leaf, PackageOpen, Palette, PawPrint, Ruler, ScanSearch, ShoppingBag, Sparkles, Sprout, Star, Sun, Wind, X } from "lucide-react";
 import { toast } from "sonner";
 import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi, reviewsApi } from "@/api/services";
 import { PageSkeleton, ErrorState } from "@/components/shared/page-state";
@@ -33,6 +33,19 @@ export const Route = createFileRoute("/product/$id")({
 
 const toList = (value: string | string[] | undefined): string[] =>
   Array.isArray(value) ? value : value ? value.split(/\r?\n|•/).map((s) => s.trim()).filter(Boolean) : [];
+
+const uniqueText = (items: Array<string | undefined>): string[] => {
+  const seen = new Set<string>();
+  return items
+    .map((item) => item?.trim())
+    .filter((item): item is string => Boolean(item))
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
 
 type FactIcon = "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun";
 type ProductFact = { label: string; value: string; icon: FactIcon };
@@ -79,6 +92,28 @@ function productFacts(product: Product, variant: ProductSize | undefined, select
     fact("sun", spec?.sunlight ?? spec?.["sunlight_requirement"], "Sunlight Requirement"),
     tagUse && tagUse !== primaryUse ? fact("use", tagUse, "Use") : null,
   ].filter((item): item is ProductFact => item !== null).slice(0, 9);
+}
+
+function reasonsForProduct(product: Product, variant: ProductSize | undefined, selectedPlanter: string | undefined): string[] {
+  const spec = product.plant_spec;
+  const descriptionReason = (product.short_description || product.description)?.split(/[.!?]/)[0]?.trim();
+  const taggedUse = product.tags && product.tags.length ? product.tags.slice(0, 4).join(", ") : undefined;
+  return uniqueText([
+    ...toList(product.reasons_to_buy),
+    ...toList(product.buy_reasons),
+    ...toList(product.why_buy),
+    descriptionReason,
+    textFromUnknown(spec?.sunlight) ? `Suitable for ${textFromUnknown(spec?.sunlight)}` : undefined,
+    textFromUnknown(spec?.watering ?? spec?.water_schedule) ? `${textFromUnknown(spec?.watering ?? spec?.water_schedule)} water care` : undefined,
+    textFromUnknown(spec?.difficulty ?? spec?.difficulty_level) ? `${textFromUnknown(spec?.difficulty ?? spec?.difficulty_level)} care level` : undefined,
+    textFromUnknown(spec?.plant_type) ? `${textFromUnknown(spec?.plant_type)} choice for your plant collection` : undefined,
+    spec?.fragrant ? "Naturally fragrant variety" : undefined,
+    spec?.air_purifying ? "Air-purifying variety for indoor spaces" : undefined,
+    spec?.flowering ? "Flowering variety for a softer home look" : undefined,
+    selectedPlanter ? `Pairs with the selected ${selectedPlanter} planter` : undefined,
+    textFromUnknown(variant?.height) ? `Available in ${textFromUnknown(variant?.height)} plant height` : undefined,
+    taggedUse ? `Fits ${taggedUse} plant needs` : undefined,
+  ]).slice(0, 5);
 }
 
 function ProductPage() {
@@ -212,6 +247,32 @@ function ProductDescriptionSection({ description }: { description?: string | und
   );
 }
 
+function ReasonsToBuySection({ image, title, reasons }: { image?: string | undefined; title: string; reasons: string[] }) {
+  if (!image || reasons.length === 0) return null;
+  return (
+    <section className="bg-forest py-5 sm:py-7 lg:py-9" aria-labelledby="reasons-title">
+      <div className="mx-auto grid max-w-[1480px] gap-7 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-10">
+        <div className="aspect-[1.08/1] overflow-hidden rounded-md bg-primary-tint sm:aspect-[1.45/1] lg:aspect-[1.08/1]">
+          <img src={image} alt={title} width={1200} height={900} loading="lazy" className="size-full object-cover" />
+        </div>
+        <div className="py-2 lg:py-8">
+          <h2 id="reasons-title" className="max-w-lg text-4xl leading-tight text-forest-foreground sm:text-5xl lg:text-6xl">
+            5 Reasons to<br /><em className="font-display italic">buy this plant.</em>
+          </h2>
+          <ul className="mt-8 space-y-4">
+            {reasons.map((reason) => (
+              <li key={reason} className="flex items-start gap-3 text-sm font-semibold leading-6 text-star sm:text-base">
+                <Check className="mt-1 size-4 shrink-0 stroke-[2.5]" />
+                <span>{reason}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Breadcrumbs({ title, category }: { title: string; category?: string }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
@@ -321,6 +382,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <ProductDescriptionSection description={preview.description} />
       </div>
       <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
+      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} />
     </div>
   );
 }
@@ -371,6 +433,8 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const facts = productFacts(p, v, selectedSize, selectedPlanter);
   const description = p.description || p.short_description;
+  const reasons = reasonsForProduct(p, v, selectedPlanter);
+  const reasonsImage = p.reason_image ?? p.lifestyle_image ?? imgs[0];
 
   const selectVariant = (index: number) => { setSelected(index); setActiveImage(0); setQuantity(1); };
   const selectSize = (name: string) => {
@@ -482,6 +546,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
       </div>
 
       <ReviewsSection productId={p.id} rating={p.rating} count={p.review_count} />
+      <ReasonsToBuySection image={reasonsImage} title={p.title} reasons={reasons} />
       {similar.data && similar.data.length > 0 && <div className="bg-primary-tint"><ProductRail eyebrow="You may also like" title="Similar products" products={similar.data} /></div>}
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
