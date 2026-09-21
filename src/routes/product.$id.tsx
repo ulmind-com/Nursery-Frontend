@@ -256,7 +256,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
           <div className="min-w-0">
             <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} />
+            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={preview.price + planterPrice} quantity={quantity} stock={0} preview settings={settings.data} />} />
           </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
