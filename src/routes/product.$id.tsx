@@ -201,12 +201,12 @@ function BelowImageInfo({ description, care, deliveryLabel, actions }: { descrip
   );
 }
 
-function FactsAndDescription({ facts, description }: { facts: ProductFact[]; description?: string | undefined }) {
-  if (facts.length === 0 && !description) return null;
+function ProductDescriptionSection({ description }: { description?: string | undefined }) {
+  if (!description) return null;
   return (
     <div className="mt-8">
-      <ProductFactsGrid facts={facts} />
-      {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
+      <h2 className="text-base font-bold text-foreground">Product Description</h2>
+      <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>
     </div>
   );
 }
