@@ -14,6 +14,7 @@ import { YouMayAlsoLike, alsoLikeFromPreview, alsoLikeFromProduct } from "@/comp
 import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
 import { ReviewsSection } from "@/components/product/reviews-section";
 import { ComparisonSection } from "@/components/product/comparison-section";
+import { ProductFaqSection } from "@/components/product/product-faq-section";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
@@ -392,6 +393,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
       <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} noun={previewNoun} />
       <ComparisonSection comparison={preview.comparison} />
       <YouMayAlsoLike items={alsoLikeItems} />
+      <ProductFaqSection faq={preview.faq} fallbackImage={gallery[0]} />
     </div>
   );
 }
@@ -558,6 +560,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
       <ReasonsToBuySection image={reasonsImage} title={p.title} reasons={reasons} />
       <ComparisonSection comparison={p.comparison} />
       {similar.data && similar.data.length > 0 && <YouMayAlsoLike items={similar.data.map(alsoLikeFromProduct)} />}
+      <ProductFaqSection faq={p.faq} fallbackImage={imgs[0]} />
 
       <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>

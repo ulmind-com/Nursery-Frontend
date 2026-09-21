@@ -22,7 +22,7 @@ import heroWatering from "@/assets/category-hero-watering.jpg";
 import heroPest from "@/assets/category-hero-pest-control.jpg";
 import heroDecor from "@/assets/category-hero-decor.jpg";
 import { normalizeCategorySlug } from "./category-hero";
-import type { ProductComparison } from "@/types/api";
+import type { ProductComparison, ProductFaq } from "@/types/api";
 
 export type PreviewItem = {
   id: string;
@@ -43,6 +43,7 @@ export type PreviewItem = {
   reasonsToBuy?: string[];
   reasonsImage?: string;
   comparison?: ProductComparison;
+  faq?: ProductFaq;
 };
 
 export type PreviewFacts = NonNullable<PreviewItem["facts"]>;
@@ -50,7 +51,7 @@ type PreviewReviews = NonNullable<PreviewItem["reviews"]>;
 type ReviewSeed = { n: string; r: number; t?: string; c: string; h?: number };
 type PreviewContent = Pick<
   PreviewItem,
-  "description" | "careInstructions" | "facts" | "reviews" | "reasonsToBuy" | "reasonsImage" | "comparison"
+  "description" | "careInstructions" | "facts" | "reviews" | "reasonsToBuy" | "reasonsImage" | "comparison" | "faq"
 >;
 
 const REVIEW_DATES = [
@@ -96,6 +97,49 @@ function plantComparison(): ProductComparison {
   };
 }
 
+function plantFaq(name: string, image: string, care: string[]): ProductFaq {
+  const shortName = name.replace(/ Plant$/i, "");
+  return {
+    image,
+    image_alt: `${name} in a styled home setting`,
+    items: [
+      {
+        question: `How should I care for my ${shortName}?`,
+        answer: care.join(" "),
+      },
+      {
+        question: `Where should I place my ${shortName}?`,
+        answer: "Choose the light and placement described in the care guidance above, and give the plant a little time to settle after moving it.",
+      },
+      {
+        question: `Can I gift the ${shortName}?`,
+        answer: "Yes. Select the planter you prefer and add a gift note before checkout when that option is available.",
+      },
+    ],
+  };
+}
+
+function goodsFaq(name: string, image: string, usage: string[]): ProductFaq {
+  return {
+    image,
+    image_alt: `${name} product view`,
+    items: [
+      {
+        question: `How do I use the ${name}?`,
+        answer: usage.join(" "),
+      },
+      {
+        question: `How should I maintain the ${name}?`,
+        answer: usage[1] || usage[0] || "Follow the product care guidance shown above.",
+      },
+      {
+        question: `Is the ${name} suitable for my setup?`,
+        answer: "Check the size, material, placement and usage details shown on this page before choosing it for your space.",
+      },
+    ],
+  };
+}
+
 function goodsComparison(image: string, alt: string): ProductComparison {
   return {
     title: "MyGarden vs the Rest",
@@ -136,6 +180,7 @@ function plantContent(opts: {
     reasonsToBuy: opts.reasons,
     reasonsImage: opts.image,
     comparison: plantComparison(),
+    faq: plantFaq(opts.name, opts.image, opts.care),
   };
 }
 
@@ -157,6 +202,7 @@ function goodsContent(opts: {
     reasonsToBuy: opts.reasons,
     reasonsImage: opts.image,
     comparison: goodsComparison(opts.image, opts.name),
+    faq: goodsFaq(opts.name, opts.image, opts.usage),
   };
 }
 
@@ -219,6 +265,10 @@ const plants: PreviewItem[] = [
         { label: "Plant range", local: { status: "mixed", detail: "Store dependent" }, brand: { status: "positive", title: "Curated collection" }, others: { status: "mixed", detail: "May vary" } },
       ],
     },
+    faq: plantFaq("Peace Lily Plant", peaceLilyDetailRoom, [
+      "Keep the soil lightly moist and avoid long dry spells.",
+      "Place it in bright, filtered light and trim tired leaves when needed.",
+    ]),
   },
   {
     id: "preview-plants-1",
