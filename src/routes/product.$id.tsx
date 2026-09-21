@@ -183,8 +183,8 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function BelowImageInfo({ description, care, deliveryLabel }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined }) {
-  if (!description && care.length === 0) {
+function BelowImageInfo({ description, care, deliveryLabel, actions }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined; actions?: ReactNode }) {
+  if (!description && care.length === 0 && !actions) {
     return (
       <div className="mt-8 space-y-6">
         <ShippingEstimator deliveryLabel={deliveryLabel} />
@@ -196,6 +196,7 @@ function BelowImageInfo({ description, care, deliveryLabel }: { description?: st
       {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
       {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
       <ShippingEstimator deliveryLabel={deliveryLabel} />
+      {actions}
     </div>
   );
 }
