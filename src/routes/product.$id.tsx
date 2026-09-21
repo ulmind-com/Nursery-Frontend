@@ -183,19 +183,29 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function ProductInfoSection({ description, care, facts, deliveryLabel }: { description?: string | undefined; care: string[]; facts: ProductFact[]; deliveryLabel?: string | undefined }) {
-  if (!description && care.length === 0 && facts.length === 0) return null;
-  return (
-    <div className="mt-8 grid gap-8 lg:grid-cols-[.95fr_1fr]">
-      <div className="space-y-6">
-        {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
-        {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+function BelowImageInfo({ description, care, deliveryLabel }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined }) {
+  if (!description && care.length === 0) {
+    return (
+      <div className="mt-8 space-y-6">
         <ShippingEstimator deliveryLabel={deliveryLabel} />
       </div>
-      <div className="rounded-md p-0">
-        <ProductFactsGrid facts={facts} />
-        {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
-      </div>
+    );
+  }
+  return (
+    <div className="mt-8 space-y-6">
+      {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
+      {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+      <ShippingEstimator deliveryLabel={deliveryLabel} />
+    </div>
+  );
+}
+
+function FactsAndDescription({ facts, description }: { facts: ProductFact[]; description?: string | undefined }) {
+  if (facts.length === 0 && !description) return null;
+  return (
+    <div className="mt-8">
+      <ProductFactsGrid facts={facts} />
+      {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
     </div>
   );
 }
@@ -243,7 +253,10 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={preview.title} category={preview.category} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
-          <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+          <div className="min-w-0">
+            <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
+            <BelowImageInfo description={preview.description} care={previewCare} deliveryLabel={deliveryLabel} />
+          </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
@@ -308,7 +321,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
             />
           </section>
         </div>
-        <ProductInfoSection description={preview.description} care={previewCare} facts={previewFacts} deliveryLabel={deliveryLabel} />
+        <FactsAndDescription facts={previewFacts} description={preview.description} />
       </div>
     </div>
   );
@@ -398,7 +411,10 @@ function LiveProductPage({ product: p }: { product: Product }) {
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={p.title} />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
-          <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
+          <div className="min-w-0">
+            <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
+            <BelowImageInfo description={description} care={[...care, ...tips]} deliveryLabel={deliveryLabel} />
+          </div>
           <section className="min-w-0 rounded-md p-5 sm:p-6">
             <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
             <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{p.title}</h1>
@@ -468,7 +484,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
           </section>
         </div>
 
-        <ProductInfoSection description={description} care={[...care, ...tips]} facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} deliveryLabel={deliveryLabel} />
+        <FactsAndDescription facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} description={description} />
 
         {includes.length > 0 && <section className="mt-8 rounded-md p-0"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
