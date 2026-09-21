@@ -17,13 +17,13 @@ export function CouponBox({ subtotal, preview = false }: { subtotal: number; pre
   const { data, isPending, isError } = useQuery({ queryKey: ["coupons", "active"], queryFn: couponApi.active, staleTime: 5 * 60 * 1000 });
   const coupons: Coupon[] = data ?? [];
 
-  if (isPending) return <div className="h-24 animate-pulse rounded-lg bg-muted" />;
+  if (isPending) return <div className="h-20 animate-pulse rounded-md bg-muted" />;
   if (isError || coupons.length === 0) {
     if (!preview) return null;
     return (
       <section aria-label="Available offers">
-        <h2 className="text-xl text-forest">Offers for you:</h2>
-        <div className="mt-4 rounded-lg border border-dashed border-primary/55 bg-primary-tint/65 px-4 py-5 text-sm text-muted-foreground">
+        <h2 className="text-lg text-forest">Offers for you:</h2>
+        <div className="mt-2.5 rounded-md border border-dashed border-primary/55 bg-primary-tint/65 px-3.5 py-3.5 text-xs leading-5 text-muted-foreground">
           Current shop offers will appear here when added in the admin panel.
         </div>
       </section>
@@ -43,14 +43,14 @@ export function CouponBox({ subtotal, preview = false }: { subtotal: number; pre
 
   return (
     <section aria-label="Available offers">
-      <h2 className="text-xl text-forest">Offers for you:</h2>
-      <ul className="mt-4 divide-y divide-dashed divide-primary/35 overflow-hidden rounded-lg border border-dashed border-primary/55 bg-primary-tint/65">
+      <h2 className="text-lg text-forest">Offers for you:</h2>
+      <ul className="mt-2.5 divide-y divide-dashed divide-primary/35 overflow-hidden rounded-md border border-dashed border-primary/55 bg-primary-tint/65">
         {coupons.map((coupon) => {
           const min = coupon.minimum_order ?? 0;
           const needed = Math.max(0, min - subtotal);
           const locked = needed > 0;
           return (
-            <li key={coupon.code} className="flex items-center gap-3 px-4 py-4">
+            <li key={coupon.code} className="flex items-center gap-2.5 px-3.5 py-3">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-foreground">{coupon.description || coupon.code}</p>
                 <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">

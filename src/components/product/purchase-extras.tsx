@@ -68,20 +68,20 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
   };
 
   return (
-    <div className="mt-7">
+    <div className="mt-5">
       {(sku || sizeLabel) && (
-        <div className="border-y border-border py-5 text-sm text-muted-foreground">
+        <div className="border-y border-border py-3.5 text-xs text-muted-foreground">
           {sku && <p>SKU: <span className="font-medium text-foreground">{sku}</span></p>}
-          {sizeLabel && <p className={sku ? "mt-2" : ""}>Pot size: <span className="font-semibold text-foreground">{sizeLabel}</span></p>}
+          {sizeLabel && <p className={sku ? "mt-1.5" : ""}>Pot size: <span className="font-semibold text-foreground">{sizeLabel}</span></p>}
         </div>
       )}
 
       {colors.length > 0 && (
-        <section aria-labelledby="color-title" className="mt-6">
-          <h2 id="color-title" className="text-base font-semibold text-foreground">Color <span className="font-normal">– {selectedColor}</span></h2>
-          <div className="mt-3 flex flex-wrap gap-2.5">
+        <section aria-labelledby="color-title" className="mt-4">
+          <h2 id="color-title" className="text-sm font-semibold text-foreground">Color <span className="font-normal">– {selectedColor}</span></h2>
+          <div className="mt-2 flex flex-wrap gap-2">
             {colors.map((color) => (
-              <Button key={color.label} type="button" variant="ghost" size="icon" disabled={!color.available} aria-label={`Select ${color.label}`} aria-pressed={selectedColor === color.label} onClick={() => onColorChange?.(color.label)} className={`size-10 rounded-full border bg-background p-1 ${selectedColor === color.label ? "border-primary ring-1 ring-primary" : "border-border"}`}>
+              <Button key={color.label} type="button" variant="ghost" size="icon" disabled={!color.available} aria-label={`Select ${color.label}`} aria-pressed={selectedColor === color.label} onClick={() => onColorChange?.(color.label)} className={`size-9 rounded-full border bg-background p-1 ${selectedColor === color.label ? "border-primary ring-1 ring-primary" : "border-border"}`}>
                 <span className={`size-full rounded-full ${swatchClass(color.label)}`} aria-hidden="true" />
               </Button>
             ))}
@@ -89,16 +89,16 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
         </section>
       )}
 
-      <div className={`${colors.length > 0 || sku || sizeLabel ? "mt-6" : ""} flex flex-wrap items-baseline gap-3`}>
+      <div className={`${colors.length > 0 || sku || sizeLabel ? "mt-4" : ""} flex flex-wrap items-baseline gap-2`}>
         <span className="text-sm font-semibold text-foreground">Price:</span>
-        <span className="price-num text-3xl text-forest">{money(price)}</span>
-        {mrp && mrp > price && <span className="price-num text-base font-normal text-muted-foreground line-through">{money(mrp)}</span>}
+        <span className="price-num text-2xl text-forest">{money(price)}</span>
+        {mrp && mrp > price && <span className="price-num text-sm font-normal text-muted-foreground line-through">{money(mrp)}</span>}
         {discount > 0 && <span className="rounded-md bg-sale px-2 py-1 text-xs font-bold text-sale-foreground">{discount}% off</span>}
         {settings?.tax_rate !== undefined && <span className="text-xs text-muted-foreground">Inclusive of taxes.</span>}
       </div>
 
-      <div className="mt-6">
-        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
+      <div className="mt-4">
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-foreground sm:text-sm">
           <Checkbox checked={isGift} onCheckedChange={(checked) => saveGift(checked === true)} className="size-4 rounded-sm" />
           <Gift className="size-4 text-primary" />
           <span>Make this a gift · Add a hand-written note free</span>
@@ -106,36 +106,36 @@ export function PurchaseExtras({ colors = [], selectedColor, onColorChange, pric
         {isGift && <Textarea value={giftNote} onChange={(event) => saveNote(event.target.value)} maxLength={300} rows={2} placeholder="Write your gift note" className="mt-3 bg-background" aria-label="Gift note" />}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <span className="text-sm font-semibold text-foreground">Quantity:</span>
-        <div className="grid h-11 w-36 grid-cols-3 items-center overflow-hidden rounded-md border border-input bg-background">
+      <div className="mt-4 flex flex-wrap items-center gap-2.5">
+        <span className="text-xs font-semibold text-foreground">Quantity:</span>
+        <div className="grid h-10 w-32 grid-cols-3 items-center overflow-hidden rounded-md border border-input bg-background">
           <Button type="button" variant="ghost" size="icon" className="rounded-full" disabled={quantity <= 1} onClick={() => onQuantityChange(quantity - 1)} aria-label="Decrease quantity"><Minus /></Button>
           <span className="price-num text-center text-base" aria-live="polite">{quantity}</span>
           <Button type="button" variant="ghost" size="icon" className="rounded-full" disabled={preview || stock < 1 || quantity >= stock} onClick={() => onQuantityChange(quantity + 1)} aria-label="Increase quantity"><Plus /></Button>
         </div>
       </div>
 
-      {deliveryTitle && <p className="mt-5 text-sm font-bold text-forest">Delivery time: {deliveryTitle}</p>}
+      {deliveryTitle && <p className="mt-3.5 text-xs font-bold text-forest">Delivery time: {deliveryTitle}</p>}
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Button type="button" className="h-12 rounded-md bg-star text-sm font-bold text-foreground hover:bg-star/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add to cart" : "Notify me"}</Button>
-        <Button type="button" className="h-12 rounded-md bg-forest text-sm font-bold text-forest-foreground hover:bg-forest/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
+      <div className="mt-3.5 grid gap-2.5 sm:grid-cols-2">
+        <Button type="button" className="h-11 rounded-md bg-star text-xs font-bold text-foreground hover:bg-star/90" disabled={stock < 1 && !preview} onClick={onAdd}><ShoppingBag />{preview ? "Preview only" : stock > 0 ? "Add to cart" : "Notify me"}</Button>
+        <Button type="button" className="h-11 rounded-md bg-forest text-xs font-bold text-forest-foreground hover:bg-forest/90" disabled={preview || stock < 1} onClick={onBuyNow ?? onAdd}><CreditCard />Buy it now</Button>
       </div>
 
-      <div className="mt-8"><CouponBox subtotal={price * quantity} preview={preview} /></div>
+      <div className="mt-5"><CouponBox subtotal={price * quantity} preview={preview} /></div>
 
       {(settings?.plant_guarantee?.enabled || supportTitle || supportDetail || deliveryTitle || freeAbove !== undefined) && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2">
           {settings?.plant_guarantee?.enabled && (
-            <div className="flex items-center gap-3 rounded-lg bg-star px-4 py-3 text-foreground">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-background"><ShieldCheck className="size-5" /></span>
-              <div className="min-w-0"><p className="font-bold">{settings.plant_guarantee.label || `${settings.plant_guarantee.days ?? ""}-Day Plant Guarantee`}</p>{settings.plant_guarantee.description && <p className="mt-0.5 text-xs">{settings.plant_guarantee.description}</p>}</div>
+            <div className="flex items-center gap-2.5 rounded-md bg-star px-3 py-2.5 text-foreground">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-background"><ShieldCheck className="size-4" /></span>
+              <div className="min-w-0"><p className="text-sm font-bold">{settings.plant_guarantee.label || `${settings.plant_guarantee.days ?? ""}-Day Plant Guarantee`}</p>{settings.plant_guarantee.description && <p className="mt-0.5 text-[11px] leading-4">{settings.plant_guarantee.description}</p>}</div>
             </div>
           )}
           {(supportTitle || supportDetail || deliveryTitle || freeAbove !== undefined) && (
-            <div className="grid gap-3 rounded-lg bg-star/55 px-4 py-3 sm:grid-cols-2">
-              {(supportTitle || supportDetail) && <div className="flex items-center gap-3"><span className="grid size-9 shrink-0 place-items-center rounded-full bg-background"><MessageCircle className="size-5" /></span><div><p className="font-bold">{supportTitle || "Plant care support"}</p>{supportDetail && <p className="text-xs text-foreground/70">{supportDetail}</p>}</div></div>}
-              {(deliveryTitle || freeAbove !== undefined) && <div className="flex items-center gap-3"><span className="grid size-9 shrink-0 place-items-center rounded-full bg-background"><Truck className="size-5" /></span><p className="font-bold">{deliveryTitle || `Free delivery above ${currency}${freeAbove?.toLocaleString("en-IN")}`}</p></div>}
+            <div className="grid gap-2.5 rounded-md bg-star/55 px-3 py-2.5 sm:grid-cols-2">
+              {(supportTitle || supportDetail) && <div className="flex items-center gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-background"><MessageCircle className="size-4" /></span><div><p className="text-xs font-bold">{supportTitle || "Plant care support"}</p>{supportDetail && <p className="text-[11px] leading-4 text-foreground/70">{supportDetail}</p>}</div></div>}
+              {(deliveryTitle || freeAbove !== undefined) && <div className="flex items-center gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-background"><Truck className="size-4" /></span><p className="text-xs font-bold">{deliveryTitle || `Free delivery above ${currency}${freeAbove?.toLocaleString("en-IN")}`}</p></div>}
             </div>
           )}
         </div>
