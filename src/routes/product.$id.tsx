@@ -220,7 +220,7 @@ function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefin
   );
 }
 
-function BelowImageInfo({ description, care, deliveryLabel, actions }: { description?: string | undefined; care: string[]; deliveryLabel?: string | undefined; actions?: ReactNode }) {
+function BelowImageInfo({ description, care, careTitle = "Care Instruction", deliveryLabel, actions }: { description?: string | undefined; care: string[]; careTitle?: string; deliveryLabel?: string | undefined; actions?: ReactNode }) {
   if (!description && care.length === 0 && !actions) {
     return (
       <div className="mt-8 space-y-6">
