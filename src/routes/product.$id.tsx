@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { BellRing, Check, ChevronRight, Droplets, Heart, Leaf, PackageOpen, PawPrint, Ruler, ShoppingBag, Sparkles, Star, Sun, Wind, X } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { BellRing, ChevronDown, ChevronRight, Droplets, Flower2, Heart, Leaf, PackageOpen, Palette, PawPrint, Ruler, ScanSearch, ShoppingBag, Sparkles, Sprout, Star, Sun, Wind, X } from "lucide-react";
 import { toast } from "sonner";
 import { productsApi, queryKeys, recommendationApi, settingsApi, miscApi, reviewsApi } from "@/api/services";
 import { PageSkeleton, ErrorState } from "@/components/shared/page-state";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductRail } from "@/components/home/section-rail";
 import { money } from "@/components/product/product-card";
 import { findPreviewItem } from "@/components/category/preview-products";
@@ -31,6 +33,53 @@ export const Route = createFileRoute("/product/$id")({
 const toList = (value: string | string[] | undefined): string[] =>
   Array.isArray(value) ? value : value ? value.split(/\r?\n|•/).map((s) => s.trim()).filter(Boolean) : [];
 
+type FactIcon = "water" | "flower" | "fragrance" | "use" | "size" | "genus" | "pot" | "sun";
+type ProductFact = { label: string; value: string; icon: FactIcon };
+
+const factIcons: Record<FactIcon, typeof Droplets> = {
+  water: Droplets,
+  flower: Palette,
+  fragrance: Flower2,
+  use: Sprout,
+  size: Ruler,
+  genus: ScanSearch,
+  pot: PackageOpen,
+  sun: Sun,
+};
+
+const textFromUnknown = (value: unknown): string | undefined => {
+  if (typeof value === "string") return value.trim() || undefined;
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "Yes" : undefined;
+  if (Array.isArray(value)) {
+    const values = value.map((item) => textFromUnknown(item)).filter((item): item is string => Boolean(item));
+    return values.length ? values.join(", ") : undefined;
+  }
+  return undefined;
+};
+
+const fact = (icon: FactIcon, value: unknown, label: string): ProductFact | null => {
+  const text = textFromUnknown(value);
+  return text ? { icon, value: text, label } : null;
+};
+
+function productFacts(product: Product, variant: ProductSize | undefined, selectedSize: string | undefined, selectedPlanter: string | undefined): ProductFact[] {
+  const spec = product.plant_spec;
+  const primaryUse = textFromUnknown(spec?.["use"]) ?? textFromUnknown(spec?.["usage"]) ?? textFromUnknown(spec?.plant_type);
+  const tagUse = product.tags && product.tags.length ? product.tags.join(", ") : undefined;
+  return [
+    fact("water", spec?.["water_requirement"] ?? spec?.watering ?? spec?.water_schedule, "Water Requirement"),
+    fact("flower", spec?.["flower_color"] ?? spec?.["flower_colour"], "Flower Color"),
+    fact("fragrance", spec?.["fragrance"] ?? (spec?.fragrant ? "Fragrant" : undefined), "Fragrance"),
+    fact("use", primaryUse, "Use"),
+    fact("size", variant?.height ?? selectedSize ?? spec?.["size"], "Size"),
+    fact("genus", spec?.["genus"] ?? spec?.["scientific_name"] ?? spec?.["botanical_name"], "Genus"),
+    fact("pot", selectedPlanter ? "Yes" : undefined, "With Pots"),
+    fact("sun", spec?.sunlight ?? spec?.["sunlight_requirement"], "Sunlight Requirement"),
+    tagUse && tagUse !== primaryUse ? fact("use", tagUse, "Use") : null,
+  ].filter((item): item is ProductFact => item !== null).slice(0, 9);
+}
+
 function ProductPage() {
   const { id } = Route.useParams();
   const preview = findPreviewItem(id);
@@ -46,18 +95,106 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
   return (
-    <div className={`grid min-w-0 gap-3 ${hasThumbnails ? "lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`surface-card grid min-w-0 self-start rounded-md p-4 sm:p-6 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
       {hasThumbnails && (
-        <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
+        <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
-            <Button key={`${src}-${index}`} type="button" variant="ghost" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-lg border-2 bg-card p-0 transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-transparent hover:border-border"}`}>
+            <Button key={`${src}-${index}`} type="button" variant="ghost" onClick={() => onChange(index)} aria-label={`View image ${index + 1}`} aria-pressed={index === activeImage} className={`size-[72px] shrink-0 overflow-hidden rounded-sm border-2 bg-card p-0 transition-colors duration-200 ${index === activeImage ? "border-primary" : "border-border hover:border-primary"}`}>
               <img src={src} alt="" width={1024} height={1280} loading="lazy" className="size-full object-cover" />
             </Button>
           ))}
         </div>
       )}
-      <div className="order-1 aspect-[1.04/1] overflow-hidden rounded-2xl bg-primary-tint lg:order-2">
+      <div className="order-1 aspect-[1.04/1] overflow-hidden rounded-sm bg-primary-tint lg:order-2">
         {hero ? <img src={hero} alt={title} width={1024} height={1280} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
+      </div>
+      <p className="order-3 hidden items-center justify-center gap-3 text-xs text-muted-foreground sm:flex lg:col-start-2"><ScanSearch className="size-3.5" /> Roll over image to zoom in</p>
+    </div>
+  );
+}
+
+function RatingLine({ rating, count, suffix }: { rating?: number | undefined; count?: number | undefined; suffix?: string | undefined }) {
+  if (!rating && !count && !suffix) return null;
+  return (
+    <p className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/80">
+      {rating ? Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-4 ${index < Math.round(rating) ? "fill-star text-star" : "text-border"}`} />) : null}
+      {rating ? <span className="font-semibold">{rating.toFixed(1)}</span> : null}
+      {count ? <span>({count} reviews)</span> : null}
+      {suffix ? <><span aria-hidden="true">|</span><span>{suffix}</span></> : null}
+    </p>
+  );
+}
+
+function ProductFactsGrid({ facts }: { facts: ProductFact[] }) {
+  if (!facts.length) return null;
+  return (
+    <section aria-label="Product facts" className="border-y border-foreground/75 py-5">
+      <div className="grid gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
+        {facts.map(({ icon, label, value }, index) => {
+          const Icon = factIcons[icon];
+          return (
+            <div key={`${label}-${value}-${index}`} className="flex min-w-0 items-start gap-3">
+              <Icon className="mt-0.5 size-11 shrink-0 stroke-[1.5] text-primary" />
+              <div className="min-w-0">
+                <p className={`break-words font-bold leading-tight text-foreground/65 ${value.length > 18 ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"}`}>{value}</p>
+                <p className="mt-1 break-words text-sm text-muted-foreground sm:text-base">{label}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function DetailAccordion({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="surface-card rounded-md bg-card">
+      <Button type="button" variant="ghost" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex h-auto w-full justify-between rounded-md px-6 py-6 text-left text-xl font-bold text-foreground hover:bg-card">
+        <span>{title}</span>
+        <ChevronDown className={`size-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </Button>
+      {open && <div className="px-6 pb-6 text-sm leading-7 text-muted-foreground">{children}</div>}
+    </section>
+  );
+}
+
+function ShippingEstimator({ deliveryLabel }: { deliveryLabel?: string | undefined }) {
+  const [zip, setZip] = useState("");
+  const [estimated, setEstimated] = useState(false);
+  return (
+    <section className="surface-card rounded-md bg-card p-6">
+      <h2 className="text-xl text-foreground">Estimate shipping</h2>
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <label className="text-sm font-semibold text-foreground">Country
+          <Select defaultValue="India"><SelectTrigger className="mt-2 h-12 rounded-sm bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="India">India</SelectItem></SelectContent></Select>
+        </label>
+        <label className="text-sm font-semibold text-foreground">Province
+          <Select defaultValue="West Bengal"><SelectTrigger className="mt-2 h-12 rounded-sm bg-background"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="West Bengal">West Bengal</SelectItem><SelectItem value="Andaman and Nicobar">Andaman and Nicobar</SelectItem><SelectItem value="Delhi">Delhi</SelectItem><SelectItem value="Maharashtra">Maharashtra</SelectItem></SelectContent></Select>
+        </label>
+        <label className="text-sm font-semibold text-foreground">Zip code
+          <Input value={zip} onChange={(event) => { setZip(event.target.value); setEstimated(false); }} inputMode="numeric" className="mt-2 h-12 rounded-sm bg-background" />
+        </label>
+      </div>
+      <Button type="button" onClick={() => setEstimated(Boolean(zip.trim()))} className="mt-5 rounded-sm bg-star px-8 text-foreground hover:bg-star/90">Estimate</Button>
+      {estimated && <p className="mt-4 text-sm font-semibold text-forest">{deliveryLabel ? `Estimated delivery: ${deliveryLabel}` : "Delivery availability will be confirmed at checkout."}</p>}
+    </section>
+  );
+}
+
+function ProductInfoSection({ description, care, facts, deliveryLabel }: { description?: string | undefined; care: string[]; facts: ProductFact[]; deliveryLabel?: string | undefined }) {
+  if (!description && care.length === 0 && facts.length === 0) return null;
+  return (
+    <div className="mt-8 grid gap-8 lg:grid-cols-[.95fr_1fr]">
+      <div className="space-y-6">
+        {description && <DetailAccordion title="Description"><p>{description}</p></DetailAccordion>}
+        {care.length > 0 && <DetailAccordion title="Care Instruction"><ul className="space-y-2">{care.map((item) => <li key={item}>{item}</li>)}</ul></DetailAccordion>}
+        <ShippingEstimator deliveryLabel={deliveryLabel} />
+      </div>
+      <div className="surface-card rounded-md bg-card p-6">
+        <ProductFactsGrid facts={facts} />
+        {description && <div className="mt-6"><h2 className="text-base font-bold text-foreground">Product Description</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p></div>}
       </div>
     </div>
   );
@@ -94,6 +231,9 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
   const selectedPreviewPlanter = previewPlanters.find((item) => item.name === selectedPlanter) ?? previewPlanters[0];
   const planterPrice = selectedPreviewPlanter.prices[selectedSize];
   const gallery = preview.gallery?.length ? preview.gallery : [preview.image];
+  const previewFacts = preview.facts ?? [];
+  const previewCare = preview.careInstructions ?? [];
+  const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
   const chooseSize = (size: "Small" | "Medium") => {
     setSelectedSize(size);
     setActiveImage(size === "Medium" && gallery.length > 1 ? gallery.length - 1 : 0);
@@ -102,16 +242,16 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
     <div className="bg-storefront-wash pb-24 lg:pb-16">
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={preview.title} category={preview.category} />
-        <div className="grid gap-8 lg:grid-cols-[1.18fr_.92fr] lg:gap-14">
+        <div className="grid gap-7 lg:grid-cols-[1.03fr_1fr] lg:gap-8">
           <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="min-w-0 lg:pt-1">
-            <p className="flex flex-wrap items-center gap-2 text-sm text-foreground/85"><Star className="size-5 fill-primary text-primary" /><span className="font-semibold">{preview.rating?.toFixed(1) ?? "Preview"}</span>{preview.reviewCount ? <span>({preview.reviewCount} reviews)</span> : null}<span aria-hidden="true">|</span><span>Design preview</span></p>
-            <h1 className="mt-3 text-4xl leading-[1.08] text-forest sm:text-5xl lg:text-[3.5rem]">{preview.title}</h1>
-            <p className="mt-4 text-lg text-foreground/85 sm:text-xl">{preview.subtitle ?? "Premium nursery product preview"}</p>
+          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-7">
+            <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
+            <h1 className="mt-3 text-3xl leading-tight text-foreground sm:text-4xl">{preview.title}</h1>
+            <p className="mt-3 text-base text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
 
             <div className="mt-8">
               <div className="mb-3 flex items-center justify-between gap-4">
-                <h2 className="text-lg text-forest sm:text-xl">Select Plant Size</h2>
+                <h2 className="text-base font-bold text-foreground">Select Plant Size</h2>
                 <span className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</span>
               </div>
               <div className="grid max-w-[286px] grid-cols-2 gap-2.5">
@@ -122,7 +262,7 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
             </div>
 
             <div className="mt-9">
-              <h2 className="mb-4 text-xl text-forest sm:text-2xl">Select Planter</h2>
+              <h2 className="mb-4 text-base font-bold text-foreground">Select Planter</h2>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {previewPlanters.map((planter) => {
                   const active = planter.name === selectedPlanter;
@@ -147,17 +287,22 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
               stock={0}
               onQuantityChange={setQuantity}
               onAdd={() => toast.info("Add this product in the admin panel to enable shopping.")}
+              onBuyNow={() => toast.info("Add this product in the admin panel to enable checkout.")}
               preview
               settings={settings.data}
+              sku="PREVIEW-PLANT"
+              sizeLabel={selectedSize}
             />
           </section>
         </div>
+        <ProductInfoSection description={preview.description} care={previewCare} facts={previewFacts} deliveryLabel={deliveryLabel} />
       </div>
     </div>
   );
 }
 
 function LiveProductPage({ product: p }: { product: Product }) {
+  const nav = useNavigate();
   const similar = useQuery({ queryKey: ["recommendations", "similar", p.id], queryFn: () => recommendationApi.similar(p.id) });
   const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   const reviews = useQuery({ queryKey: ["reviews", p.id], queryFn: () => reviewsApi.list({ product_id: p.id, limit: 6 }) });
@@ -201,6 +346,9 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const includes = toList(p.includes);
   const care = toList(p.care_instructions);
   const tips = toList(p.care_tips);
+  const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
+  const facts = productFacts(p, v, selectedSize, selectedPlanter);
+  const description = p.description || p.short_description;
 
   const selectVariant = (index: number) => { setSelected(index); setActiveImage(0); setQuantity(1); };
   const selectSize = (name: string) => {
@@ -221,6 +369,10 @@ function LiveProductPage({ product: p }: { product: Product }) {
     addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: quantity, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) });
     toast.success(`${quantity} × ${p.title} added to cart`);
   };
+  const buyNow = async () => {
+    add();
+    await nav({ to: "/checkout" });
+  };
   const notifyMe = async () => {
     try {
       await miscApi.waitlist({ product_id: p.id, ...(v?.name ? { size_variant: v.name } : {}) });
@@ -232,17 +384,17 @@ function LiveProductPage({ product: p }: { product: Product }) {
     <div className="bg-storefront-wash pb-24 lg:pb-0">
       <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
         <Breadcrumbs title={p.title} />
-        <div className="grid gap-8 lg:grid-cols-[1.18fr_.92fr] lg:gap-14">
+        <div className="grid gap-7 lg:grid-cols-[1.03fr_1fr] lg:gap-8">
           <Gallery images={imgs} title={p.title} activeImage={activeImage} onChange={setActiveImage} />
-          <section className="min-w-0 lg:pt-1">
-            {Boolean(p.rating) && <p className="flex flex-wrap items-center gap-1.5 text-sm text-foreground/80"><Star className="size-5 fill-primary text-primary" /><span className="font-semibold">{p.rating?.toFixed(1)}</span><span>({p.review_count || 0} reviews)</span></p>}
-            <h1 className="mt-2 text-3xl leading-[1.08] text-forest sm:text-5xl">{p.title}</h1>
+          <section className="surface-card min-w-0 rounded-md bg-card p-5 sm:p-7">
+            <RatingLine rating={p.rating} count={p.review_count} suffix={p.sold_count ? `${p.sold_count.toLocaleString("en-IN")} Happy Customers` : undefined} />
+            <h1 className="mt-3 text-3xl leading-tight text-foreground sm:text-4xl">{p.title}</h1>
             <p className="mt-3 text-base text-foreground/85 sm:text-lg">{p.short_description || p.description}</p>
 
             {sizeNames.length > 0 && (
               <div className="mt-9">
                 <div className="mb-3 flex items-center justify-between gap-4">
-                  <h2 className="text-lg text-foreground">Select Size</h2>
+                  <h2 className="text-base font-bold text-foreground">Select Plant Size</h2>
                   {heights.length > 0 && <button type="button" onClick={() => setSizeGuideOpen(true)} className="text-sm font-semibold text-forest underline underline-offset-4">Size Guide</button>}
                 </div>
                 <div className="grid max-w-[430px] grid-cols-2 gap-2.5 sm:grid-cols-3">
@@ -257,7 +409,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
 
             {planterNames.length > 0 && (
               <div className="mt-7">
-                <h2 className="mb-3 text-lg text-foreground">Select Planter</h2>
+                <h2 className="mb-3 text-base font-bold text-foreground">Select Planter</h2>
                 <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                   {planterNames.map((name) => {
                     const options = sizeVariants.filter(({ item }) => item.pot_type === name);
@@ -283,21 +435,18 @@ function LiveProductPage({ product: p }: { product: Product }) {
               stock={stock}
               onQuantityChange={setQuantity}
               onAdd={stock > 0 ? add : () => void notifyMe()}
+              onBuyNow={stock > 0 ? () => void buyNow() : undefined}
               settings={settings.data}
+              sku={v?.sku ?? p.sku}
+              sizeLabel={v?.pot_size ?? v?.height ?? selectedSize}
             />
-            {v?.sku && <p className="mt-3 text-xs text-muted-foreground">SKU: {v.sku}</p>}
             {traits.length > 0 && <ul className="mt-5 flex flex-wrap gap-2">{traits.map(({ icon: Icon, label }) => <li key={label} className="flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-medium text-primary-soft-foreground"><Icon className="size-3.5" />{label}</li>)}</ul>}
           </section>
         </div>
 
-        {(specRows.length > 0 || includes.length > 0 || care.length > 0 || tips.length > 0 || (p.description && p.short_description)) && (
-          <div className="mt-12 grid gap-8 border-t border-border pt-10 lg:grid-cols-2">
-            {specRows.length > 0 && <section><h2 className="text-2xl text-forest">Product details</h2><dl className="mt-5 grid grid-cols-2 gap-5">{specRows.map(({ icon: Icon, label, value }) => <div key={label} className="flex items-start gap-3"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon className="size-4" /></span><div><dt className="text-[11px] uppercase text-muted-foreground">{label}</dt><dd className="mt-0.5 text-sm font-semibold">{value}</dd></div></div>)}</dl></section>}
-            {includes.length > 0 && <section><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
-            {(care.length > 0 || tips.length > 0) && <section><h2 className="text-2xl text-forest">Care guide</h2><ul className="mt-5 space-y-2.5">{[...care, ...tips].map((item) => <li key={item} className="flex items-start gap-2.5 text-sm leading-6 text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
-            {p.description && p.short_description && <section><h2 className="text-2xl text-forest">About this product</h2><p className="mt-4 text-sm leading-7 text-muted-foreground">{p.description}</p></section>}
-          </div>
-        )}
+        <ProductInfoSection description={description} care={[...care, ...tips]} facts={facts.length ? facts : specRows.map(({ icon: _Icon, label, value }) => ({ icon: "use", label, value }))} deliveryLabel={deliveryLabel} />
+
+        {includes.length > 0 && <section className="mt-8 surface-card rounded-md bg-card p-6"><h2 className="text-2xl text-forest">What's included</h2><ul className="mt-5 space-y-2.5">{includes.map((item) => <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground"><Leaf className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul></section>}
       </div>
 
       {reviewItems.length > 0 && <ReviewsSection reviews={reviewItems} rating={p.rating} count={p.review_count} />}
