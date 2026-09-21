@@ -8,6 +8,7 @@ import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PlantAssistant } from "@/components/layout/plant-assistant";
+import { CartDrawer } from "@/components/commerce/cart-drawer";
 import type { Settings } from "@/types/api";
 
 function NavLinks({ className, activeClassName, onNavigate }: { className: string; activeClassName?: string; onNavigate?: () => void }) {
@@ -41,7 +42,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const { data: settings } = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   const { data: categories = [] } = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list, staleTime: 300_000 });
   const announcement = useRotatingAnnouncement(settings?.announcements);
@@ -93,11 +94,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <Button variant="ghost" size="icon" asChild className="lg:hidden"><Link to="/search" search={{}} aria-label="Search"><Search /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/account" aria-label="Account"><UserRound /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/wishlist" aria-label="Wishlist"><Heart /></Link></Button>
-            <Button variant="ghost" size="icon" asChild className="relative">
-              <Link to="/cart" aria-label={`Cart with ${count} items`}>
-                <ShoppingBag />
-                {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
-              </Link>
+            <Button variant="ghost" size="icon" className="relative" onClick={openCart} aria-label={`Cart with ${count} items`}>
+              <ShoppingBag />
+              {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
             </Button>
           </div>
         </div>
@@ -122,13 +121,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <MessageCircle className="size-5" />
         </a>
       )}
+      <CartDrawer />
       <PlantAssistant />
     </div>
   );
 }
 
 function MobileTabBar() {
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const item = "flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-semibold text-muted-foreground";
   const active = { className: `${item} text-primary` };
   return (
@@ -137,11 +137,11 @@ function MobileTabBar() {
       <Link to="/plants" search={{}} className={item} activeProps={active}><LayoutGrid className="size-5" />Shop</Link>
       <Link to="/search" search={{}} className={item} activeProps={active}><Search className="size-5" />Search</Link>
       <Link to="/wishlist" className={item} activeProps={active}><Heart className="size-5" />Wishlist</Link>
-      <Link to="/cart" className={`${item} relative`} activeProps={active}>
+      <button type="button" onClick={openCart} className={`${item} relative`}>
         <ShoppingBag className="size-5" />
         {count > 0 && <span className="absolute right-4 top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
         Cart
-      </Link>
+      </button>
     </nav>
   );
 }
