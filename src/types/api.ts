@@ -24,11 +24,11 @@ export interface BlogPost { id?: string; slug?: string; key?: string; title: str
 export interface GoogleReview { id?: string; author_name?: string; rating: number; text?: string; time?: string; profile_photo_url?: string }
 export interface Wishlist { ids: string[]; items: Product[] }
 export interface Recommendation { title?: string; products: Product[] }
-export interface Settings { currency: string; currency_code?: string; tax_rate?: number; shop: { name: string; address?: string; phone?: string; email?: string; state?: string }; delivery?: { free_above?: number; [key: string]: unknown }; support?: { title?: string; note?: string; whatsapp?: string; hours?: string; socials?: Array<{ label: string; href: string }>; [key: string]: unknown }; plant_guarantee?: { enabled: boolean; days?: number; label?: string; description?: string }; announcements?: string[] }
+export interface Settings { currency: string; currency_code?: string; tax_rate?: number; shop: { name: string; address?: string; phone?: string; email?: string; state?: string }; delivery?: { free_above?: number; [key: string]: unknown }; support?: { title?: string; note?: string; whatsapp?: string; hours?: string; socials?: Array<{ label: string; href: string }>; [key: string]: unknown }; plant_guarantee?: { enabled: boolean; days?: number; label?: string; description?: string }; cod?: { enabled?: boolean; max_order?: number; label?: string; note?: string }; announcements?: string[] }
 export interface ChatMessage { id: string; role: "user" | "assistant"; content: string }
 export interface User { id: string; name: string; email: string; phone?: string | null; avatar?: string | null; addresses?: Address[]; cart?: CartItem[]; created_at?: string | null }
 export interface AuthResponse { access_token: string; token_type?: string; user: User }
-export interface CheckoutResponse extends Order { razorpay_order_id?: string; razorpay_amount?: number; razorpay_currency?: string; key_id?: string }
+export interface CheckoutResponse extends Omit<Order, "id" | "status" | "items"> { id?: string; order_id?: string; status?: string; items?: OrderItem[]; razorpay_order_id?: string; razorpay_amount?: number; razorpay_currency?: string; key_id?: string; amount?: number; currency?: string }
 export interface CartItem { product_id: string; title: string; image?: string; qty: number; size_variant?: string; pot_type?: string; unit_price: number; mrp?: number; stock?: number; sku?: string }
 export interface ApiValidationDetail { loc?: Array<string | number>; msg?: string; type?: string }
 export interface ApiError { status?: number; message: string; details?: ApiValidationDetail[] }
