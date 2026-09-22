@@ -84,6 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Plant Nursery" },
       { name: "description", content: "Thoughtfully grown plants and garden essentials, delivered with care." },
       { name: "author", content: "Plant Nursery" },
+      { property: "og:image", content: "/images/home-hero-no-people.jpg" },
+      { name: "twitter:image", content: "/images/home-hero-no-people.jpg" },
     ],
     links: [
       {
@@ -93,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23dcfce7%22 stroke=%22%2316a34a%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z%22/><path d=%22M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12%22/></svg>", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,
