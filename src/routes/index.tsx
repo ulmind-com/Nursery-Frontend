@@ -44,13 +44,13 @@ const homeVideos = [
 const spotlightPromos: SpotlightPromo[] = [
   {
     id: "sp1",
-    image: "/images/spotlight-1.jpg",
+    image: "/images/spotlight-1.png",
     link: "/search?q=Peace%20Lily",
     alt: "Starring Peace Lily",
   },
   {
     id: "sp2",
-    image: "/images/spotlight-2.jpg",
+    image: "/images/spotlight-2.png",
     link: "/search?q=Kadi%20Patta",
     alt: "Kadi Patta Plant New Launch",
   },
