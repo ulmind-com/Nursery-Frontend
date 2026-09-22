@@ -280,7 +280,7 @@ function Footer({ settings }: { settings: Settings | undefined }) {
               href="https://www.ulmind.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-center gap-2.5 text-[13px] font-medium text-forest-foreground/90"
+              className="group flex items-center justify-center gap-1.5 text-[13px] font-medium text-forest-foreground/90"
             >
               <span className="opacity-80 transition-opacity group-hover:opacity-100">
                 Designed and Developed by
