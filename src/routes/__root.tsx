@@ -84,8 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Plant Nursery" },
       { name: "description", content: "Thoughtfully grown plants and garden essentials, delivered with care." },
       { name: "author", content: "Plant Nursery" },
-      { property: "og:image", content: "/images/home-hero-no-people.jpg" },
-      { name: "twitter:image", content: "/images/home-hero-no-people.jpg" },
+      { property: "og:image", content: "https://mygarden.ulmind.store/og-image.png" },
+      { name: "twitter:image", content: "https://mygarden.ulmind.store/og-image.png" },
     ],
     links: [
       {
