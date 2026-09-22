@@ -46,7 +46,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   const { data: categories = [] } = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list, staleTime: 300_000 });
   const announcement = useRotatingAnnouncement(settings?.announcements);
-  const whatsapp = settings?.support?.whatsapp;
+  const whatsapp = settings?.support?.whatsapp || "918537861040";
   const isCheckout = path.startsWith("/checkout");
 
   if (isCheckout) {
