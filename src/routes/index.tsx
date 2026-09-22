@@ -68,8 +68,8 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-8 pt-8 sm:px-6 sm:pb-10 sm:pt-10 lg:px-9 lg:pb-12 lg:pt-12">
-        <h2 className="mb-8 text-center font-display text-[2rem] font-bold text-white sm:mb-10 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
+      <section className="mt-6 min-w-0 overflow-hidden bg-forest px-3 py-5 sm:px-6 sm:py-7 lg:mt-8 lg:px-9 lg:py-8">
+        <h2 className="mb-6 text-center font-display text-[2rem] font-bold text-white sm:mb-8 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
         <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-full justify-start gap-4 px-2 sm:gap-6 lg:justify-center lg:gap-6">
             {(categories.data ?? []).slice(0, 9).map((cat) => (
@@ -161,7 +161,7 @@ function HomePage() {
 
 function CategoryTrustStrip() {
   return (
-    <div className="bg-storefront-wash pb-8 px-3 sm:px-6 lg:px-9">
+    <div className="bg-storefront-wash pb-10 pt-6 px-3 sm:px-6 lg:px-9 lg:pb-12 lg:pt-8">
       <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between rounded-[2rem] bg-[#facc15] px-6 py-5 shadow-sm sm:flex-row lg:px-10">
         
         {/* Item 1 */}
