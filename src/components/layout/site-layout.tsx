@@ -138,7 +138,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           target="_blank"
           rel="noreferrer noopener"
           aria-label="Chat with us on WhatsApp"
-          className="fixed bottom-20 right-4 z-40 transition-transform duration-200 hover:scale-110 lg:bottom-6"
+          className="fixed bottom-24 right-4 z-40 transition-transform duration-200 hover:scale-110 lg:bottom-24"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552" className="size-14 drop-shadow-lg">
             <defs><linearGradient id="wa-bg" x1="85.915" x2="86.535" y1="32.567" y2="137.092" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#57d163"/><stop offset="1" stopColor="#23b33a"/></linearGradient></defs>
