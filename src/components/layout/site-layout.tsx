@@ -288,7 +288,7 @@ function Footer({ settings }: { settings: Settings | undefined }) {
               <img
                 src="/assets/ulmind.png"
                 alt="Ulmind"
-                className="h-8 w-auto object-contain transition-all group-hover:scale-105"
+                className="h-11 w-auto object-contain transition-all group-hover:scale-105 sm:h-12"
               />
             </a>
           </div>
