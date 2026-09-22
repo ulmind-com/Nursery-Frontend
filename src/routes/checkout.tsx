@@ -208,6 +208,8 @@ function CheckoutPage() {
      Shipping and the real total appear as soon as the address is usable, the
      way a customer expects — no "confirm address" step in between. */
   const quoteToken = useRef(0);
+  // Read back by payNow: the `error` state it closes over is a render behind.
+  const lastQuoteError = useRef("");
   const refreshQuote = useCallback(
     async (method: PaymentMethod, code: string, nextForm: DeliveryForm) => {
       const token = ++quoteToken.current;
@@ -216,13 +218,16 @@ function CheckoutPage() {
         const next = await ordersApi.quote(buildPayload(method, code, nextForm));
         if (token !== quoteToken.current) return null; // a newer edit already won
         setQuote(next);
+        lastQuoteError.current = "";
         setError("");
         if (next.cod_available === false && method === "cod") setPayment("online");
         return next;
       } catch (caught) {
         if (token !== quoteToken.current) return null;
+        const message = normalizeApiError(caught).message;
         setQuote(null);
-        setError(normalizeApiError(caught).message);
+        lastQuoteError.current = message;
+        setError(message);
         return null;
       } finally {
         if (token === quoteToken.current) setQuoting(false);
@@ -315,7 +320,8 @@ function CheckoutPage() {
       // The quote doubles as validation (stock, pincode, coupon), so never
       // place an order against a stale or missing one.
       const confirmed = quote ?? (await refreshQuote(payment, coupon, form));
-      if (!confirmed) throw new Error(error || "We couldn't confirm delivery for this address.");
+      if (!confirmed)
+        throw new Error(lastQuoteError.current || "We couldn't confirm delivery for this address.");
 
       const order = await ordersApi.create(buildPayload(payment, coupon, form));
       // `order_id` / `amount` / `currency` are what older builds of the API
@@ -612,12 +618,22 @@ function CheckoutPage() {
             </section>
 
             {error && (
-              <p
+              <div
                 role="alert"
-                className="rounded-md border border-[#f3c9c9] bg-[#fdf2f2] px-4 py-3 text-sm font-medium text-[#b42318]"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[#f3c9c9] bg-[#fdf2f2] px-4 py-3 text-sm font-medium text-[#b42318]"
               >
-                {error}
-              </p>
+                <span>{error}</span>
+                {complete && (
+                  <button
+                    type="button"
+                    disabled={quoting}
+                    onClick={() => void refreshQuote(payment, coupon, form)}
+                    className="shrink-0 rounded-md border border-[#e4a9a9] px-3 py-1 text-xs font-bold text-[#b42318] transition-colors hover:bg-[#f9e3e3] disabled:opacity-50"
+                  >
+                    {quoting ? "Retrying…" : "Try again"}
+                  </button>
+                )}
+              </div>
             )}
 
             {/* ── Pay now ── */}
