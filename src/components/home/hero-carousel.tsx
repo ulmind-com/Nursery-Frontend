@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import type { Banner } from "@/types/api";
 
 const fallbackBanners = [
-  { id: "f1", image: "/images/home-hero-no-people.jpg", title: "Bring life to your space" },
-  { id: "f2", image: "/images/hero-2.jpg", title: "Green your indoor living" },
-  { id: "f3", image: "/images/hero-3.jpg", title: "Breathe fresh air everyday" },
+  { id: "f1", image: "/images/home-hero-no-people.jpg", title: "Bring life to your space", cta_url: "/plants" },
+  { id: "f2", image: "/images/hero-2.jpg", title: "Green your indoor living", cta_url: "/plants" },
+  { id: "f3", image: "/images/hero-3.jpg", title: "Breathe fresh air everyday", cta_url: "/plants" },
+  { id: "f4", image: "/images/category-hero-pots.jpg", title: "Premium Pots & Planters", cta_url: "/search?category=Pots" },
+  { id: "f5", image: "/images/category-hero-tools.jpg", title: "Essential Garden Tools", cta_url: "/search?category=Garden%20Tools" },
+  { id: "f6", image: "/images/category-hero-decor.jpg", title: "Beautiful Garden Decor", cta_url: "/search?category=Gardening%20Decor" },
+  { id: "f7", image: "/images/category-hero-fertilisers.jpg", title: "Organic Fertilisers", cta_url: "/search?category=Fertilisers" },
+  { id: "f8", image: "/images/category-hero-seeds.jpg", title: "High-Quality Seeds", cta_url: "/search?category=Seeds" },
 ];
 
 export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopName: string }) {
@@ -43,7 +48,7 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
                     {slide.title || "Bring life to your space"}
                   </h1>
                   <a 
-                    href="/plants" 
+                    href={slide.cta_url || "/plants"} 
                     className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:scale-105 sm:mt-7 sm:px-8 sm:py-3 sm:text-base"
                   >
                     Shop Now
