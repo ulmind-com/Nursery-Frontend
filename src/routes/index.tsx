@@ -6,6 +6,7 @@ import { HeroCarousel } from "@/components/home/hero-carousel";
 import { StorefrontProductGrid } from "@/components/home/storefront-product-grid";
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
+import { VideoGallery } from "@/components/home/video-gallery";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -29,6 +30,15 @@ const browseShortcuts = [
   { name: "Pest Control", slug: "pest-control", image: categoryPestControl },
   { name: "Gardening Decor", slug: "gardening-decor", image: categoryDecor },
 ] as const;
+
+const homeVideos = [
+  { id: "v1", src: "/Video/video-1.mp4", title: "Transform your living room" },
+  { id: "v2", src: "/Video/video-2.mp4", title: "Easy care tips for busy days" },
+  { id: "v3", src: "/Video/video-3.mp4", title: "Styling your work desk" },
+  { id: "v4", src: "/Video/video-4.mp4", title: "Pet-friendly plants" },
+  { id: "v5", src: "/Video/video-5.mp4", title: "Morning mist routine" },
+  { id: "v6", src: "/Video/video-6.mp4", title: "Propagating made simple" },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -97,6 +107,8 @@ function HomePage() {
       </section>
 
       <CategoryTrustStrip />
+      
+      <VideoGallery videos={homeVideos} />
 
       <StorefrontProductGrid products={products} />
 
