@@ -188,8 +188,27 @@ function Footer({ settings }: { settings: Settings | undefined }) {
         <FooterColumn title="Help" links={[["Support", "/support"], ["Shipping", "/shipping"], ["Returns", "/returns"], ["My orders", "/account/orders"]]} />
         <FooterColumn title="Company" links={[["About", "/about"], ["Journal", "/blog"], ["Privacy", "/privacy"], ["Terms", "/terms"]]} />
       </div>
-      <div className="border-t border-forest-foreground/15 px-6 py-5 text-center text-xs text-forest-foreground/70">
-        © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
+      <div className="border-t border-forest-foreground/15 px-6 py-5">
+        <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-4 sm:flex-row">
+          <p className="text-xs text-forest-foreground/70">
+            © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
+          </p>
+          <a
+            href="https://www.ulmind.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2.5 text-[13px] font-medium text-forest-foreground/90"
+          >
+            <span className="opacity-80 transition-opacity group-hover:opacity-100">
+              Designed and Developed by
+            </span>
+            <img
+              src="/assets/ulmind.png"
+              alt="Ulmind"
+              className="h-10 w-auto object-contain transition-all group-hover:scale-105 sm:h-12"
+            />
+          </a>
+        </div>
       </div>
     </footer>
   );
