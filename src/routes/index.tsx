@@ -68,12 +68,12 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-12 pt-10 sm:px-6 sm:pb-16 lg:px-9 lg:pt-14">
-        <h2 className="mb-10 text-center font-display text-[2rem] font-bold text-white sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
-        <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
-          <div className="flex min-w-max justify-start gap-4 sm:gap-6 p-1 lg:w-full lg:justify-center lg:gap-8">
+      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-9 lg:pb-24 lg:pt-24">
+        <h2 className="mb-12 text-center font-display text-[2rem] font-bold text-white sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
+        <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max min-w-full justify-start gap-4 px-2 sm:gap-6 lg:justify-center lg:gap-6">
             {(categories.data ?? []).slice(0, 9).map((cat) => (
-              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[96px] shrink-0 text-center sm:w-[116px] lg:w-[128px]">
+              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} loading="lazy" className="size-full object-contain" />
@@ -85,7 +85,7 @@ function HomePage() {
               </Link>
             ))}
             {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }) => (
-              <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[96px] shrink-0 text-center sm:w-[116px] lg:w-[128px]">
+              <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
                 </div>
