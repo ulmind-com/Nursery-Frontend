@@ -36,10 +36,18 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
               ) : (
                 <img src={slide.image} alt={slide.title || shopName} className="absolute inset-0 size-full object-cover object-center" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-background/35" />
+              <div className="absolute inset-0 bg-gradient-to-l from-white/95 via-white/60 to-transparent sm:w-2/3 sm:left-auto sm:right-0" />
               <div className="relative flex h-full min-w-0 items-center justify-end px-5 sm:px-10 lg:px-[9%]">
-                <div className="w-[48%] min-w-0 text-forest sm:w-[45%] lg:w-[42%]">
-                  <h1 className="max-w-[12ch] text-[1.75rem] leading-[1.08] sm:text-[2.6rem] lg:text-[3.35rem]">{slide.title || "Bring life to your space"}</h1>
+                <div className="w-[60%] min-w-0 text-forest sm:w-[45%] lg:w-[42%] flex flex-col items-start drop-shadow-md sm:drop-shadow-none">
+                  <h1 className="max-w-[12ch] text-[1.75rem] font-extrabold leading-[1.08] sm:text-[2.6rem] lg:text-[3.35rem] text-forest mix-blend-normal">
+                    {slide.title || "Bring life to your space"}
+                  </h1>
+                  <a 
+                    href="/plants" 
+                    className="mt-5 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:scale-105 sm:mt-7 sm:px-8 sm:py-3 sm:text-base"
+                  >
+                    Shop Now
+                  </a>
                 </div>
               </div>
             </div>
