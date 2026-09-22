@@ -7,6 +7,7 @@ import { StorefrontProductGrid } from "@/components/home/storefront-product-grid
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
 import { VideoGallery } from "@/components/home/video-gallery";
+import { SpotlightSection, type SpotlightPromo } from "@/components/home/spotlight-section";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -38,6 +39,28 @@ const homeVideos = [
   { id: "v4", src: "/Video/video-4.mp4", title: "Pet-friendly plants" },
   { id: "v5", src: "/Video/video-5.mp4", title: "Morning mist routine" },
   { id: "v6", src: "/Video/video-6.mp4", title: "Propagating made simple" },
+];
+
+const spotlightPromos: SpotlightPromo[] = [
+  {
+    id: "sp1",
+    titleTop: "STARRING",
+    titleBottom: "PEACE LILY",
+    titleBottomColor: "#e4ff00",
+    image: "/images/sample-peace-lily.jpg",
+    link: "/search?q=Peace%20Lily",
+    buttonText: "Shop Now",
+    buttonTheme: "yellow",
+  },
+  {
+    id: "sp2",
+    titleTop: "Kadi Patta Plant",
+    image: "/images/sample-snake-plant.jpg",
+    link: "/search?q=Kadi%20Patta",
+    buttonText: "Shop Now",
+    buttonTheme: "dark",
+    badge: "New Launch",
+  },
 ];
 
 export const Route = createFileRoute("/")({
@@ -109,6 +132,8 @@ function HomePage() {
       <CategoryTrustStrip />
       
       <VideoGallery videos={homeVideos} />
+
+      <SpotlightSection promos={spotlightPromos} />
 
       <StorefrontProductGrid products={products} />
 
