@@ -68,7 +68,7 @@ function HomePage() {
 
       <section className="min-w-0 overflow-hidden bg-storefront-wash px-3 pb-7 pt-4 sm:px-6 sm:pb-8 lg:px-9 lg:pt-4">
           <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max justify-start gap-3 sm:gap-5 lg:w-full lg:justify-between lg:gap-4">
+            <div className="flex min-w-max justify-start gap-3 sm:gap-5 p-1 lg:w-full lg:justify-between lg:gap-4">
             {(categories.data ?? []).slice(0, 9).map((cat, index) => (
               <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
                 <div className={`mx-auto aspect-square overflow-hidden rounded-full bg-background p-1 transition-colors duration-200 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
