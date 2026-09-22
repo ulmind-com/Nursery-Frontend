@@ -71,7 +71,7 @@ function HomePage() {
             <div className="flex min-w-max justify-start gap-3 sm:gap-5 p-1 lg:w-full lg:justify-between lg:gap-4">
             {(categories.data ?? []).slice(0, 9).map((cat, index) => (
               <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
-                <div className={`mx-auto aspect-square overflow-hidden rounded-full bg-background p-1 transition-colors duration-200 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
+                <div className={`mx-auto aspect-square overflow-hidden rounded-full bg-background p-1 border transition-colors duration-200 ${index === 0 ? "border-primary" : "border-transparent group-hover:border-primary"}`}>
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} loading="lazy" className="size-full rounded-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   ) : (
@@ -83,7 +83,7 @@ function HomePage() {
             ))}
             {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }, index) => (
               <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
-                <div className={`mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-background p-2 transition-colors duration-200 sm:p-2.5 ${index === 0 ? "ring-1 ring-primary" : "group-hover:ring-1 group-hover:ring-primary"}`}>
+                <div className={`mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-background p-2 sm:p-2.5 border transition-colors duration-200 ${index === 0 ? "border-primary" : "border-transparent group-hover:border-primary"}`}>
                   <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain transition-transform duration-300 group-hover:scale-105" />
                 </div>
                 <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm lg:min-h-10">{name}</h2>
