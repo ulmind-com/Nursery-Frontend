@@ -265,17 +265,22 @@ function Footer({ settings }: { settings: Settings | undefined }) {
 
       {/* Bottom Footer */}
       <div className="border-t border-forest-foreground/15 px-6 py-6">
-        <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
+        <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-6 sm:flex-row sm:items-center">
           
-          <div className="flex flex-col gap-2 text-center sm:text-left">
+          {/* Copyright (Left) */}
+          <div className="flex-1 text-center sm:text-left">
             <p className="text-xs text-forest-foreground/70">
               © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
             </p>
+          </div>
+
+          {/* Developer Credit (Center) */}
+          <div className="flex-1 flex justify-center">
             <a
               href="https://www.ulmind.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="group mt-1 flex items-center justify-center gap-2.5 text-[13px] font-medium text-forest-foreground/90 sm:justify-start"
+              className="group flex items-center justify-center gap-2.5 text-[13px] font-medium text-forest-foreground/90"
             >
               <span className="opacity-80 transition-opacity group-hover:opacity-100">
                 Designed and Developed by
@@ -288,7 +293,8 @@ function Footer({ settings }: { settings: Settings | undefined }) {
             </a>
           </div>
 
-          <div className="flex flex-col items-center gap-3 sm:items-end">
+          {/* Socials (Right) */}
+          <div className="flex-1 flex flex-col items-center gap-3 sm:items-end">
             <p className="text-xs font-semibold text-forest-foreground/80">Follow Us</p>
             <div className="flex gap-3">
               <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Facebook className="size-4" /></a>
