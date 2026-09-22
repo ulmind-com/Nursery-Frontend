@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Leaf, Star } from "lucide-react";
+import { Leaf, Star, Sprout, RefreshCcw, MessageCircle } from "lucide-react";
 import { blogApi, categoriesApi, homeApi, miscApi, productsApi, queryKeys, settingsApi } from "@/api/services";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { StorefrontProductGrid } from "@/components/home/storefront-product-grid";
@@ -95,6 +95,8 @@ function HomePage() {
           </div>
       </section>
 
+      <CategoryTrustStrip />
+
       <StorefrontProductGrid products={products} />
 
       <TrustBar settings={settings.data} />
@@ -153,5 +155,47 @@ function HomePage() {
         </section>
       )}
     </>
+  );
+}
+
+function CategoryTrustStrip() {
+  return (
+    <div className="bg-storefront-wash pb-8 px-3 sm:px-6 lg:px-9">
+      <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between rounded-[2rem] bg-[#facc15] px-6 py-5 shadow-sm sm:flex-row lg:px-10">
+        
+        {/* Item 1 */}
+        <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
+          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
+            <Sprout className="size-6 text-black" />
+          </div>
+          <p className="text-sm font-semibold text-black">90-Day Pre Fertilised Soil</p>
+        </div>
+
+        {/* Item 2 */}
+        <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
+          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
+            <Leaf className="size-6 text-black" />
+          </div>
+          <p className="text-sm font-semibold text-black">Arrives Healthy</p>
+        </div>
+
+        {/* Item 3 */}
+        <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
+          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
+            <RefreshCcw className="size-6 text-black" />
+          </div>
+          <p className="text-sm font-semibold text-black">Free Replacement</p>
+        </div>
+
+        {/* Item 4 */}
+        <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center">
+          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
+            <MessageCircle className="size-6 text-black" />
+          </div>
+          <p className="text-sm font-semibold text-black">Free Plant Care Support</p>
+        </div>
+
+      </div>
+    </div>
   );
 }
