@@ -44,15 +44,22 @@ const homeVideos = [
 const spotlightPromos: SpotlightPromo[] = [
   {
     id: "sp1",
-    image: "/images/spotlight-1.jpg",
+    titleTop: "STARRING",
+    titleBottom: "PEACE LILY",
+    titleBottomColor: "#e4ff00",
+    image: "/images/sample-peace-lily.jpg",
     link: "/search?q=Peace%20Lily",
-    alt: "Starring Peace Lily",
+    buttonText: "Shop Now",
+    buttonTheme: "yellow",
   },
   {
     id: "sp2",
-    image: "/images/spotlight-2.jpg",
+    titleTop: "Kadi Patta Plant",
+    image: "/images/sample-snake-plant.jpg",
     link: "/search?q=Kadi%20Patta",
-    alt: "Kadi Patta Plant New Launch",
+    buttonText: "Shop Now",
+    buttonTheme: "dark",
+    badge: "New Launch",
   },
 ];
 
