@@ -267,15 +267,25 @@ function Footer({ settings }: { settings: Settings | undefined }) {
       <div className="border-t border-forest-foreground/15 px-6 py-6">
         <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
           
-          <div className="flex flex-col gap-1 text-center sm:text-left">
+          <div className="flex flex-col gap-2 text-center sm:text-left">
             <p className="text-xs text-forest-foreground/70">
               © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
             </p>
-            <p className="text-xs text-forest-foreground/50">
-              <a href="https://www.ulmind.com" target="_blank" rel="noopener noreferrer" className="hover:text-forest-foreground/70 transition-colors">
-                Designed and Developed by Ulmind
-              </a>
-            </p>
+            <a
+              href="https://www.ulmind.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mt-1 flex items-center justify-center gap-2.5 text-[13px] font-medium text-forest-foreground/90 sm:justify-start"
+            >
+              <span className="opacity-80 transition-opacity group-hover:opacity-100">
+                Designed and Developed by
+              </span>
+              <img
+                src="/assets/ulmind.png"
+                alt="Ulmind"
+                className="h-8 w-auto object-contain transition-all group-hover:scale-105"
+              />
+            </a>
           </div>
 
           <div className="flex flex-col items-center gap-3 sm:items-end">
