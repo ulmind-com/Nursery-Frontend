@@ -7,7 +7,7 @@ import { brand } from "@/config/brand";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { PlantAssistant } from "@/components/layout/plant-assistant";
+
 import { CartDrawer } from "@/components/commerce/cart-drawer";
 import type { Settings } from "@/types/api";
 
@@ -138,7 +138,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           target="_blank"
           rel="noreferrer noopener"
           aria-label="Chat with us on WhatsApp"
-          className="fixed bottom-28 right-4 z-40 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform duration-200 hover:scale-110 lg:bottom-10"
+          className="fixed bottom-20 right-4 z-40 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform duration-200 hover:scale-110 lg:bottom-6"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552" className="size-8">
             <defs><linearGradient id="wa-b" x1="85.915" x2="86.535" y1="32.567" y2="137.092" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#57d163"/><stop offset="1" stopColor="#23b33a"/></linearGradient></defs>
@@ -149,7 +149,6 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </a>
       )}
       <CartDrawer />
-      <PlantAssistant />
     </div>
   );
 }
