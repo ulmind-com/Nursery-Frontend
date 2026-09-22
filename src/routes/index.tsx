@@ -68,31 +68,32 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="min-w-0 overflow-hidden bg-storefront-wash px-3 pb-7 pt-4 sm:px-6 sm:pb-8 lg:px-9 lg:pt-4">
-          <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max justify-start gap-3 sm:gap-5 p-1 lg:w-full lg:justify-between lg:gap-4">
-            {(categories.data ?? []).slice(0, 9).map((cat, index) => (
-              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
-                <div className={`mx-auto aspect-square overflow-hidden rounded-full bg-background p-1 border transition-colors duration-200 ${index === 0 ? "border-primary" : "border-transparent group-hover:border-primary"}`}>
+      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-12 pt-10 sm:px-6 sm:pb-16 lg:px-9 lg:pt-14">
+        <h2 className="mb-10 text-center font-display text-[2rem] font-bold text-white sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
+        <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
+          <div className="flex min-w-max justify-start gap-4 sm:gap-6 p-1 lg:w-full lg:justify-center lg:gap-8">
+            {(categories.data ?? []).slice(0, 9).map((cat) => (
+              <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[96px] shrink-0 text-center sm:w-[116px] lg:w-[128px]">
+                <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   {cat.image ? (
-                    <img src={cat.image} alt={cat.name} loading="lazy" className="size-full rounded-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={cat.image} alt={cat.name} loading="lazy" className="size-full object-contain" />
                   ) : (
-                    <span className="flex size-full items-center justify-center rounded-full bg-primary-tint"><Leaf className="size-7 text-primary" /></span>
+                    <span className="flex size-full items-center justify-center rounded-full bg-primary-tint"><Leaf className="size-8 text-primary" /></span>
                   )}
                 </div>
-                <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm">{cat.name}</h2>
+                <h2 className="mt-4 line-clamp-2 text-sm font-medium leading-5 text-white sm:text-[15px]">{cat.name}</h2>
               </Link>
             ))}
-            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }, index) => (
-              <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[88px] shrink-0 text-center sm:w-[108px] lg:w-[118px]">
-                <div className={`mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-background p-2 sm:p-2.5 border transition-colors duration-200 ${index === 0 ? "border-primary" : "border-transparent group-hover:border-primary"}`}>
-                  <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain transition-transform duration-300 group-hover:scale-105" />
+            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }) => (
+              <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[96px] shrink-0 text-center sm:w-[116px] lg:w-[128px]">
+                <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
+                  <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
                 </div>
-                <h2 className="mt-2.5 line-clamp-2 text-xs font-semibold leading-4 sm:text-sm lg:min-h-10">{name}</h2>
+                <h2 className="mt-4 line-clamp-2 text-sm font-medium leading-5 text-white sm:text-[15px] lg:min-h-10">{name}</h2>
               </Link>
             ))}
-            </div>
           </div>
+        </div>
       </section>
 
       <CategoryTrustStrip />
