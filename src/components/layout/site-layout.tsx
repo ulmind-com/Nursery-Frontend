@@ -171,46 +171,124 @@ function MobileTabBar() {
   );
 }
 
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Truck, HandCoins, Headphones, PackageOpen } from "lucide-react";
+
 function Footer({ settings }: { settings: Settings | undefined }) {
   const shopName = settings?.shop.name || brand.brandName;
+  
   return (
     <footer className="mt-10 border-t bg-forest text-forest-foreground">
-      <div className="mx-auto grid max-w-[1480px] gap-10 px-6 py-16 sm:grid-cols-2 lg:grid-cols-5 lg:px-10">
-        <div className="sm:col-span-2">
-          <p className="font-display text-2xl font-extrabold">{shopName}</p>
-          <p className="mt-3 max-w-sm text-sm leading-6 text-forest-foreground/75">
-            Plants selected with care, packed securely, and delivered from our nursery to your home.
-          </p>
-          {settings?.plant_guarantee?.enabled && (
-            <p className="mt-6 inline-block rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground">{settings.plant_guarantee.label}</p>
-          )}
-          {settings?.shop.email && <p className="mt-5 text-sm text-forest-foreground/75">{settings.shop.email}</p>}
-          {settings?.shop.phone && <p className="text-sm text-forest-foreground/75">{settings.shop.phone}</p>}
+      {/* Feature Strip */}
+      <div className="border-b border-forest-foreground/15">
+        <div className="mx-auto grid max-w-[1480px] grid-cols-1 gap-6 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
+          <div className="flex items-start gap-4">
+            <PackageOpen className="size-8 shrink-0 text-primary-soft" />
+            <div>
+              <h3 className="font-bold text-sm tracking-wide">100,000+ Plants Delivered</h3>
+              <p className="mt-1 text-xs text-forest-foreground/75">Found great new homes!</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <HandCoins className="size-8 shrink-0 text-primary-soft" />
+            <div>
+              <h3 className="font-bold text-sm tracking-wide">Cash on Delivery</h3>
+              <p className="mt-1 text-xs text-forest-foreground/75">Available across India!</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <Truck className="size-8 shrink-0 text-primary-soft" />
+            <div>
+              <h3 className="font-bold text-sm tracking-wide">Fast & Safe Delivery</h3>
+              <p className="mt-1 text-xs text-forest-foreground/75">Packaged with Care and Love!</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <Headphones className="size-8 shrink-0 text-primary-soft" />
+            <div>
+              <h3 className="font-bold text-sm tracking-wide">Help & Support</h3>
+              <p className="mt-1 text-xs text-forest-foreground/75">Friendly & Quick!</p>
+            </div>
+          </div>
         </div>
-        <FooterColumn title="Shop" links={[["Plants", "/plants"], ["Combos", "/combos"], ["Offers", "/offers"], ["Wishlist", "/wishlist"]]} />
-        <FooterColumn title="Help" links={[["Support", "/support"], ["Shipping", "/shipping"], ["Returns", "/returns"], ["My orders", "/account/orders"]]} />
-        <FooterColumn title="Company" links={[["About", "/about"], ["Journal", "/blog"], ["Privacy", "/privacy"], ["Terms", "/terms"]]} />
       </div>
-      <div className="border-t border-forest-foreground/15 px-6 py-5">
-        <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-xs text-forest-foreground/70">
-            © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
+
+      {/* Main Footer Links */}
+      <div className="mx-auto grid max-w-[1480px] gap-12 px-6 py-16 lg:grid-cols-[2fr_1fr_1.5fr] lg:gap-16 lg:px-10">
+        
+        {/* About Section */}
+        <div>
+          <h2 className="mb-6 text-xs font-bold uppercase tracking-wider">About {shopName}</h2>
+          <p className="text-sm leading-relaxed text-forest-foreground/75">
+            {shopName} is a platform for Urban India to stay close to nature. Every city turning into a concrete jungle now, {shopName} offers unique solutions for every person with beautiful plants, pots & decorative knick-knacks to create your green patch. We strive to be the perfect Urban solution with our unique products developed keeping you in mind.
           </p>
-          <a
-            href="https://www.ulmind.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-2.5 text-[13px] font-medium text-forest-foreground/90"
-          >
-            <span className="opacity-80 transition-opacity group-hover:opacity-100">
-              Designed and Developed by
-            </span>
-            <img
-              src="/assets/ulmind.png"
-              alt="Ulmind"
-              className="h-10 w-auto object-contain transition-all group-hover:scale-105 sm:h-12"
+        </div>
+
+        {/* Quick Links */}
+        <FooterColumn 
+          title="Quick Links" 
+          links={[
+            ["Contact Us", "/support"], 
+            ["Search", "/search"], 
+            ["FAQ", "/support"], 
+            ["Blog", "/blog"], 
+            ["About Us", "/about"], 
+            ["Terms & Conditions", "/terms"], 
+            ["Cancellation & Return Policy", "/returns"], 
+            ["Terms of Service", "/terms"], 
+            ["Refund policy", "/returns"]
+          ]} 
+        />
+
+        {/* Newsletter Section */}
+        <div>
+          <h2 className="mb-6 text-xs font-bold uppercase tracking-wider">Newsletter</h2>
+          <p className="mb-4 text-sm leading-relaxed text-forest-foreground/75">
+            Subscribe to our newsletter to get the latest updates about new launches and discounts!
+          </p>
+          <form className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row" onSubmit={(e) => e.preventDefault()}>
+            <input 
+              type="email" 
+              placeholder="Your email" 
+              className="h-11 w-full rounded-md bg-white/10 px-4 text-sm text-forest-foreground placeholder:text-forest-foreground/50 outline-none ring-primary focus:ring-1"
+              required
             />
-          </a>
+            <button 
+              type="submit" 
+              className="h-11 whitespace-nowrap rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Subscribe
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      {/* Bottom Footer */}
+      <div className="border-t border-forest-foreground/15 px-6 py-6">
+        <div className="mx-auto flex max-w-[1480px] flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
+          
+          <div className="flex flex-col gap-1 text-center sm:text-left">
+            <p className="text-xs text-forest-foreground/70">
+              © {new Date().getFullYear()} {shopName}. Grown thoughtfully.
+            </p>
+            <p className="text-xs text-forest-foreground/50">
+              <a href="https://www.ulmind.com" target="_blank" rel="noopener noreferrer" className="hover:text-forest-foreground/70 transition-colors">
+                Designed and Developed by Ulmind
+              </a>
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center gap-3 sm:items-end">
+            <p className="text-xs font-semibold text-forest-foreground/80">Follow Us</p>
+            <div className="flex gap-3">
+              <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Facebook className="size-4" /></a>
+              <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Twitter className="size-4" /></a>
+              <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Instagram className="size-4" /></a>
+              <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Youtube className="size-4" /></a>
+              <a href="#" className="flex size-8 items-center justify-center rounded-full bg-forest-foreground/10 text-forest-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><Linkedin className="size-4" /></a>
+            </div>
+          </div>
+          
         </div>
       </div>
     </footer>
@@ -220,10 +298,10 @@ function Footer({ settings }: { settings: Settings | undefined }) {
 function FooterColumn({ title, links }: { title: string; links: Array<[string, string]> }) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-bold">{title}</h2>
-      <div className="space-y-3">
+      <h2 className="mb-6 text-xs font-bold uppercase tracking-wider">{title}</h2>
+      <div className="space-y-3.5">
         {links.map(([label, to]) => (
-          <a key={to} href={to} className="block text-sm text-forest-foreground/75 transition-colors duration-200 hover:text-primary-foreground">{label}</a>
+          <a key={label} href={to} className="block text-sm text-forest-foreground/75 transition-colors duration-200 hover:text-primary-foreground">{label}</a>
         ))}
       </div>
     </div>
