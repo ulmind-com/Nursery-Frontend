@@ -68,8 +68,8 @@ function HomePage() {
     <>
       <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
 
-      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-9 lg:pb-24 lg:pt-24">
-        <h2 className="mb-12 text-center font-display text-[2rem] font-bold text-white sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
+      <section className="min-w-0 overflow-hidden bg-forest px-3 pb-8 pt-8 sm:px-6 sm:pb-10 sm:pt-10 lg:px-9 lg:pb-12 lg:pt-12">
+        <h2 className="mb-8 text-center font-display text-[2rem] font-bold text-white sm:mb-10 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
         <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-full justify-start gap-4 px-2 sm:gap-6 lg:justify-center lg:gap-6">
             {(categories.data ?? []).slice(0, 9).map((cat) => (
