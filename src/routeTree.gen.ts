@@ -17,7 +17,10 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CombosRouteImport } from './routes/combos'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CorporateGiftsRouteImport } from './routes/corporate-gifts'
 import { Route as GardenServicesRouteImport } from './routes/garden-services'
+import { Route as GiftingRouteImport } from './routes/gifting'
+import { Route as LocateStoreRouteImport } from './routes/locate-store'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
@@ -82,9 +85,24 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CorporateGiftsRoute = CorporateGiftsRouteImport.update({
+  id: '/corporate-gifts',
+  path: '/corporate-gifts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GardenServicesRoute = GardenServicesRouteImport.update({
   id: '/garden-services',
   path: '/garden-services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftingRoute = GiftingRouteImport.update({
+  id: '/gifting',
+  path: '/gifting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocateStoreRoute = LocateStoreRouteImport.update({
+  id: '/locate-store',
+  path: '/locate-store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -212,7 +230,10 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/combos': typeof CombosRoute
   '/contact': typeof ContactRoute
+  '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
+  '/gifting': typeof GiftingRoute
+  '/locate-store': typeof LocateStoreRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
@@ -245,7 +266,10 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/combos': typeof CombosRoute
   '/contact': typeof ContactRoute
+  '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
+  '/gifting': typeof GiftingRoute
+  '/locate-store': typeof LocateStoreRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
@@ -279,7 +303,10 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/combos': typeof CombosRoute
   '/contact': typeof ContactRoute
+  '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
+  '/gifting': typeof GiftingRoute
+  '/locate-store': typeof LocateStoreRoute
   '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
@@ -315,7 +342,10 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/combos'
     | '/contact'
+    | '/corporate-gifts'
     | '/garden-services'
+    | '/gifting'
+    | '/locate-store'
     | '/login'
     | '/offers'
     | '/order-confirmation'
@@ -348,7 +378,10 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/combos'
     | '/contact'
+    | '/corporate-gifts'
     | '/garden-services'
+    | '/gifting'
+    | '/locate-store'
     | '/login'
     | '/offers'
     | '/order-confirmation'
@@ -381,7 +414,10 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/combos'
     | '/contact'
+    | '/corporate-gifts'
     | '/garden-services'
+    | '/gifting'
+    | '/locate-store'
     | '/login'
     | '/offers'
     | '/order-confirmation'
@@ -416,7 +452,10 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CombosRoute: typeof CombosRoute
   ContactRoute: typeof ContactRoute
+  CorporateGiftsRoute: typeof CorporateGiftsRoute
   GardenServicesRoute: typeof GardenServicesRoute
+  GiftingRoute: typeof GiftingRoute
+  LocateStoreRoute: typeof LocateStoreRoute
   LoginRoute: typeof LoginRoute
   OffersRoute: typeof OffersRoute
   OrderConfirmationRoute: typeof OrderConfirmationRoute
@@ -493,11 +532,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/corporate-gifts': {
+      id: '/corporate-gifts'
+      path: '/corporate-gifts'
+      fullPath: '/corporate-gifts'
+      preLoaderRoute: typeof CorporateGiftsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/garden-services': {
       id: '/garden-services'
       path: '/garden-services'
       fullPath: '/garden-services'
       preLoaderRoute: typeof GardenServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gifting': {
+      id: '/gifting'
+      path: '/gifting'
+      fullPath: '/gifting'
+      preLoaderRoute: typeof GiftingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locate-store': {
+      id: '/locate-store'
+      path: '/locate-store'
+      fullPath: '/locate-store'
+      preLoaderRoute: typeof LocateStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -714,7 +774,10 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CombosRoute: CombosRoute,
   ContactRoute: ContactRoute,
+  CorporateGiftsRoute: CorporateGiftsRoute,
   GardenServicesRoute: GardenServicesRoute,
+  GiftingRoute: GiftingRoute,
+  LocateStoreRoute: LocateStoreRoute,
   LoginRoute: LoginRoute,
   OffersRoute: OffersRoute,
   OrderConfirmationRoute: OrderConfirmationRoute,

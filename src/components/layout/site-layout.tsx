@@ -21,8 +21,12 @@ function NavLinks({ className, activeClassName, onNavigate }: { className: strin
       <Link to="/plants" search={{ q: "plant care" }} {...props}>Plant Care</Link>
       <Link to="/plants" search={{ q: "seeds" }} {...props}>Seeds</Link>
       <Link to="/combos" {...props}>Combos</Link>
+      <Link to="/gifting" {...props}>Gifting</Link>
+      <Link to="/corporate-gifts" {...props}>Corporate Gifts</Link>
+      <Link to="/garden-services" {...props}>Garden Services</Link>
       <Link to="/offers" {...props}>Offers</Link>
       <Link to="/blog" {...props}>Journal</Link>
+      <Link to="/locate-store" {...props}>Locate Store</Link>
     </>
   );
 }
