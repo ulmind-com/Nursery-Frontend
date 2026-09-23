@@ -22,9 +22,9 @@ import type { Product, ProductSize, Review } from "@/types/api";
 export const Route = createFileRoute("/product/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Product ${params.id} | Plant Nursery` },
+      { title: `Product ${params.id} | MyGarden` },
       { name: "description", content: "Plant details, care guidance, sizes, and availability." },
-      { property: "og:title", content: "Shop this plant | Plant Nursery" },
+      { property: "og:title", content: "Shop this plant | MyGarden" },
       { property: "og:description", content: "Plant details, care guidance, sizes, and availability." },
       { property: "og:type", content: "product" },
       { name: "twitter:card", content: "summary_large_image" },

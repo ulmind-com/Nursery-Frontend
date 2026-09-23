@@ -4,9 +4,9 @@ import { Leaf, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About | Plant Nursery" },
+      { title: "About | MyGarden" },
       { name: "description", content: "How we select, pack, and support plants for Indian homes." },
-      { property: "og:title", content: "About | Plant Nursery" },
+      { property: "og:title", content: "About | MyGarden" },
       { property: "og:description", content: "Meet the nursery behind your plants." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

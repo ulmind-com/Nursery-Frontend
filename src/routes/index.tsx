@@ -16,7 +16,7 @@ import { BrandComparisonSection } from "@/components/home/brand-comparison";
 import { GrowGardenBanner } from "@/components/home/grow-garden-banner";
 import { StoreLocatorSection, storesFromApi } from "@/components/home/store-locator";
 import { GardenServicesBand } from "@/components/home/garden-services";
-import { brand } from "@/config/brand";
+import { displayName } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
 const categoryPots = "/images/category-pots.png";
@@ -67,9 +67,9 @@ const spotlightPromos: SpotlightPromo[] = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Premium Plants Online | Plant Nursery" },
+      { title: "Premium Plants Online | MyGarden" },
       { name: "description", content: "Shop healthy indoor and outdoor plants, planters, and care essentials from a trusted Indian nursery." },
-      { property: "og:title", content: "Premium Plants Online | Plant Nursery" },
+      { property: "og:title", content: "Premium Plants Online | MyGarden" },
       { property: "og:description", content: "Thoughtfully grown plants and garden essentials, delivered with care." },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://mygarden.ulmind.store/og-image.png" },
@@ -117,7 +117,7 @@ function HomePage() {
 
   return (
     <>
-      <HeroCarousel banners={banners.data ?? []} shopName={settings.data?.shop.name || brand.brandName} />
+      <HeroCarousel banners={banners.data ?? []} shopName={displayName(settings.data?.shop.name)} />
 
       <section className="mt-6 min-w-0 overflow-hidden bg-forest px-3 py-5 sm:px-6 sm:py-7 lg:mt-8 lg:px-9 lg:py-8">
         <h2 className="mb-6 text-center font-display text-[2rem] font-bold text-white sm:mb-8 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>

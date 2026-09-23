@@ -7,9 +7,9 @@ import { PageSkeleton } from "@/components/shared/page-state";
 export const Route = createFileRoute("/support")({
   head: () => ({
     meta: [
-      { title: "Customer Support | Plant Nursery" },
+      { title: "Customer Support | MyGarden" },
       { name: "description", content: "Reach the nursery team for order help, plant care advice, and delivery questions." },
-      { property: "og:title", content: "Customer Support | Plant Nursery" },
+      { property: "og:title", content: "Customer Support | MyGarden" },
       { property: "og:description", content: "Reach the nursery team for order and plant care help." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

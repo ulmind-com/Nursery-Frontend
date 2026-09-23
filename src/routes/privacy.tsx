@@ -4,9 +4,9 @@ import { PolicyPage, PolicySection } from "@/components/shared/policy-page";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy | Plant Nursery" },
+      { title: "Privacy Policy | MyGarden" },
       { name: "description", content: "How the nursery collects, uses, and protects your personal information." },
-      { property: "og:title", content: "Privacy Policy | Plant Nursery" },
+      { property: "og:title", content: "Privacy Policy | MyGarden" },
       { property: "og:description", content: "How we handle your personal information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -26,9 +26,9 @@ export const Route = createFileRoute("/plants")({
   validateSearch: parseSearch,
   head: () => ({
     meta: [
-      { title: "Plants | Plant Nursery" },
+      { title: "Plants | MyGarden" },
       { name: "description", content: "Explore healthy indoor and outdoor plants for Indian homes." },
-      { property: "og:title", content: "Plants | Plant Nursery" },
+      { property: "og:title", content: "Plants | MyGarden" },
       { property: "og:description", content: "Explore healthy indoor and outdoor plants for Indian homes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -12,9 +12,9 @@ export const Route = createFileRoute("/search")({
   validateSearch: (s: Record<string, unknown>): { q?: string } => (typeof s["q"] === "string" && s["q"] ? { q: s["q"] } : {}),
   head: () => ({
     meta: [
-      { title: "Search | Plant Nursery" },
+      { title: "Search | MyGarden" },
       { name: "description", content: "Search plants, planters, and garden essentials." },
-      { property: "og:title", content: "Search | Plant Nursery" },
+      { property: "og:title", content: "Search | MyGarden" },
       { property: "og:description", content: "Find the right plants and garden essentials." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

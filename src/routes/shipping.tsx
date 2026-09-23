@@ -6,9 +6,9 @@ import { PolicyPage, PolicySection } from "@/components/shared/policy-page";
 export const Route = createFileRoute("/shipping")({
   head: () => ({
     meta: [
-      { title: "Shipping & Delivery | Plant Nursery" },
+      { title: "Shipping & Delivery | MyGarden" },
       { name: "description", content: "How plants are packed, dispatched, and delivered, including delivery charges." },
-      { property: "og:title", content: "Shipping & Delivery | Plant Nursery" },
+      { property: "og:title", content: "Shipping & Delivery | MyGarden" },
       { property: "og:description", content: "Packing, dispatch, and delivery details for nursery orders." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

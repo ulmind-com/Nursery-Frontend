@@ -9,9 +9,9 @@ import type { GardenBlock, GardenBlocks, GardenService, GardenServiceSection } f
 export const Route = createFileRoute("/garden-services")({
   head: () => ({
     meta: [
-      { title: "Garden Services | Plant Nursery" },
+      { title: "Garden Services | MyGarden" },
       { name: "description", content: "Year round care for your garden and office space — landscaping, vertical gardens, corporate plant rentals and indoor styling." },
-      { property: "og:title", content: "Garden Services | Plant Nursery" },
+      { property: "og:title", content: "Garden Services | MyGarden" },
       { property: "og:description", content: "End-to-end garden services, tailored to your space and handled with zero hassle." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

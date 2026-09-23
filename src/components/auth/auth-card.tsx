@@ -140,7 +140,7 @@ function Hero({
     <div className={`auth-hero is-${variant} flex flex-col items-center justify-center gap-4 px-9 text-center text-white`}>
       <span className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur-sm">
         <Leaf className="size-3.5" />
-        Plant Nursery
+        MyGarden
       </span>
       <h2 className="font-display text-[2.1rem] font-extrabold leading-[1.1] drop-shadow-sm sm:text-[2.4rem]">{title}</h2>
       <p className="max-w-[22rem] text-sm leading-6 text-white/85">{text}</p>

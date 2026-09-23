@@ -1,9 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Home, LayoutGrid, Leaf, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
+import { Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { categoriesApi, queryKeys, settingsApi } from "@/api/services";
-import { brand } from "@/config/brand";
+import { displayName } from "@/config/brand";
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -55,10 +56,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <header className="border-b border-border bg-background">
           <div className="mx-auto grid h-[74px] max-w-[1180px] grid-cols-3 items-center px-4 sm:h-[86px] sm:px-6">
             <span aria-hidden="true" />
-            <Link to="/" className="flex items-center justify-center gap-2 font-display text-xl font-extrabold text-forest sm:text-2xl">
-              <Leaf className="size-7 fill-primary-soft text-primary" />
-              <span>{settings?.shop.name || brand.brandName}</span>
-            </Link>
+            <div className="flex justify-center">
+              <BrandLogo name={displayName(settings?.shop.name)} />
+            </div>
             <Button variant="ghost" size="icon" className="relative justify-self-end" onClick={openCart} aria-label={`Cart with ${count} items`}>
               <ShoppingBag />
               {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
@@ -86,7 +86,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </SheetTrigger>
             <SheetContent side="left" className="w-[88%] p-0">
               <SheetHeader className="border-b p-5 text-left">
-                <SheetTitle className="text-2xl text-forest">{settings?.shop.name || brand.brandName}</SheetTitle>
+                <SheetTitle asChild><BrandLogo name={displayName(settings?.shop.name)} asLink={false} /></SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col p-3">
                 <NavLinks className="border-b border-border px-3 py-4 text-sm font-semibold" onNavigate={() => setMobileOpen(false)} />
@@ -101,10 +101,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               )}
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-extrabold text-forest sm:text-[1.4rem] lg:text-[1.75rem]">
-            <Leaf className="hidden size-8 fill-primary-soft text-primary sm:block" />
-            <span className="truncate">{settings?.shop.name || brand.brandName}</span>
-          </Link>
+          <BrandLogo name={displayName(settings?.shop.name)} />
           <form
             className="relative hidden min-w-0 lg:block"
             onSubmit={(event) => { event.preventDefault(); const q = search.trim(); if (q) void navigate({ to: "/search", search: { q } }); }}
@@ -174,7 +171,7 @@ function MobileTabBar() {
 import { Facebook, Instagram, Linkedin, Twitter, Youtube, Truck, HandCoins, Headphones, PackageOpen } from "lucide-react";
 
 function Footer({ settings }: { settings: Settings | undefined }) {
-  const shopName = settings?.shop.name || brand.brandName;
+  const shopName = displayName(settings?.shop.name);
   
   return (
     <footer className="mt-10 border-t bg-forest text-forest-foreground">
@@ -217,7 +214,8 @@ function Footer({ settings }: { settings: Settings | undefined }) {
         
         {/* About Section */}
         <div>
-          <h2 className="mb-6 text-xs font-bold uppercase tracking-wider">About {shopName}</h2>
+          <div className="mb-5"><BrandLogo name={shopName} tone="light" asLink={false} /></div>
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-forest-foreground/70">About {shopName}</h2>
           <p className="text-sm leading-relaxed text-forest-foreground/75">
             {shopName} is a platform for Urban India to stay close to nature. Every city turning into a concrete jungle now, {shopName} offers unique solutions for every person with beautiful plants, pots & decorative knick-knacks to create your green patch. We strive to be the perfect Urban solution with our unique products developed keeping you in mind.
           </p>
