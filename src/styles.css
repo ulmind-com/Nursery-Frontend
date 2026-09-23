@@ -260,6 +260,16 @@
   to { transform: translateX(-100%); }
 }
 
+/* Press logo strip — same drift, a touch slower so wordmarks stay readable */
+@keyframes press-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@utility animate-press-marquee {
+  animation: press-marquee 38s linear infinite;
+}
+
 @utility animate-offers-marquee {
   animation: offers-marquee 45s linear infinite;
 }
