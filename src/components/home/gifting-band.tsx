@@ -13,8 +13,18 @@ export const defaultGifting: GiftingSection = {
   secondary_url: "/contact",
 };
 
+/* The API returns "" for fields the admin has not filled in, so a plain spread
+   would blank out the bundled copy — only non-empty values override. */
+function withDefaults(section: GiftingSection | undefined): GiftingSection {
+  const merged: Record<string, unknown> = { ...defaultGifting };
+  for (const [key, value] of Object.entries(section ?? {})) {
+    if (typeof value === "string" ? value.trim() !== "" : value !== undefined) merged[key] = value;
+  }
+  return merged as GiftingSection;
+}
+
 export function GiftingBand({ section }: { section?: GiftingSection | undefined }) {
-  const gift = { ...defaultGifting, ...(section ?? {}) };
+  const gift = withDefaults(section);
   if (gift.active === false) return null;
 
   return (
