@@ -269,54 +269,65 @@ function Page() {
   const faqs = pick("faq", fallbackFaqs);
   const clients = blocks["client"] ?? [];
   const whyPoints = section.why_points?.length ? section.why_points : fallbackWhyPoints;
-  const heroImage = section.hero_image || section.page_image || "/images/botanical-hero.jpg";
+  const heroImage = section.hero_image || "/garden-service.png";
 
   return (
     <div className="bg-background">
-      {/* Hero — painted green panel and yellow swashes over a full-bleed photo */}
+      {/* Hero — the artwork already carries the headline and button, so the
+          painted panel only renders when the admin swaps in a plain photo. */}
       <section className="relative overflow-hidden" aria-labelledby="gs-hero-title">
-        <img src={heroImage} alt="" aria-hidden="true" className="h-[380px] w-full object-cover sm:h-[460px] lg:h-[540px]" />
-        <div aria-hidden="true" className="absolute inset-0 bg-forest/15" />
+        <a href="#enquiry" className="block" aria-label={section.hero_cta_label || "Book service"}>
+          <img
+            src={heroImage}
+            alt={`${section.hero_title || "Year round care"} — ${section.hero_subtitle ?? "for your garden & office space"}`}
+            width={2161}
+            height={728}
+            className="h-[300px] w-full object-cover object-[28%_center] sm:h-[380px] sm:object-[20%_center] lg:h-auto lg:aspect-[2161/728] lg:object-center"
+          />
+        </a>
+        <h1 id="gs-hero-title" className="sr-only">
+          {section.hero_title || "Year round care"} {section.hero_subtitle ?? "for your garden & office space"}
+        </h1>
 
-        {/* Decorative brush swashes, mirrored on each edge */}
-        <svg aria-hidden="true" viewBox="0 0 240 800" preserveAspectRatio="none" className="pointer-events-none absolute -left-10 top-0 h-full w-[20%] text-star sm:-left-8 sm:w-[13%]">
-          <path d="M168 -60C36 170 26 430 132 880" fill="none" stroke="currentColor" strokeWidth="26" strokeLinecap="round" />
-        </svg>
-        <svg aria-hidden="true" viewBox="0 0 240 800" preserveAspectRatio="none" className="pointer-events-none absolute -right-10 top-0 h-full w-[20%] -scale-x-100 text-star sm:-right-8 sm:w-[13%]">
-          <path d="M168 -60C36 170 26 430 132 880" fill="none" stroke="currentColor" strokeWidth="26" strokeLinecap="round" />
-        </svg>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <div className="relative w-full max-w-[min(92vw,56rem)] px-6 py-7 sm:px-14 sm:py-10 lg:px-20 lg:py-12">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 1000 260"
-              preserveAspectRatio="none"
-              className="absolute inset-0 size-full text-primary drop-shadow-[0_18px_40px_rgba(0,0,0,0.35)]"
-            >
-              <path
-                d="M11 62C4 27 33 11 80 7c186-12 646-9 858 3 45 3 66 25 59 62-8 41 4 106-4 145-7 33-30 42-73 44-217 10-612 8-824 0-47-2-70-16-73-51-3-37 4-111-12-148Z"
-                fill="currentColor"
-              />
+        {section.hero_overlay && (
+          <>
+            <div aria-hidden="true" className="absolute inset-0 bg-forest/15" />
+            <svg aria-hidden="true" viewBox="0 0 240 800" preserveAspectRatio="none" className="pointer-events-none absolute -left-10 top-0 h-full w-[20%] text-star sm:-left-8 sm:w-[13%]">
+              <path d="M168 -60C36 170 26 430 132 880" fill="none" stroke="currentColor" strokeWidth="26" strokeLinecap="round" />
+            </svg>
+            <svg aria-hidden="true" viewBox="0 0 240 800" preserveAspectRatio="none" className="pointer-events-none absolute -right-10 top-0 h-full w-[20%] -scale-x-100 text-star sm:-right-8 sm:w-[13%]">
+              <path d="M168 -60C36 170 26 430 132 880" fill="none" stroke="currentColor" strokeWidth="26" strokeLinecap="round" />
             </svg>
 
-            <div className="relative">
-              <h1 id="gs-hero-title" className="font-display text-[2rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[3.25rem] lg:text-[4.25rem]">
-                {section.hero_title || "Year round care"}
-              </h1>
-              <p className="mt-1 font-display text-lg font-semibold text-white/95 sm:text-2xl lg:text-[2.25rem]">
-                {section.hero_subtitle ?? "for your garden & office space"}
-              </p>
-            </div>
-          </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+              <div className="relative w-full max-w-[min(92vw,56rem)] px-6 py-7 sm:px-14 sm:py-10 lg:px-20 lg:py-12">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 1000 260"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 size-full text-primary drop-shadow-[0_18px_40px_rgba(0,0,0,0.35)]"
+                >
+                  <path d="M11 62C4 27 33 11 80 7c186-12 646-9 858 3 45 3 66 25 59 62-8 41 4 106-4 145-7 33-30 42-73 44-217 10-612 8-824 0-47-2-70-16-73-51-3-37 4-111-12-148Z" fill="currentColor" />
+                </svg>
+                <div className="relative">
+                  <p className="font-display text-[2rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[3.25rem] lg:text-[4.25rem]">
+                    {section.hero_title || "Year round care"}
+                  </p>
+                  <p className="mt-1 font-display text-lg font-semibold text-white/95 sm:text-2xl lg:text-[2.25rem]">
+                    {section.hero_subtitle ?? "for your garden & office space"}
+                  </p>
+                </div>
+              </div>
 
-          <a
-            href="#enquiry"
-            className="mt-6 rounded-[1.1rem] bg-card px-8 py-3.5 font-display text-base font-bold text-forest shadow-[0_18px_40px_-18px_rgba(0,0,0,0.65)] transition hover:bg-star sm:mt-8 sm:px-10 sm:py-4 sm:text-xl"
-          >
-            {section.hero_cta_label || "Book service"}
-          </a>
-        </div>
+              <a
+                href="#enquiry"
+                className="mt-6 rounded-[1.1rem] bg-card px-8 py-3.5 font-display text-base font-bold text-forest shadow-[0_18px_40px_-18px_rgba(0,0,0,0.65)] transition hover:bg-star sm:mt-8 sm:px-10 sm:py-4 sm:text-xl"
+              >
+                {section.hero_cta_label || "Book service"}
+              </a>
+            </div>
+          </>
+        )}
       </section>
 
       {/* Services */}
