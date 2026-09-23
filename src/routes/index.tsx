@@ -116,6 +116,34 @@ function HomePage() {
     ? mediaData.filter((item) => item.section === "farm")
     : mediaData?.["farm"] ?? [];
   const farmCards = farmCardsFromMedia(farmMedia);
+  /* Admin sections and the recommendation feed overlap, so the page was showing
+     two "Recommended for you" rails with the same products. Titles are claimed
+     once, and a product only appears in the first rail that carries it. */
+  const seenTitles = new Set<string>();
+  const seenProductIds = new Set<string>();
+  const rails: Array<{ key: string; title: string; eyebrow?: string; featured: boolean; products: Product[] }> = [];
+
+  const pushRail = (rail: { key: string; title: string; eyebrow?: string; featured: boolean; products: Product[] }) => {
+    const titleKey = rail.title.trim().toLowerCase();
+    if (!titleKey || seenTitles.has(titleKey)) return;
+    const fresh = rail.products.filter((product) => product.id && !seenProductIds.has(product.id));
+    if (fresh.length === 0) return;
+    fresh.forEach((product) => seenProductIds.add(product.id));
+    seenTitles.add(titleKey);
+    rails.push({ ...rail, products: fresh });
+  };
+
+  for (const section of sections.data ?? []) {
+    if (section.active === false) continue;
+    pushRail({
+      key: section.id ?? section.title ?? "section",
+      title: section.title || "Handpicked",
+      featured: section.layout === "featured",
+      products: section.products ?? [],
+    });
+  }
+  pushRail({ key: "recommended", title: "Recommended for you", eyebrow: "Picked for you", featured: true, products: recommended });
+
   const productResult = storefrontProducts.data;
   const products: Product[] = Array.isArray(productResult) ? productResult : productResult?.items ?? [];
 
@@ -167,19 +195,11 @@ function HomePage() {
 
       <TrustBar settings={settings.data} />
 
-      {(sections.data ?? [])
-        .filter((section) => section.active !== false && (section.products?.length ?? 0) > 0)
-        .map((section) => (
-          <div key={section.id} className={section.layout === "featured" ? "bg-primary-tint" : ""}>
-            <ProductRail title={section.title || "Handpicked"} products={section.products ?? []} />
-          </div>
-        ))}
-
-      {recommended.length > 0 && (
-        <div className="bg-primary-tint">
-          <ProductRail eyebrow="Picked for you" title="Recommended for you" products={recommended} />
+      {rails.map((rail) => (
+        <div key={rail.key} className={rail.featured ? "bg-primary-tint" : ""}>
+          <ProductRail {...(rail.eyebrow ? { eyebrow: rail.eyebrow } : {})} title={rail.title} products={rail.products} />
         </div>
-      )}
+      ))}
 
       {reviews.length > 0 && (
         <section className="mx-auto max-w-[1480px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
