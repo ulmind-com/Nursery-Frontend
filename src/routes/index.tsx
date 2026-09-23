@@ -8,6 +8,10 @@ import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail, SectionHeader } from "@/components/home/section-rail";
 import { VideoGallery } from "@/components/home/video-gallery";
 import { SpotlightSection, type SpotlightPromo } from "@/components/home/spotlight-section";
+import { BhiduApprovedSection } from "@/components/home/bhidu-approved-section";
+import { OffersMarquee, offerCardsFromMedia } from "@/components/home/offers-marquee";
+import { ShopBySpaceSection, spaceCardsFromMedia } from "@/components/home/shop-by-space";
+import { FarmToHomeSection, farmCardsFromMedia } from "@/components/home/farm-to-home";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -81,12 +85,27 @@ function HomePage() {
   const storefrontProducts = useQuery({ queryKey: queryKeys.products({ limit: 6 }), queryFn: () => productsApi.list({ limit: 6 }) });
   const googleReviews = useQuery({ queryKey: ["google-reviews"], queryFn: miscApi.googleReviews });
   const posts = useQuery({ queryKey: queryKeys.blog, queryFn: blogApi.list });
+  const siteMedia = useQuery({ queryKey: ["site-media"], queryFn: homeApi.media });
 
   const recommended: Product[] = Array.isArray(recommendations.data)
     ? recommendations.data.flatMap((entry) => ("products" in entry ? entry.products || [] : [entry as Product]))
     : [];
   const blogPosts = posts.data?.items ?? [];
   const reviews = googleReviews.data ?? [];
+  /* Offer cards come from site media (section "offers"), managed in the admin panel */
+  const mediaData = siteMedia.data;
+  const offerMedia = Array.isArray(mediaData)
+    ? mediaData.filter((item) => item.section === "offers")
+    : mediaData?.["offers"] ?? [];
+  const offerCards = offerCardsFromMedia(offerMedia);
+  const spaceMedia = Array.isArray(mediaData)
+    ? mediaData.filter((item) => item.section === "spaces")
+    : mediaData?.["spaces"] ?? [];
+  const spaceCards = spaceCardsFromMedia(spaceMedia);
+  const farmMedia = Array.isArray(mediaData)
+    ? mediaData.filter((item) => item.section === "farm")
+    : mediaData?.["farm"] ?? [];
+  const farmCards = farmCardsFromMedia(farmMedia);
   const productResult = storefrontProducts.data;
   const products: Product[] = Array.isArray(productResult) ? productResult : productResult?.items ?? [];
 
@@ -128,7 +147,13 @@ function HomePage() {
 
       <SpotlightSection promos={spotlightPromos} />
 
+      <BhiduApprovedSection products={products} />
+
+      <OffersMarquee offers={offerCards} />
+
       <StorefrontProductGrid products={products} />
+
+      <ShopBySpaceSection spaces={spaceCards} />
 
       <TrustBar settings={settings.data} />
 
@@ -185,6 +210,7 @@ function HomePage() {
           </div>
         </section>
       )}
+      <FarmToHomeSection cards={farmCards} />
     </>
   );
 }
