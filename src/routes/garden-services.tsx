@@ -1,17 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Check, Clock, IndianRupee, Leaf, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { CalendarClock, Check, ChevronDown, Hand, MapPin, Phone, Shovel, UserRound } from "lucide-react";
 import { gardenServicesApi, queryKeys } from "@/api/services";
 import { defaultGardenSection } from "@/components/home/garden-services";
-import type { GardenService } from "@/types/api";
+import type { GardenBlock, GardenBlocks, GardenService, GardenServiceSection } from "@/types/api";
 
 export const Route = createFileRoute("/garden-services")({
   head: () => ({
     meta: [
       { title: "Garden Services | Plant Nursery" },
-      { name: "description", content: "Botanical styling, landscape architecture, curated planters and plant care — designed around your space and handled end to end." },
+      { name: "description", content: "Year round care for your garden and office space — landscaping, vertical gardens, corporate plant rentals and indoor styling." },
       { property: "og:title", content: "Garden Services | Plant Nursery" },
-      { property: "og:description", content: "End-to-end garden services, tailored to your vision and handled with zero hassle." },
+      { property: "og:description", content: "End-to-end garden services, tailored to your space and handled with zero hassle." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -19,179 +20,522 @@ export const Route = createFileRoute("/garden-services")({
   component: Page,
 });
 
-/* Shown until the admin publishes services of their own */
+/* ---------- Bundled content, shown until the admin publishes their own ---------- */
+
 const fallbackServices: GardenService[] = [
-  { id: "d1", title: "Botanical styling", summary: "A curated plant palette chosen for your light, your layout and the way you live.", price_from: "4,999", duration: "2–3 days", features: ["On-site light study", "Plant + planter palette", "Styling and placement"] },
-  { id: "d2", title: "Landscape architecture", summary: "Balconies, terraces and courtyards designed end to end, drawings through to planting.", price_from: "24,999", duration: "3–6 weeks", features: ["Concept and 3D layout", "Material and planter selection", "Execution and handover"] },
-  { id: "d3", title: "Curated planters", summary: "Statement pots planted to order and delivered ready to place — nothing left for you to do.", price_from: "2,499", duration: "5–7 days", features: ["Pot and plant pairing", "Pre-fertilised soil mix", "Delivered planted"] },
-  { id: "d4", title: "Plant care & maintenance", summary: "A gardener on a schedule: pruning, repotting, pest control and seasonal feeding.", price_from: "1,499", duration: "Monthly visits", features: ["Pruning and repotting", "Pest and disease control", "Seasonal feeding"] },
+  { id: "d1", title: "Potted-Exotic Garden Care", summary: "Add a touch of lush sophistication to your spaces with rare and exotic potted plants.", image: "/images/sample-areca-palm.jpg", features: ["Annual Maintenance Packages (Corporate & Hospitality).", "Flexible Subscription-Based Plant Care Plans."] },
+  { id: "d2", title: "Vertical Gardens", summary: "Turn plain walls into stunning green features.", image: "/places/balcony.jpg", features: ["Installation of Bio-Wall & Felt-Wall Systems", "Annual Maintenance Packages (Corporate & Hospitality).", "Subscription-Based Care Plans."] },
+  { id: "d3", title: "Corporate Plant Rentals", summary: "Elevate your workspace with thoughtfully curated, low-maintenance greenery that inspires productivity and style.", image: "/places/office.jpg", features: ["Premium Pots, Planters & Plants.", "Customized & Portable Vertical Garden Systems."] },
+  { id: "d4", title: "Indoor Plant Styling", summary: "Styling that brings nature indoors, effortlessly.", image: "/places/living-room.jpg", features: ["Personalized Plant Recommendations.", "Interior Styling for Homes & Offices.", "Curated Pots & Planters for Your Aesthetic."] },
 ];
 
-const steps = [
-  { icon: MessageCircle, title: "Tell us your space", body: "Share a few photos, the light you get and what you want the space to feel like." },
-  { icon: Leaf, title: "We design it", body: "Our horticulturists put together a plant and planter plan with a clear quote." },
-  { icon: Sparkles, title: "We install it", body: "Our team delivers, plants and styles everything on site — you just walk in." },
-  { icon: Check, title: "We keep it alive", body: "Optional maintenance visits so your garden looks as good in month six as on day one." },
+const fallbackProcess: GardenBlock[] = [
+  { id: "p1", title: "Site Visit & Evaluation", body: "We assess lighting, drainage, water pressure, aesthetics, and more to understand your space." },
+  { id: "p2", title: "Design & Planning", body: "Our experts create a customized plan aligned with your interiors or project scope." },
+  { id: "p3", title: "Client Approval", body: "You review and approve the plan — we only move forward once you're happy." },
+  { id: "p4", title: "Installation & Ongoing Care", body: "We bring your garden to life and keep it thriving with our maintenance packages." },
 ];
 
-function ServiceCard({ service, index }: { service: GardenService; index: number }) {
-  return (
-    <article className="surface-card group flex flex-col overflow-hidden">
-      {service.image ? (
-        <div className="aspect-[16/10] overflow-hidden bg-primary-soft">
-          <img src={service.image} alt={service.title} loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
-        </div>
-      ) : (
-        <div className="flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-primary-tint to-primary-soft">
-          <span className="font-display text-5xl font-extrabold text-primary/25">{String(index + 1).padStart(2, "0")}</span>
-        </div>
-      )}
+const fallbackSteps: GardenBlock[] = [
+  { id: "s1", title: "Pick Your Service" },
+  { id: "s2", title: "Get a Call from Our Team" },
+  { id: "s3", title: "Schedule a Site Visit" },
+  { id: "s4", title: "We Deliver & Maintain with Expertise" },
+];
 
-      <div className="flex flex-1 flex-col p-6 lg:p-7">
-        <h3 className="font-display text-lg font-bold text-forest lg:text-xl">{service.title}</h3>
-        {service.summary && <p className="mt-2 text-sm leading-6 text-muted-foreground">{service.summary}</p>}
+const stepIcons = [Hand, UserRound, CalendarClock, Shovel];
 
-        {service.features && service.features.length > 0 && (
-          <ul className="mt-5 space-y-2.5">
-            {service.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-2.5 text-sm text-forest/85">
-                <Check className="mt-0.5 size-4 shrink-0 stroke-[3] text-primary" aria-hidden="true" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        )}
+const fallbackProjects: GardenBlock[] = [
+  { id: "pr1", image: "/places/living-room.jpg", title: "Café greening" },
+  { id: "pr2", image: "/farm/farm-1.jpg", title: "Shelf garden" },
+  { id: "pr3", image: "/places/bedroom.jpg", title: "Bedroom corner" },
+  { id: "pr4", image: "/places/balcony.jpg", title: "Balcony garden" },
+  { id: "pr5", image: "/images/botanical-hero.jpg", title: "Terrace lounge" },
+  { id: "pr6", image: "/farm/farm-2.jpg", title: "Landscaped edge" },
+  { id: "pr7", image: "/images/home-hero-no-people.jpg", title: "Indoor jungle" },
+  { id: "pr8", image: "/places/office.jpg", title: "Office green wall" },
+  { id: "pr9", image: "/farm/farm-3.jpg", title: "Lobby styling" },
+];
 
-        {(service.price_from || service.duration) && (
-          <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
-            {service.price_from && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-star px-3 py-1.5 text-xs font-bold text-forest">
-                <IndianRupee className="size-3.5" aria-hidden="true" />
-                From {service.price_from}
-              </span>
-            )}
-            {service.duration && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint px-3 py-1.5 text-xs font-semibold text-forest/80">
-                <Clock className="size-3.5" aria-hidden="true" />
-                {service.duration}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-    </article>
+const fallbackTestimonials: GardenBlock[] = [
+  { id: "t1", body: "We are very happy with your services. The plants are keeping our office fresh and vibrant, and the newly added plants are also very healthy and lively. Your staff visits regularly as per schedule, maintaining everything in a proper manner. Thank you so much to the entire team for your dedicated efforts.", author: "Bhagyeshri. Office Manager, GetVantage Tech Pvt. Ltd." },
+  { id: "t2", body: "We've been associated with the team for the past three years and are extremely pleased with their exceptional plant management services. The staff is professional, proactive, and always open to feedback. Their commitment to sustainability perfectly aligns with our environmental goals.", author: "Sanket Yenpure. Facility Manager" },
+  { id: "t3", body: "We are happy to have your greens in our premises. It surely brings a lot of freshness to our space. Appreciate your services and prompt action to our requests from time to time.", author: "Anita. Cravatex Ltd, Mumbai" },
+];
+
+const fallbackFaqs: GardenBlock[] = [
+  { id: "f1", title: "What kind of garden services do you provide?", body: "Landscaping and garden development, garden maintenance, vertical gardens and green walls, corporate plant rentals and indoor plant styling — for homes, offices, hospitality and public projects." },
+  { id: "f2", title: "Do you provide garden maintenance services for homes and apartments?", body: "Yes. We maintain balcony gardens, terrace gardens, bungalow lawns and society gardens on monthly and annual plans." },
+  { id: "f3", title: "Which cities do you currently serve?", body: "We currently serve Kolkata and Mumbai, and we have executed large-scale projects in several other cities. Tell us where you are and we will let you know what we can do." },
+  { id: "f4", title: "Do you offer corporate plant rentals and office greenery solutions?", body: "Yes. Indoor plant rentals for offices, events and hospitality spaces, with routine maintenance and bi-weekly health checks by our team." },
+  { id: "f5", title: "How often will you maintain my garden?", body: "Most plans are fortnightly or monthly. Larger corporate sites are usually weekly. We agree the schedule with you before the first visit." },
+  { id: "f6", title: "Can you design a vertical garden for my apartment or office?", body: "Yes — bio-wall and felt-wall systems, plus portable modular frames when the wall cannot be drilled." },
+  { id: "f7", title: "Are your garden services eco-friendly?", body: "We use compost-based nutrition, local materials and efficient irrigation, and keep artificial inputs to a minimum." },
+  { id: "f8", title: "How do I book a consultation?", body: "Fill in the call-back form on this page or call us during working hours. We will arrange a site visit at a time that suits you." },
+];
+
+const fallbackWhyPoints = [
+  "100% Premium Quality & Service Standards.",
+  "End-to-End Green Solutions Under One Roof.",
+  "Timely Execution, Every Time.",
+  "Guaranteed Maintenance & Plant Health.",
+];
+
+const fallbackAbout = `Our mission is simple — to make green living accessible and sustainable. Whether it's a balcony garden in a Kolkata apartment, a corporate office in Mumbai, or a large landscape project, we bring the same dedication and expertise.
+
+- We are not just gardeners; we are growers with our own farms.
+- Every plant is nurtured, tested, and cared for before it reaches your space.
+- From soil health to pruning schedules, we handle the details so you don't have to.
+- Our services are trusted across residential, corporate, hospitality, and public projects.
+
+When you choose us, you're choosing a partner who ensures your garden looks fresh, vibrant, and alive — season after season.`;
+
+const fallbackSeo = `**From balcony gardens to corporate landscapes — we design, maintain, and care for green spaces that thrive all year round.**
+
+## Our Gardening & Maintenance Services
+
+We provide end-to-end solutions to keep your gardens, lawns, and green walls healthy and beautiful.
+
+### Landscaping & Garden Development
+- Custom landscape design and development for residences, offices, and large campuses.
+- Bungalow and lawn maintenance with regular pruning, soil enrichment, and seasonal care.
+- Expertise in terrace gardens and balcony gardens that maximise small spaces.
+
+### Garden Maintenance Services
+- Lawn care, pruning and upkeep to maintain a neat and vibrant look.
+- Soil treatment — composting, pH balancing, and amendment for better growth.
+- Fertigation and pest control using eco-friendly methods.
+- Irrigation system checks and water schedules to prevent waste.
+
+### Vertical Gardens & Green Walls
+- Innovative vertical gardening solutions for homes, corporates, and public spaces.
+- Modular green wall systems designed for easy installation and low maintenance.
+
+### Corporate Plant Rentals
+- Indoor plant rental services for offices, events, and hospitality spaces.
+- Wide variety of plants with planters to match your interiors.
+- Routine maintenance and bi-weekly health checks by our expert team.`;
+
+const fallbackLocations = ["Kolkata", "Mumbai", "Other city"];
+
+/* ---------- Tiny rich-text renderer for the admin's long-form copy ---------- */
+
+function bold(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**")
+      ? <strong key={i} className="font-bold text-forest">{part.slice(2, -2)}</strong>
+      : <span key={i}>{part}</span>
   );
 }
 
-function Page() {
-  const { data } = useQuery({ queryKey: queryKeys.gardenServices, queryFn: gardenServicesApi.get, staleTime: 300_000 });
+function RichText({ body }: { body: string }) {
+  const lines = body.split("\n");
+  const out: React.ReactNode[] = [];
+  let bullets: string[] = [];
 
-  const section = data?.section ?? defaultGardenSection;
-  const services = data?.items && data.items.length > 0 ? data.items : fallbackServices;
-  const heroImage = section.page_image || section.image || defaultGardenSection.image;
-  const whatsapp = section.whatsapp?.replace(/\D/g, "");
+  const flush = () => {
+    if (bullets.length === 0) return;
+    out.push(
+      <ul key={`ul-${out.length}`} className="my-4 space-y-2 pl-1">
+        {bullets.map((b, i) => (
+          <li key={i} className="flex gap-2.5 text-sm leading-7 text-foreground/80 sm:text-base">
+            <span aria-hidden="true" className="mt-2.5 size-1.5 shrink-0 rounded-full bg-primary" />
+            <span>{bold(b)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    bullets = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { flush(); continue; }
+    if (line.startsWith("- ")) { bullets.push(line.slice(2)); continue; }
+    flush();
+    if (line.startsWith("### ")) {
+      out.push(<h4 key={out.length} className="mt-8 font-display text-lg font-bold text-forest sm:text-xl">{line.slice(4)}</h4>);
+    } else if (line.startsWith("## ")) {
+      out.push(<h3 key={out.length} className="mt-10 font-display text-xl font-extrabold text-forest sm:text-2xl">{line.slice(3)}</h3>);
+    } else {
+      out.push(<p key={out.length} className="mt-4 text-sm leading-7 text-foreground/80 sm:text-base sm:leading-8">{bold(line)}</p>);
+    }
+  }
+  flush();
+  return <>{out}</>;
+}
+
+/* ---------- Lead form ---------- */
+
+function EnquiryForm({ section, services }: { section: GardenServiceSection; services: GardenService[] }) {
+  const [form, setForm] = useState({ name: "", phone: "", location: "", service: "" });
+  const locations = section.locations?.length ? section.locations : fallbackLocations;
+
+  const mutation = useMutation({
+    mutationFn: gardenServicesApi.enquiry,
+    onSuccess: () => setForm({ name: "", phone: "", location: "", service: "" }),
+  });
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!form.name.trim() || !form.phone.trim()) return;
+    mutation.mutate(form);
+  };
+
+  const field = "w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10";
 
   return (
-    <div className="bg-storefront-wash pb-16 lg:pb-24">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-forest">
-        {heroImage && (
-          <img src={heroImage} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover opacity-30" />
-        )}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(to_right,oklch(0.30_0.06_169/0.95)_0%,oklch(0.30_0.06_169/0.80)_45%,oklch(0.30_0.06_169/0.45)_100%)]"
-        />
-        <div className="relative mx-auto max-w-[1480px] px-4 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-28">
-          <span className="inline-flex items-center gap-2 rounded-full bg-star px-4 py-1.5 font-display text-xs font-bold text-forest sm:text-sm">
-            <Leaf className="size-3.5" aria-hidden="true" />
-            End-to-end, zero hassle
-          </span>
-          <h1 className="mt-5 max-w-[20ch] font-display text-[2.25rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[3.25rem] lg:text-[4rem]">
-            {section.page_title || "Garden Services"}
-          </h1>
-          <p className="mt-5 max-w-[46rem] text-sm leading-7 text-white/85 sm:text-lg sm:leading-8">
-            {section.page_subtitle || section.body || defaultGardenSection.body}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3 sm:mt-10">
-            <Link
-              to="/contact"
-              className="group inline-flex items-center gap-2 rounded-full bg-star px-7 py-3.5 font-display text-sm font-bold text-forest transition hover:bg-white sm:text-base"
-            >
-              Book a consultation
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-            </Link>
-            {whatsapp && (
-              <a
-                href={`https://wa.me/${whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-7 py-3.5 font-display text-sm font-bold text-white transition hover:bg-white/10 sm:text-base"
-              >
-                <Phone className="size-4" aria-hidden="true" />
-                WhatsApp us
-              </a>
-            )}
+    <form onSubmit={submit} id="enquiry" className="rounded-[1.5rem] bg-card p-6 shadow-card-hover sm:p-9 lg:rounded-[1.75rem] lg:p-10">
+      <h2 className="font-display text-2xl font-extrabold tracking-tight text-forest sm:text-[2rem]">
+        {section.form_title || "Get in touch with us."}
+      </h2>
+      <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+        {section.form_note || "Choose from our range of garden services for a perfectly manicured garden experience."}
+      </p>
+
+      <div className="mt-7 grid gap-5 sm:grid-cols-2">
+        <label className="block">
+          <span className="font-display text-sm font-semibold text-forest">Name</span>
+          <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Enter Your Name" className={`mt-2 ${field}`} />
+        </label>
+        <label className="block">
+          <span className="font-display text-sm font-semibold text-forest">Contact Number</span>
+          <div className="relative mt-2">
+            <Phone className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-primary" aria-hidden="true" />
+            <input required inputMode="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Enter Number" className={`${field} pl-11`} />
           </div>
+        </label>
+        <label className="block">
+          <span className="font-display text-sm font-semibold text-forest">Location</span>
+          <div className="relative mt-2">
+            <MapPin className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-primary" aria-hidden="true" />
+            <select value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={`${field} appearance-none pl-11 pr-10`}>
+              <option value="">Select Location</option>
+              {locations.map((city) => <option key={city} value={city}>{city}</option>)}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          </div>
+        </label>
+        <label className="block">
+          <span className="font-display text-sm font-semibold text-forest">Service Type</span>
+          <div className="relative mt-2">
+            <select value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })} className={`${field} appearance-none pr-10`}>
+              <option value="">Select Service</option>
+              {services.map((s) => <option key={s.id ?? s.title} value={s.title}>{s.title}</option>)}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          </div>
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        disabled={mutation.isPending}
+        className="mt-7 w-full rounded-xl bg-primary py-4 font-display text-base font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-60"
+      >
+        {mutation.isPending ? "Sending…" : section.form_cta_label || "Get a Call Back"}
+      </button>
+
+      {mutation.isSuccess && <p className="mt-4 text-center text-sm font-semibold text-primary">Thanks — we'll call you back shortly.</p>}
+      {mutation.isError && <p className="mt-4 text-center text-sm font-semibold text-destructive">Something went wrong. Please try again.</p>}
+
+      {(section.phone || section.hours) && (
+        <p className="mt-6 flex flex-wrap items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+          <Phone className="size-4 text-primary" aria-hidden="true" />
+          {section.phone && <>Reach us at <a href={`tel:${section.phone.replace(/\s/g, "")}`} className="font-semibold text-forest hover:underline">{section.phone}</a></>}
+          {section.phone && section.hours && <span aria-hidden="true">·</span>}
+          {section.hours && <span>{section.hours}</span>}
+        </p>
+      )}
+    </form>
+  );
+}
+
+/* ---------- Page ---------- */
+
+function Page() {
+  const { data } = useQuery({ queryKey: queryKeys.gardenServices, queryFn: gardenServicesApi.get, staleTime: 300_000 });
+  const [openFaq, setOpenFaq] = useState<string | null>(null);
+
+  const section = { ...defaultGardenSection, ...(data?.section ?? {}) } as GardenServiceSection;
+  const blocks: GardenBlocks = data?.blocks ?? {};
+  const pick = (kind: string, fallback: GardenBlock[]) => (blocks[kind]?.length ? blocks[kind] : fallback);
+
+  const services = data?.items?.length ? data.items : fallbackServices;
+  const process = pick("process", fallbackProcess);
+  const steps = pick("step", fallbackSteps);
+  const projects = pick("project", fallbackProjects);
+  const testimonials = pick("testimonial", fallbackTestimonials);
+  const faqs = pick("faq", fallbackFaqs);
+  const clients = blocks["client"] ?? [];
+  const whyPoints = section.why_points?.length ? section.why_points : fallbackWhyPoints;
+  const heroImage = section.hero_image || section.page_image || "/images/botanical-hero.jpg";
+
+  return (
+    <div className="bg-background">
+      {/* Hero */}
+      <section className="relative overflow-hidden" aria-labelledby="gs-hero-title">
+        <img src={heroImage} alt="" aria-hidden="true" className="h-[380px] w-full object-cover sm:h-[440px] lg:h-[520px]" />
+        <div aria-hidden="true" className="absolute inset-0 bg-forest/25" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          <div className="rounded-[1.5rem] bg-primary/95 px-6 py-6 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.6)] backdrop-blur-[2px] sm:px-12 sm:py-8 lg:rounded-[2rem] lg:px-16">
+            <h1 id="gs-hero-title" className="font-display text-[2rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[3rem] lg:text-[4rem]">
+              {section.hero_title || "Year round care"}
+            </h1>
+            <p className="mt-1 font-display text-lg font-semibold text-white/95 sm:text-2xl lg:text-[2rem]">
+              {section.hero_subtitle ?? "for your garden & office space"}
+            </p>
+          </div>
+          <a
+            href="#enquiry"
+            className="mt-7 rounded-full bg-card px-8 py-3.5 font-display text-sm font-bold text-forest shadow-[0_16px_36px_-16px_rgba(0,0,0,0.6)] transition hover:bg-star sm:mt-9 sm:px-10 sm:py-4 sm:text-base"
+          >
+            {section.hero_cta_label || "Book service"}
+          </a>
         </div>
       </section>
 
       {/* Services */}
-      <section className="mx-auto max-w-[1480px] px-4 pt-14 sm:px-6 lg:px-10 lg:pt-20" aria-labelledby="services-heading">
-        <h2 id="services-heading" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
-          What we can do for your space
+      <section className="mx-auto max-w-[1480px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20" aria-labelledby="gs-services-title">
+        <h2 id="gs-services-title" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
+          {section.services_title || "What are you looking for ?"}
         </h2>
-        <p className="mx-auto mt-3 max-w-[42rem] text-center text-sm leading-7 text-muted-foreground sm:text-base">
-          Every service is quoted after we see your space, so you only pay for what your garden actually needs.
+        <p className="mt-4 text-center text-sm text-muted-foreground sm:text-base">
+          {section.services_note || "(Currently providing services in Kolkata and Mumbai)"}
         </p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:mt-12 lg:grid-cols-4">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service, index) => (
-            <ServiceCard key={service.id ?? service.title} service={service} index={index} />
+            <article key={service.id ?? service.title} className="group flex flex-col overflow-hidden rounded-[1.25rem] border border-border/70 bg-card p-4 shadow-card transition-shadow hover:shadow-card-hover">
+              <div className="overflow-hidden rounded-xl bg-primary-soft">
+                {service.image ? (
+                  <img src={service.image} alt={service.title} loading="lazy" className="aspect-square w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                ) : (
+                  <div className="flex aspect-square items-center justify-center bg-gradient-to-br from-primary-tint to-primary-soft">
+                    <span className="font-display text-5xl font-extrabold text-primary/25">{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                )}
+              </div>
+              <h3 className="mt-5 font-display text-lg font-bold text-forest">{service.title}</h3>
+              {service.summary && <p className="mt-2 text-sm font-semibold leading-6 text-foreground/85">{service.summary}</p>}
+              {service.features && service.features.length > 0 && (
+                <ul className="mt-4 space-y-2.5">
+                  {service.features.map((feature) => (
+                    <li key={feature} className="flex gap-2.5 text-sm leading-6 text-muted-foreground">
+                      <Check className="mt-0.5 size-4 shrink-0 stroke-[3] text-primary" aria-hidden="true" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {(service.price_from || service.duration) && (
+                <div className="mt-auto flex flex-wrap gap-2 pt-5">
+                  {service.price_from && <span className="rounded-full bg-star px-3 py-1.5 text-xs font-bold text-forest">From ₹{service.price_from}</span>}
+                  {service.duration && <span className="rounded-full bg-primary-tint px-3 py-1.5 text-xs font-semibold text-forest/80">{service.duration}</span>}
+                </div>
+              )}
+            </article>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="mx-auto mt-16 max-w-[1480px] px-4 sm:px-6 lg:mt-24 lg:px-10" aria-labelledby="process-heading">
-        <div className="rounded-[1.75rem] bg-forest px-6 py-12 sm:px-10 lg:rounded-[2rem] lg:px-14 lg:py-16">
-          <h2 id="process-heading" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-white sm:text-[2.25rem] lg:text-[2.75rem]">
-            How it works
+      {/* Why us + lead form */}
+      <section className="bg-storefront-wash py-14 lg:py-20">
+        <div className="mx-auto grid max-w-[1480px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10">
+          <div>
+            <div className="relative pb-16 sm:pb-24">
+              <div className="w-[78%] overflow-hidden rounded-xl shadow-card">
+                <img src={section.split_image_1 || "/garden.png"} alt="" aria-hidden="true" loading="lazy" className="aspect-[16/9] w-full object-cover" />
+              </div>
+              <div className="absolute bottom-0 right-0 w-[72%] overflow-hidden rounded-xl border-4 border-storefront-wash shadow-card-hover">
+                <img src={section.split_image_2 || "/care.png"} alt="" aria-hidden="true" loading="lazy" className="aspect-[16/10] w-full object-cover" />
+              </div>
+            </div>
+
+            <h2 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-forest sm:text-[2rem]">
+              {section.why_title || "Why Choose MyGarden?"}
+            </h2>
+            <ul className="mt-5 space-y-3.5">
+              {whyPoints.map((point) => (
+                <li key={point} className="flex gap-3 text-sm leading-6 text-foreground/85 sm:text-base">
+                  <Check className="mt-0.5 size-4 shrink-0 stroke-[3] text-primary" aria-hidden="true" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <EnquiryForm section={section} services={services} />
+        </div>
+      </section>
+
+      {/* Our Process */}
+      {process.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20" aria-labelledby="gs-process-title">
+          <h2 id="gs-process-title" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
+            {section.process_title || "Our Process"}
           </h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4 lg:gap-10">
-            {steps.map((step, index) => (
-              <div key={step.title} className="relative">
-                <div className="flex size-12 items-center justify-center rounded-full bg-star text-forest">
-                  <step.icon className="size-5" aria-hidden="true" />
-                </div>
-                <p className="mt-4 font-display text-xs font-bold uppercase tracking-[0.18em] text-white/50">
-                  Step {index + 1}
-                </p>
-                <h3 className="mt-1.5 font-display text-lg font-bold text-white">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/75">{step.body}</p>
+          <p className="mt-3 text-center text-sm text-muted-foreground sm:text-base">
+            {section.process_note || "Greenifying your space, made easy."}
+          </p>
+          <div className="mt-12 grid gap-x-8 gap-y-12 lg:grid-cols-2">
+            {process.map((step, index) => (
+              <div key={step.id ?? step.title} className="relative rounded-[1.25rem] border-t-2 border-primary bg-card px-7 py-7 pl-12 shadow-card sm:pl-14">
+                <span className="absolute -left-1 -top-6 flex size-12 items-center justify-center rounded-full bg-primary font-display text-lg font-extrabold text-primary-foreground shadow-card-hover sm:size-14 sm:text-xl">
+                  {index + 1}
+                </span>
+                <h3 className="font-display text-lg font-bold text-forest sm:text-xl">{step.title}</h3>
+                {step.body && <p className="mt-2.5 text-sm leading-7 text-muted-foreground sm:text-base">{step.body}</p>}
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Clients */}
+      {clients.length > 0 && (
+        <section className="overflow-hidden py-12 lg:py-16" aria-labelledby="gs-clients-title">
+          <div className="mx-auto max-w-[1480px] px-4 text-center sm:px-6 lg:px-10">
+            <h2 id="gs-clients-title" className="font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.5rem]">
+              {section.clients_title || "Our Esteemed Clients"}
+            </h2>
+            {section.clients_note && <p className="mx-auto mt-3 max-w-[70ch] text-sm text-muted-foreground sm:text-base">{section.clients_note}</p>}
+          </div>
+          <div className="mt-10 flex gap-12 overflow-x-auto px-4 sm:px-6 lg:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {clients.map((client) => (
+              <img
+                key={client.id ?? client.title}
+                src={client.image}
+                alt={client.title || "Client logo"}
+                loading="lazy"
+                className="h-12 w-auto shrink-0 object-contain opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-14"
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Projects */}
+      {projects.length > 0 && (
+        <section className="bg-storefront-wash py-14 lg:py-20" aria-labelledby="gs-projects-title">
+          <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
+            <h2 id="gs-projects-title" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
+              {section.projects_title || "Our Projects"}
+            </h2>
+            <div className="mt-10 grid auto-rows-[180px] grid-cols-2 gap-4 sm:auto-rows-[220px] lg:auto-rows-[260px] lg:grid-cols-3">
+              {projects.map((project, index) => (
+                <figure
+                  key={project.id ?? index}
+                  className={`group overflow-hidden rounded-xl bg-primary-soft ${index % 5 === 0 ? "col-span-2 lg:col-span-2" : ""}`}
+                >
+                  <img src={project.image} alt={project.title || "Completed project"} loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* How it works */}
+      {steps.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20" aria-labelledby="gs-steps-title">
+          <h2 id="gs-steps-title" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
+            {section.steps_title || "How it works?"}
+          </h2>
+          <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map((step, index) => {
+              const Icon = stepIcons[index % stepIcons.length]!;
+              return (
+                <div key={step.id ?? step.title} className="flex flex-col items-center text-center">
+                  <span className="flex size-16 items-center justify-center rounded-full bg-primary-tint text-primary sm:size-[4.5rem]">
+                    {step.image ? <img src={step.image} alt="" aria-hidden="true" className="size-8 object-contain" /> : <Icon className="size-7" aria-hidden="true" />}
+                  </span>
+                  <h3 className="mt-5 max-w-[22ch] font-display text-base font-semibold text-forest sm:text-lg">{step.title}</h3>
+                  {step.body && <p className="mt-2 max-w-[28ch] text-sm leading-6 text-muted-foreground">{step.body}</p>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Testimonials */}
+      {testimonials.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 pb-14 sm:px-6 lg:px-10 lg:pb-20" aria-labelledby="gs-testimonials-title">
+          <h2 id="gs-testimonials-title" className="font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.5rem]">
+            {section.testimonials_title || "What our customers say"}
+          </h2>
+          <div className="mt-8 grid items-start gap-6 lg:grid-cols-3">
+            {testimonials.map((item, index) => (
+              <blockquote key={item.id ?? index} className="rounded-[1.25rem] border border-border/70 bg-card p-6 shadow-card sm:p-7">
+                <span aria-hidden="true" className="font-display text-4xl leading-none text-primary">&ldquo;</span>
+                <p className="mt-3 text-sm leading-7 text-foreground/80">{item.body}</p>
+                {item.author && <footer className="mt-5 font-display text-sm font-bold text-forest">{item.author}</footer>}
+              </blockquote>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* About */}
+      <section className="bg-storefront-wash py-14 lg:py-20" aria-labelledby="gs-about-title">
+        <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
+          <h2 id="gs-about-title" className="font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.5rem]">
+            {section.about_title || "More About Our Garden Services"}
+          </h2>
+          <div className="mt-2 max-w-[90ch]">
+            <RichText body={section.about_body || fallbackAbout} />
           </div>
         </div>
       </section>
 
-      {/* Closing CTA */}
-      <section className="mx-auto mt-14 max-w-[1480px] px-4 sm:px-6 lg:mt-20 lg:px-10">
-        <div className="flex flex-col items-center gap-6 rounded-[1.75rem] bg-star px-6 py-12 text-center sm:px-10 lg:rounded-[2rem] lg:py-16">
-          <h2 className="max-w-[24ch] font-display text-[1.75rem] font-extrabold leading-tight tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
-            Tell us about your space — we'll take it from there
+      {/* FAQs */}
+      {faqs.length > 0 && (
+        <section className="mx-auto max-w-[1480px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20" aria-labelledby="gs-faq-title">
+          <h2 id="gs-faq-title" className="text-center font-display text-[1.75rem] font-extrabold tracking-tight text-forest sm:text-[2.25rem] lg:text-[2.75rem]">
+            {section.faq_title || "FAQs"}
           </h2>
-          <p className="max-w-[42rem] text-sm leading-7 text-forest/80 sm:text-base">
-            {section.contact_note || "Share a few photos and the light your space gets. Our horticulturists come back with a plan and a clear quote, usually within two working days."}
-          </p>
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-2 rounded-full bg-forest px-8 py-4 font-display text-sm font-bold text-forest-foreground transition hover:bg-primary sm:text-base"
-          >
-            Get in touch
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+          <div className="mx-auto mt-10 max-w-[70rem] divide-y divide-border/70">
+            {faqs.map((faq, index) => {
+              const key = faq.id ?? String(index);
+              const open = openFaq === key;
+              return (
+                <div key={key}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(open ? null : key)}
+                    aria-expanded={open}
+                    className="flex w-full items-center gap-4 py-5 text-left"
+                  >
+                    <span className={`flex size-9 shrink-0 items-center justify-center rounded-full border transition ${open ? "border-primary bg-primary text-primary-foreground" : "border-border text-forest"}`}>
+                      <span className="text-lg leading-none">{open ? "–" : "+"}</span>
+                    </span>
+                    <span className="font-display text-xs font-semibold uppercase tracking-[0.12em] text-forest sm:text-sm">
+                      {index + 1}. {faq.title}
+                    </span>
+                  </button>
+                  {open && faq.body && (
+                    <p className="pb-6 pl-13 text-sm leading-7 text-muted-foreground sm:text-base">{faq.body}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Long-form SEO copy */}
+      {(section.seo_body || fallbackSeo) && (
+        <section className="bg-storefront-wash py-14 lg:py-20">
+          <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-10">
+            <div className="max-w-[90ch]">
+              <RichText body={section.seo_body || fallbackSeo} />
+              {section.contact_note && (
+                <p className="mt-8 rounded-2xl bg-card p-6 text-sm leading-7 text-foreground/80 shadow-card sm:text-base">{section.contact_note}</p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
