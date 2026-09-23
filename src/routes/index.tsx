@@ -12,6 +12,8 @@ import { BhiduApprovedSection } from "@/components/home/bhidu-approved-section";
 import { OffersMarquee, offerCardsFromMedia } from "@/components/home/offers-marquee";
 import { ShopBySpaceSection, spaceCardsFromMedia } from "@/components/home/shop-by-space";
 import { FarmToHomeSection, farmCardsFromMedia } from "@/components/home/farm-to-home";
+import { BrandComparisonSection } from "@/components/home/brand-comparison";
+import { GrowGardenBanner } from "@/components/home/grow-garden-banner";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -211,6 +213,8 @@ function HomePage() {
         </section>
       )}
       <FarmToHomeSection cards={farmCards} />
+      <BrandComparisonSection />
+      <GrowGardenBanner />
     </>
   );
 }
