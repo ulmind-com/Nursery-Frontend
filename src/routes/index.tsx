@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Leaf, Star, Sprout, RefreshCcw, MessageCircle } from "lucide-react";
-import { blogApi, categoriesApi, homeApi, miscApi, productsApi, queryKeys, settingsApi, storesApi } from "@/api/services";
+import { blogApi, categoriesApi, gardenServicesApi, homeApi, miscApi, productsApi, queryKeys, settingsApi, storesApi } from "@/api/services";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { StorefrontProductGrid } from "@/components/home/storefront-product-grid";
 import { TrustBar } from "@/components/home/trust-bar";
@@ -15,6 +15,7 @@ import { FarmToHomeSection, farmCardsFromMedia } from "@/components/home/farm-to
 import { BrandComparisonSection } from "@/components/home/brand-comparison";
 import { GrowGardenBanner } from "@/components/home/grow-garden-banner";
 import { StoreLocatorSection, storesFromApi } from "@/components/home/store-locator";
+import { GardenServicesBand } from "@/components/home/garden-services";
 import { brand } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -90,6 +91,7 @@ function HomePage() {
   const posts = useQuery({ queryKey: queryKeys.blog, queryFn: blogApi.list });
   const siteMedia = useQuery({ queryKey: ["site-media"], queryFn: homeApi.media });
   const storesQuery = useQuery({ queryKey: queryKeys.stores, queryFn: storesApi.list });
+  const gardenServices = useQuery({ queryKey: queryKeys.gardenServices, queryFn: gardenServicesApi.get });
 
   const recommended: Product[] = Array.isArray(recommendations.data)
     ? recommendations.data.flatMap((entry) => ("products" in entry ? entry.products || [] : [entry as Product]))
@@ -218,6 +220,7 @@ function HomePage() {
       <BrandComparisonSection />
       <GrowGardenBanner />
       <StoreLocatorSection stores={storesFromApi(storesQuery.data)} />
+      <GardenServicesBand section={gardenServices.data?.section} />
     </>
   );
 }
