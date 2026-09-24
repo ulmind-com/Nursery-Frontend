@@ -20,6 +20,7 @@ import { StoreLocatorSection, storesFromApi } from "@/components/home/store-loca
 import { GardenServicesBand } from "@/components/home/garden-services";
 import { GiftingBand } from "@/components/home/gifting-band";
 import { PressMarquee } from "@/components/home/press-marquee";
+import { TrustLottie } from "@/components/home/trust-lottie";
 import { navCategories } from "@/lib/nav-categories";
 import { displayName } from "@/config/brand";
 import type { Product } from "@/types/api";
@@ -269,33 +270,25 @@ function CategoryTrustStrip() {
         
         {/* Item 1 */}
         <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
-          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
-            <Sprout className="size-6 text-black" />
-          </div>
+          <TrustLottie src="/lottie/soil.json" icon={Sprout} label="90-Day Pre Fertilised Soil" />
           <p className="text-sm font-semibold text-black">90-Day Pre Fertilised Soil</p>
         </div>
 
         {/* Item 2 */}
         <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
-          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
-            <Leaf className="size-6 text-black" />
-          </div>
+          <TrustLottie src="/lottie/healthy.json" icon={Leaf} label="Arrives Healthy" />
           <p className="text-sm font-semibold text-black">Arrives Healthy</p>
         </div>
 
         {/* Item 3 */}
         <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center sm:border-r sm:border-black/10">
-          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
-            <RefreshCcw className="size-6 text-black" />
-          </div>
+          <TrustLottie src="/lottie/replacement.json" icon={RefreshCcw} label="Free Replacement" />
           <p className="text-sm font-semibold text-black">Free Replacement</p>
         </div>
 
         {/* Item 4 */}
         <div className="flex flex-1 w-full flex-col items-center justify-center gap-3 py-4 text-center">
-          <div className="flex size-14 items-center justify-center rounded-full border-2 border-black bg-white">
-            <MessageCircle className="size-6 text-black" />
-          </div>
+          <TrustLottie src="/lottie/support.json" icon={MessageCircle} label="Free Plant Care Support" />
           <p className="text-sm font-semibold text-black">Free Plant Care Support</p>
         </div>
 
