@@ -165,28 +165,30 @@ function Hero({
   );
 }
 
+const MarqueeRow = ({ offers, hidden = false }: { offers: Coupon[]; hidden?: boolean }) => (
+  <div
+    aria-hidden={hidden || undefined}
+    className="flex shrink-0 animate-offers-marquee items-center gap-10 pr-10 motion-reduce:[animation-play-state:paused]"
+  >
+    {offers.map((offer, index) => (
+      <span
+        key={`${offer.code}-${index}`}
+        className="flex items-center gap-2 whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em]"
+      >
+        <Tag className="size-3.5" aria-hidden />
+        {couponBadge(offer)} · {offer.code}
+      </span>
+    ))}
+  </div>
+);
+
+/** Rows live outside the component so a re-render never restarts the scroll. */
 function CodeMarquee({ offers }: { offers: Coupon[] }) {
   const track = offers.length < 4 ? [...offers, ...offers, ...offers] : [...offers, ...offers];
-  const Row = ({ hidden = false }: { hidden?: boolean }) => (
-    <div
-      aria-hidden={hidden || undefined}
-      className="flex shrink-0 animate-offers-marquee items-center gap-10 pr-10 motion-reduce:[animation-play-state:paused]"
-    >
-      {track.map((offer, index) => (
-        <span
-          key={`${offer.code}-${index}`}
-          className="flex items-center gap-2 whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em]"
-        >
-          <Tag className="size-3.5" aria-hidden />
-          {couponBadge(offer)} · {offer.code}
-        </span>
-      ))}
-    </div>
-  );
   return (
     <div className="relative flex overflow-hidden border-t border-forest-foreground/15 bg-forest-foreground/10 py-3">
-      <Row />
-      <Row hidden />
+      <MarqueeRow offers={track} />
+      <MarqueeRow offers={track} hidden />
     </div>
   );
 }

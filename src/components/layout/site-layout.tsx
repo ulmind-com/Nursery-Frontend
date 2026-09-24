@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { memo, type ReactNode, useEffect, useState } from "react";
 import { categoriesApi, queryKeys, settingsApi } from "@/api/services";
 import { displayName } from "@/config/brand";
 import { BrandLogo } from "@/components/layout/brand-logo";
@@ -73,41 +73,80 @@ function NavLinks({
  * Two identical tracks sit side by side so the loop never shows a seam, and the
  * drift pauses on hover (and for anyone who prefers reduced motion).
  */
-function AnnouncementBar({ announcements }: { announcements: string[] | undefined }) {
+const AnnounceRow = ({ items, hidden = false }: { items: string[]; hidden?: boolean }) => (
+  <div
+    aria-hidden={hidden || undefined}
+    className="flex shrink-0 animate-announce-marquee items-center group-hover/announce:[animation-play-state:paused] motion-reduce:[animation-play-state:paused]"
+  >
+    {items.map((line, index) => (
+      <span key={`${line}-${index}`} className="flex items-center whitespace-nowrap">
+        {line}
+        <span aria-hidden className="px-5 text-forest-foreground/45 sm:px-7">
+          •
+        </span>
+      </span>
+    ))}
+  </div>
+);
+
+/**
+ * Announcement strip — every live offer drifting right to left on a loop.
+ *
+ * Memoised, and the rows live outside the component: a re-render from anywhere
+ * else in the layout would otherwise remount the track and restart the
+ * animation mid-scroll, which reads as a judder.
+ */
+const AnnouncementBar = memo(function AnnouncementBar({
+  announcements,
+}: {
+  announcements: string[] | undefined;
+}) {
   const items = (announcements ?? []).filter((line) => line.trim());
   if (items.length === 0) return null;
 
   // Short lists are repeated so the track is always wider than the viewport.
   const track = items.length < 4 ? [...items, ...items, ...items] : [...items, ...items];
-  const Row = ({ hidden = false }: { hidden?: boolean }) => (
-    <div
-      aria-hidden={hidden || undefined}
-      className="flex shrink-0 animate-announce-marquee items-center group-hover/announce:[animation-play-state:paused] motion-reduce:[animation-play-state:paused]"
-    >
-      {track.map((line, index) => (
-        <span key={`${line}-${index}`} className="flex items-center whitespace-nowrap">
-          {line}
-          <span aria-hidden className="px-5 text-forest-foreground/45 sm:px-7">
-            •
-          </span>
-        </span>
-      ))}
-    </div>
-  );
 
   return (
     <div className="group/announce flex overflow-hidden bg-forest py-2 text-[11px] font-semibold text-forest-foreground sm:text-xs">
-      <Row />
-      <Row hidden />
+      <AnnounceRow items={track} />
+      <AnnounceRow items={track} hidden />
     </div>
+  );
+});
+
+/**
+ * Header search — kept separate so the typing placeholder re-renders this field
+ * alone instead of the whole site shell several times a second.
+ */
+function HeaderSearch() {
+  const [search, setSearch] = useState("");
+  const placeholder = useTypewriter(SEARCH_PHRASES);
+  const navigate = useNavigate();
+  return (
+    <form
+      className="relative hidden min-w-0 lg:block"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const q = search.trim();
+        if (q) void navigate({ to: "/search", search: { q } });
+      }}
+    >
+      <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-forest" />
+      <input
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        aria-label="Search products"
+        placeholder={placeholder}
+        className="h-11 w-full rounded-lg bg-search-surface pl-11 pr-4 text-sm outline-none ring-primary transition-shadow duration-200 placeholder:text-muted-foreground focus:ring-1"
+      />
+    </form>
   );
 }
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (state) => state.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const placeholder = useTypewriter(SEARCH_PHRASES);
   const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { data: settings } = useQuery({
@@ -200,23 +239,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </SheetContent>
           </Sheet>
           <BrandLogo name={displayName(settings?.shop.name)} />
-          <form
-            className="relative hidden min-w-0 lg:block"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const q = search.trim();
-              if (q) void navigate({ to: "/search", search: { q } });
-            }}
-          >
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-forest" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              aria-label="Search products"
-              placeholder={placeholder}
-              className="h-11 w-full rounded-lg bg-search-surface pl-11 pr-4 text-sm outline-none ring-primary transition-shadow duration-200 placeholder:text-muted-foreground focus:ring-1"
-            />
-          </form>
+          <HeaderSearch />
           <div className="flex items-center justify-end gap-0.5">
             <Button variant="ghost" size="icon" asChild className="lg:hidden">
               <Link to="/search" search={{}} aria-label="Search">
