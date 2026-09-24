@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Flower2, Heart, Leaf, PawPrint, Sparkles, Star, Wind } from "lucide-react";
 import { AddToBasketButton, type QuickAddItem } from "@/components/product/cart-actions";
+import { cn } from "@/lib/utils";
 import type { Product, ProductSize } from "@/types/api";
 
 export const money = (value: number) =>
@@ -58,6 +59,9 @@ export function ProductCard({ product }: { product: Product }) {
   const discount = mrp && mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const pills = benefitPills(product);
   const rating = product.rating ?? 0;
+  /* Bestsellers get the red spotlight treatment — driven purely by the flag
+     the admin ticks on the product. */
+  const featured = Boolean(product.is_bestseller);
 
   /* Colour swatches when the variants differ by pot colour, size chips otherwise. */
   const hasColors = sizes.some((size) => size.pot_color);
@@ -84,7 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
       <Link
         to="/product/$id"
         params={{ id: product.id }}
-        className="relative block aspect-square overflow-hidden rounded-2xl bg-primary-tint"
+        className={cn("relative block aspect-square overflow-hidden bg-primary-tint", featured ? "rounded-t-2xl" : "rounded-2xl")}
       >
         {image ? (
           <img
@@ -101,7 +105,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {product.is_bestseller && (
-            <span className="rounded-full bg-[#c8794f] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+            <span className="rounded-full bg-[#b4262f] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
               Bestseller
             </span>
           )}
@@ -129,29 +133,29 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col px-1 pb-1 pt-3 sm:px-2">
+      <div className={cn("flex flex-1 flex-col px-3 pb-3 pt-3", featured && "rounded-b-2xl bg-[#b4262f] text-white")}>
         <div className="flex items-center gap-1.5">
           <span className="flex gap-0.5" aria-label={`Rated ${rating.toFixed(1)} out of 5`}>
             {Array.from({ length: 5 }, (_, i) => (
               <Star key={i} className={`size-3.5 ${i < Math.round(rating) ? "fill-star text-star" : "fill-border text-border"}`} />
             ))}
           </span>
-          <span className="text-xs font-semibold text-foreground">{rating.toFixed(1)}</span>
-          <span className="text-xs text-muted-foreground">| {product.review_count || 0}</span>
+          <span className={cn("text-xs font-semibold", featured ? "text-white" : "text-foreground")}>{rating.toFixed(1)}</span>
+          <span className={cn("text-xs", featured ? "text-white/75" : "text-muted-foreground")}>| {product.review_count || 0}</span>
         </div>
 
         <Link
           to="/product/$id"
           params={{ id: product.id }}
-          className="mt-2 line-clamp-2 min-h-10 text-[15px] font-semibold leading-5 text-forest transition-colors duration-200 hover:text-primary"
+          className={cn("mt-2 line-clamp-2 min-h-10 text-[15px] font-semibold leading-5 transition-colors duration-200", featured ? "text-white hover:text-white/85" : "text-forest hover:text-primary")}
         >
           {product.title}
         </Link>
 
         <div className="mt-2 flex flex-wrap items-baseline gap-x-2">
-          <span className="price-num text-lg font-bold text-forest">{money(price)}</span>
+          <span className={cn("price-num text-lg font-bold", featured ? "text-white" : "text-forest")}>{money(price)}</span>
           {mrp && mrp > price && (
-            <span className="price-num text-sm font-medium text-sale line-through">{money(mrp)}</span>
+            <span className={cn("price-num text-sm font-medium line-through", featured ? "text-white/75" : "text-sale")}>{money(mrp)}</span>
           )}
         </div>
 
@@ -168,7 +172,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         {chooserLabel && (
           <div className="mt-3">
-            <p className="text-xs font-semibold text-foreground">{chooserLabel}</p>
+            <p className={cn("text-xs font-semibold", featured ? "text-white" : "text-foreground")}>{chooserLabel}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {sizes.map((size, i) => {
                 const active = i === index;
@@ -183,7 +187,13 @@ export function ProductCard({ product }: { product: Product }) {
                     aria-label={`${chooserLabel}: ${size.pot_color || size.name}`}
                     aria-pressed={active}
                     className={`flex size-9 items-center justify-center rounded-full border text-[11px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 ${
-                      active ? "border-forest ring-2 ring-forest/30" : "border-border hover:border-forest/50"
+                      active
+                        ? featured
+                          ? "border-white ring-2 ring-white/40"
+                          : "border-forest ring-2 ring-forest/30"
+                        : featured
+                          ? "border-white/50 hover:border-white"
+                          : "border-border hover:border-forest/50"
                     } ${hasColors ? "" : active ? "bg-star text-foreground" : "bg-background text-foreground"}`}
                     {...(hasColors && size.pot_color
                       ? { style: { backgroundColor: swatchColor(size.pot_color) } }
