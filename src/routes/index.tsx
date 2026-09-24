@@ -90,7 +90,7 @@ function HomePage() {
   const recommendations = useQuery({ queryKey: ["recommendations", "home"], queryFn: homeApi.recommendations });
   const storefrontProducts = useQuery({ queryKey: queryKeys.products({ limit: 6 }), queryFn: () => productsApi.list({ limit: 6 }) });
   const googleReviews = useQuery({ queryKey: ["google-reviews"], queryFn: miscApi.googleReviews });
-  const posts = useQuery({ queryKey: queryKeys.blog, queryFn: blogApi.list });
+  const posts = useQuery({ queryKey: queryKeys.blog, queryFn: () => blogApi.list() });
   const siteMedia = useQuery({ queryKey: ["site-media"], queryFn: homeApi.media });
   const storesQuery = useQuery({ queryKey: queryKeys.stores, queryFn: storesApi.list });
   const gardenServices = useQuery({ queryKey: queryKeys.gardenServices, queryFn: gardenServicesApi.get });
