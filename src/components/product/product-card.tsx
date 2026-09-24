@@ -42,7 +42,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl bg-card"
+      className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl bg-card @container"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

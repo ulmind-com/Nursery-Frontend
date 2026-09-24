@@ -48,7 +48,7 @@ export const alsoLikeFromPreview = (item: PreviewItem): AlsoLikeItem => ({
 
 function Card({ item }: { item: AlsoLikeItem }) {
   return (
-    <article className="w-[260px] shrink-0 snap-start overflow-hidden rounded-xl bg-card sm:w-[290px] lg:w-[320px]">
+    <article className="w-[260px] shrink-0 snap-start overflow-hidden rounded-xl bg-card @container sm:w-[290px] lg:w-[320px]">
       <Link
         to="/product/$id"
         params={{ id: item.id }}

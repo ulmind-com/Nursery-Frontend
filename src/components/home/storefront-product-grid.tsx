@@ -56,7 +56,7 @@ function previewQuickAdd(product: PreviewItem): QuickAddItem {
 function PreviewCard({ product, index }: { product: PreviewItem; index: number }) {
   const meta = previewMeta[index] ?? ["Nursery product preview", 0, 0];
   return (
-    <article className="group min-w-0 overflow-hidden rounded-xl bg-card">
+    <article className="group min-w-0 overflow-hidden rounded-xl bg-card @container">
       <Link
         to="/product/$id"
         params={{ id: product.id }}
@@ -101,7 +101,7 @@ function PreviewCard({ product, index }: { product: PreviewItem; index: number }
 function LiveProductCard({ product }: { product: Product }) {
   const { image, price, mrp } = liveProductDetails(product);
   return (
-    <article className="group min-w-0 overflow-hidden rounded-xl bg-card">
+    <article className="group min-w-0 overflow-hidden rounded-xl bg-card @container">
       <Link
         to="/product/$id"
         params={{ id: product.id }}

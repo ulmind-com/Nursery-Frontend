@@ -9,7 +9,7 @@ export function CategoryPreviewGrid({ slug }: { slug: string }) {
       {previewItemsFor(slug).map((item, index) => (
         <article
           key={`${item.title}-${index}`}
-          className="group min-w-0 overflow-hidden rounded-xl bg-card"
+          className="group min-w-0 overflow-hidden rounded-xl bg-card @container"
         >
           <Link
             to="/product/$id"

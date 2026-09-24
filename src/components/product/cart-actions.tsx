@@ -95,7 +95,9 @@ export function CartActions({ item, className }: { item: QuickAddItem; className
   };
 
   return (
-    <div className={cn("mt-3 grid grid-cols-2 gap-2", className)}>
+    // Sized against the card, not the screen: side by side when the card is
+    // wide enough, stacked full-width on a very narrow phone.
+    <div className={cn("mt-3 grid grid-cols-1 gap-2 @min-[9rem]:grid-cols-2", className)}>
       <Button
         type="button"
         variant="outline"
@@ -116,7 +118,7 @@ export function CartActions({ item, className }: { item: QuickAddItem; className
             "Added"
           ) : (
             <>
-              Add<span className="hidden sm:inline"> to Cart</span>
+              Add<span className="hidden @max-[9rem]:inline @min-[14rem]:inline"> to Cart</span>
             </>
           )}
         </span>
@@ -129,7 +131,7 @@ export function CartActions({ item, className }: { item: QuickAddItem; className
       >
         <Zap className="size-3.5 shrink-0" aria-hidden />
         <span className="truncate">
-          Buy<span className="hidden sm:inline"> Now</span>
+          Buy<span className="hidden @max-[9rem]:inline @min-[14rem]:inline"> Now</span>
         </span>
       </Button>
     </div>
