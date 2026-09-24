@@ -6,10 +6,13 @@ import {
   Gift,
   Leaf,
   Loader2,
+  Minus,
   PackageCheck,
+  Plus,
   ShieldCheck,
   ShoppingBag,
   Tag,
+  Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +24,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { normalizeApiError } from "@/lib/api";
 import { loadRazorpay, openRazorpay, type RazorpaySuccessResponse } from "@/lib/razorpay";
+import { couponMinOrder } from "@/lib/coupons";
 import { cn } from "@/lib/utils";
 import type { Address, Coupon, OrderQuote } from "@/types/api";
 
@@ -111,7 +115,7 @@ const toAddress = (form: DeliveryForm): Address => ({
 });
 
 function CheckoutPage() {
-  const { items, subtotal: cartSubtotal, clear } = useCart();
+  const { items, subtotal: cartSubtotal, clear, updateQty, removeItem } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { data: settings } = useQuery({
@@ -180,6 +184,15 @@ function CheckoutPage() {
       /* storage unavailable */
     }
   }, []);
+
+  // Quantity edits keep the line count the same, so the quote listens to a
+  // signature of the whole cart rather than to items.length.
+  const cartSignature = useMemo(
+    () => items.map((item) => `${item.product_id}:${item.size_variant ?? ""}:${item.qty}`).join("|"),
+    [items],
+  );
+
+  const unitCount = items.reduce((sum, item) => sum + item.qty, 0);
 
   const orderItems = useMemo(
     () =>
@@ -250,7 +263,7 @@ function CheckoutPage() {
   }, [
     isAuthenticated,
     complete,
-    items.length,
+    cartSignature,
     payment,
     coupon,
     form.firstName,
@@ -692,9 +705,22 @@ function CheckoutPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-[#707070]">
-                      {[item.size_variant, item.pot_type].filter(Boolean).join(" / ")}
-                    </p>
+                    {[item.size_variant, item.pot_type].filter(Boolean).length > 0 && (
+                      <p className="mt-0.5 truncate text-xs text-[#707070]">
+                        {[item.size_variant, item.pot_type].filter(Boolean).join(" / ")}
+                      </p>
+                    )}
+                    <QtyStepper
+                      qty={item.qty}
+                      max={item.stock ?? 99}
+                      unitPrice={item.unit_price}
+                      onChange={(next) => updateQty(item.product_id, next, item.size_variant)}
+                      onRemove={() => {
+                        removeItem(item.product_id, item.size_variant);
+                        toast.success(`${item.title} removed`);
+                      }}
+                      label={item.title}
+                    />
                   </div>
                   <span className="text-sm font-semibold tabular-nums">
                     {inr(item.unit_price * item.qty)}
@@ -779,7 +805,7 @@ function CheckoutPage() {
             {/* Totals */}
             <div className="mt-7 space-y-3 border-t border-[#e5e5e5] pt-6 text-sm">
               <PriceLine
-                label={`Subtotal · ${items.length} item${items.length > 1 ? "s" : ""}`}
+                label={`Subtotal · ${unitCount} item${unitCount > 1 ? "s" : ""}`}
                 value={inr(quote?.subtotal ?? cartSubtotal)}
               />
               {quote && quote.discount > 0 && (
@@ -1034,6 +1060,57 @@ function PriceLine({
   );
 }
 
+/**
+ * Quantity control on the summary line — a customer who changes their mind can
+ * add another of the same plant (or drop the line) without leaving checkout.
+ * Every change re-quotes shipping, discount and total automatically.
+ */
+function QtyStepper({
+  qty,
+  max,
+  unitPrice,
+  onChange,
+  onRemove,
+  label,
+}: {
+  qty: number;
+  max: number;
+  unitPrice: number;
+  onChange: (next: number) => void;
+  onRemove: () => void;
+  label: string;
+}) {
+  const atMax = qty >= max;
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <div className="flex items-center rounded-md border border-[#d9d9d9] bg-white">
+        <button
+          type="button"
+          onClick={() => (qty <= 1 ? onRemove() : onChange(qty - 1))}
+          aria-label={qty <= 1 ? `Remove ${label}` : `Decrease quantity of ${label}`}
+          className="flex size-7 items-center justify-center rounded-l-md text-[#333] transition-colors duration-200 hover:bg-[#f1f1f1]"
+        >
+          {qty <= 1 ? <Trash2 className="size-3.5" /> : <Minus className="size-3.5" />}
+        </button>
+        <span className="w-7 text-center text-xs font-semibold tabular-nums">{qty}</span>
+        <button
+          type="button"
+          onClick={() => onChange(qty + 1)}
+          disabled={atMax}
+          aria-label={`Increase quantity of ${label}`}
+          title={atMax ? "No more stock available" : undefined}
+          className="flex size-7 items-center justify-center rounded-r-md text-[#333] transition-colors duration-200 hover:bg-[#f1f1f1] disabled:opacity-35"
+        >
+          <Plus className="size-3.5" />
+        </button>
+      </div>
+      <span className="truncate text-[11px] text-[#8a8a8a]">
+        {atMax ? "Max available" : `${inr(unitPrice)} each`}
+      </span>
+    </div>
+  );
+}
+
 function OfferRow({
   offer,
   cartSubtotal,
@@ -1047,7 +1124,7 @@ function OfferRow({
   disabled: boolean;
   applied: boolean;
 }) {
-  const minimum = offer.minimum_order ?? 0;
+  const minimum = couponMinOrder(offer);
   const remaining = Math.max(0, minimum - cartSubtotal);
 
   return (
