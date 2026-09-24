@@ -16,6 +16,7 @@ import { ReviewsSection } from "@/components/product/reviews-section";
 import { ComparisonSection } from "@/components/product/comparison-section";
 import { ProductFaqSection } from "@/components/product/product-faq-section";
 import { useCart } from "@/contexts/cart-context";
+import { flyToCart } from "@/lib/fly-to-cart";
 import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
 
@@ -143,7 +144,7 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
           ))}
         </div>
       )}
-      <div className="order-1 aspect-[1.04/1] overflow-hidden rounded-sm bg-primary-tint lg:order-2">
+      <div data-gallery-hero className="order-1 aspect-[1.04/1] overflow-hidden rounded-sm bg-primary-tint lg:order-2">
         {hero ? <img src={hero} alt={title} width={1024} height={1280} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
       </div>
       <p className="order-3 hidden items-center justify-center gap-3 text-xs text-muted-foreground sm:flex lg:col-start-2"><ScanSearch className="size-3.5" /> Roll over image to zoom in</p>
@@ -275,6 +276,12 @@ function ReasonsToBuySection({ image, title, reasons, noun = "plant" }: { image?
   );
 }
 
+/** Fly the gallery hero into the cart icon, same as the catalogue cards do. */
+function flyHeroToCart(image: string | undefined) {
+  const hero = document.querySelector<HTMLImageElement>("[data-gallery-hero] img");
+  return flyToCart(image ?? hero?.currentSrc, hero?.getBoundingClientRect());
+}
+
 function Breadcrumbs({ title, category }: { title: string; category?: string }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
@@ -287,7 +294,7 @@ function Breadcrumbs({ title, category }: { title: string; category?: string }) 
 
 function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeof findPreviewItem>> }) {
   const nav = useNavigate();
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<"Small" | "Medium">("Small");
   const [selectedPlanter, setSelectedPlanter] = useState("Yoda");
@@ -334,7 +341,8 @@ function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeo
     sku: `PREVIEW-${preview.id}`,
   });
   const addPreviewToCart = () => {
-    addItem(previewCartItem());
+    void flyHeroToCart(gallery[0]).then(openCart);
+    addItem(previewCartItem(), { openDrawer: false });
     toast.success(`${quantity} × ${preview.title} added to cart`);
   };
   const buyPreviewNow = async () => {
@@ -426,7 +434,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
   const [activeImage, setActiveImage] = useState(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
 
   const variants = p.sizes ?? [];
   const v = variants[selected] ?? variants[0];
@@ -483,7 +491,9 @@ function LiveProductPage({ product: p }: { product: Product }) {
     if (matching) selectVariant(matching.index);
   };
   const add = () => {
-    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: quantity, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) });
+    // Fly the photo first, then slide the drawer open as it lands.
+    void flyHeroToCart(imgs[0]).then(openCart);
+    addItem({ product_id: p.id, title: p.title, ...(imgs[0] ? { image: imgs[0] } : {}), qty: quantity, ...(v?.name ? { size_variant: v.name } : {}), ...(v?.pot_type ? { pot_type: v.pot_type } : {}), unit_price: price, ...(mrp ? { mrp } : {}), stock, ...(v?.sku ? { sku: v.sku } : {}) }, { openDrawer: false });
     toast.success(`${quantity} × ${p.title} added to cart`);
   };
   const buyNow = async () => {
@@ -582,7 +592,7 @@ function LiveProductPage({ product: p }: { product: Product }) {
       {similar.data && similar.data.length > 0 && <YouMayAlsoLike items={similar.data.map(alsoLikeFromProduct)} />}
       <ProductFaqSection faq={p.faq} fallbackImage={imgs[0]} />
 
-      <div className="fixed inset-x-0 bottom-14 z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>
         {stock > 0 ? <Button className="flex-1 bg-forest text-forest-foreground hover:bg-forest/90" size="lg" onClick={add}><ShoppingBag />Add {quantity} — {money(price * quantity)}</Button> : <Button className="flex-1" size="lg" variant="secondary" onClick={() => void notifyMe()}><BellRing />Notify me</Button>}
       </div>
