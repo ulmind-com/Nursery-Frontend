@@ -1,7 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, SlidersHorizontal, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { money } from "@/components/product/product-card";
+import {
+  CartActions,
+  quickAddFromProduct,
+  type QuickAddItem,
+} from "@/components/product/cart-actions";
 import type { Product, ProductSize } from "@/types/api";
 import { previewItemsFor, type PreviewItem } from "@/components/category/preview-products";
 
@@ -16,7 +20,8 @@ const previewMeta = [
 ] as const;
 
 function liveProductDetails(product: Product) {
-  const variant: ProductSize | undefined = product.sizes?.find((size) => size.stock > 0) ?? product.sizes?.[0];
+  const variant: ProductSize | undefined =
+    product.sizes?.find((size) => size.stock > 0) ?? product.sizes?.[0];
   const images = variant?.images?.length ? variant.images : product.images;
   return {
     image: images?.[0],
@@ -36,11 +41,27 @@ function RatingStrip({ rating, reviews }: { rating: number; reviews: number }) {
   );
 }
 
+/** Preview cards show placeholder catalogue items — still fully buyable. */
+function previewQuickAdd(product: PreviewItem): QuickAddItem {
+  return {
+    id: product.id,
+    title: product.title,
+    image: product.image,
+    price: product.price,
+    mrp: product.mrp,
+    stock: 99,
+  };
+}
+
 function PreviewCard({ product, index }: { product: PreviewItem; index: number }) {
   const meta = previewMeta[index] ?? ["Nursery product preview", 0, 0];
   return (
     <article className="group min-w-0 overflow-hidden rounded-xl bg-card">
-      <Link to="/product/$id" params={{ id: product.id }} className="relative block aspect-square overflow-hidden bg-muted">
+      <Link
+        to="/product/$id"
+        params={{ id: product.id }}
+        className="relative block aspect-square overflow-hidden bg-muted"
+      >
         <img
           src={product.image}
           alt={product.title}
@@ -55,15 +76,23 @@ function PreviewCard({ product, index }: { product: PreviewItem; index: number }
         <RatingStrip rating={meta[1]} reviews={meta[2]} />
       </Link>
       <div className="p-3 sm:p-4">
-        <h3 className="line-clamp-1 text-base text-forest sm:text-xl"><Link to="/product/$id" params={{ id: product.id }}>{product.title}</Link></h3>
-        <p className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground sm:text-sm">{meta[0]}</p>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="price-num text-sm text-foreground sm:text-base">{money(product.price)}</span>
-            <span className="price-num text-[10px] font-medium text-muted-foreground line-through sm:text-sm">{money(product.mrp)}</span>
-          </div>
-          <Button asChild className="h-9 w-full rounded-full bg-forest px-3 text-[11px] text-forest-foreground hover:bg-forest/90 sm:w-auto sm:min-w-32 sm:text-sm"><Link to="/product/$id" params={{ id: product.id }}>View Product</Link></Button>
+        <h3 className="line-clamp-1 text-base text-forest sm:text-xl">
+          <Link to="/product/$id" params={{ id: product.id }}>
+            {product.title}
+          </Link>
+        </h3>
+        <p className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground sm:text-sm">
+          {meta[0]}
+        </p>
+        <div className="mt-3 flex items-baseline gap-1.5">
+          <span className="price-num text-sm text-foreground sm:text-base">
+            {money(product.price)}
+          </span>
+          <span className="price-num text-[10px] font-medium text-muted-foreground line-through sm:text-sm">
+            {money(product.mrp)}
+          </span>
         </div>
+        <CartActions item={previewQuickAdd(product)} />
       </div>
     </article>
   );
@@ -73,31 +102,52 @@ function LiveProductCard({ product }: { product: Product }) {
   const { image, price, mrp } = liveProductDetails(product);
   return (
     <article className="group min-w-0 overflow-hidden rounded-xl bg-card">
-      <Link to="/product/$id" params={{ id: product.id }} className="relative block aspect-square overflow-hidden bg-muted">
+      <Link
+        to="/product/$id"
+        params={{ id: product.id }}
+        className="relative block aspect-square overflow-hidden bg-muted"
+      >
         {image ? (
-          <img src={image} alt={product.title} width={768} height={960} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]" />
+          <img
+            src={image}
+            alt={product.title}
+            width={768}
+            height={960}
+            loading="lazy"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+          />
         ) : (
-          <span className="flex size-full items-center justify-center px-4 text-center text-xs text-muted-foreground">Image coming soon</span>
+          <span className="flex size-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
+            Image coming soon
+          </span>
         )}
         {product.is_bestseller && (
-          <span className="absolute left-2 top-2 rounded-md bg-star px-2 py-1 text-[9px] font-bold uppercase text-foreground shadow-sm sm:left-3 sm:top-3 sm:text-[10px]">Bestseller</span>
+          <span className="absolute left-2 top-2 rounded-md bg-star px-2 py-1 text-[9px] font-bold uppercase text-foreground shadow-sm sm:left-3 sm:top-3 sm:text-[10px]">
+            Bestseller
+          </span>
         )}
-        {Boolean(product.rating) && <RatingStrip rating={product.rating ?? 0} reviews={product.review_count ?? 0} />}
+        {Boolean(product.rating) && (
+          <RatingStrip rating={product.rating ?? 0} reviews={product.review_count ?? 0} />
+        )}
       </Link>
       <div className="p-3 sm:p-4">
         <Link to="/product/$id" params={{ id: product.id }} className="block">
-          <h3 className="line-clamp-1 text-base text-forest transition-colors hover:text-primary sm:text-xl">{product.title}</h3>
+          <h3 className="line-clamp-1 text-base text-forest transition-colors hover:text-primary sm:text-xl">
+            {product.title}
+          </h3>
         </Link>
-        <p className="mt-0.5 line-clamp-1 min-h-4 text-[11px] text-muted-foreground sm:text-sm">{product.short_description ?? product.description ?? ""}</p>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="price-num text-sm text-foreground sm:text-base">{money(price)}</span>
-            {mrp && mrp > price ? <span className="price-num text-[10px] font-medium text-muted-foreground line-through sm:text-sm">{money(mrp)}</span> : null}
-          </div>
-          <Button asChild className="h-9 w-full rounded-full bg-forest px-3 text-[11px] text-forest-foreground hover:bg-forest/90 sm:w-auto sm:min-w-32 sm:text-sm">
-            <Link to="/product/$id" params={{ id: product.id }}>View Product</Link>
-          </Button>
+        <p className="mt-0.5 line-clamp-1 min-h-4 text-[11px] text-muted-foreground sm:text-sm">
+          {product.short_description ?? product.description ?? ""}
+        </p>
+        <div className="mt-3 flex items-baseline gap-1.5">
+          <span className="price-num text-sm text-foreground sm:text-base">{money(price)}</span>
+          {mrp && mrp > price ? (
+            <span className="price-num text-[10px] font-medium text-muted-foreground line-through sm:text-sm">
+              {money(mrp)}
+            </span>
+          ) : null}
         </div>
+        <CartActions item={quickAddFromProduct(product)} />
       </div>
     </article>
   );
@@ -110,18 +160,30 @@ export function StorefrontProductGrid({ products }: { products: Product[] }) {
     <section className="border-t border-border bg-storefront-wash px-3 pb-12 sm:px-6 lg:px-9 lg:pb-16">
       <div className="mx-auto max-w-[1480px]">
         <div className="flex h-14 items-center justify-between border-b border-border/70 sm:h-16">
-          <Link to="/plants" search={{}} className="flex items-center gap-2 text-xs font-semibold uppercase text-forest transition-colors hover:text-primary sm:text-sm">
+          <Link
+            to="/plants"
+            search={{}}
+            className="flex items-center gap-2 text-xs font-semibold uppercase text-forest transition-colors hover:text-primary sm:text-sm"
+          >
             <SlidersHorizontal className="size-4" /> Filter
           </Link>
-          <Link to="/plants" search={{ sort_by: "recommended" }} className="flex items-center gap-1.5 text-xs font-medium text-forest transition-colors hover:text-primary sm:text-sm">
+          <Link
+            to="/plants"
+            search={{ sort_by: "recommended" }}
+            className="flex items-center gap-1.5 text-xs font-medium text-forest transition-colors hover:text-primary sm:text-sm"
+          >
             Sort by <ChevronDown className="size-4" />
           </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-4 sm:gap-5 sm:pt-5 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-8">
           {hasLiveProducts
-            ? products.slice(0, 6).map((product) => <LiveProductCard key={product.id} product={product} />)
-            : previewProducts.map((product, index) => <PreviewCard key={product.id} product={product} index={index} />)}
+            ? products
+                .slice(0, 6)
+                .map((product) => <LiveProductCard key={product.id} product={product} />)
+            : previewProducts.map((product, index) => (
+                <PreviewCard key={product.id} product={product} index={index} />
+              ))}
         </div>
       </div>
     </section>
