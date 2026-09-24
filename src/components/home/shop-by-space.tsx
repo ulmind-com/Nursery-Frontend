@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { SiteMedia } from "@/types/api";
+import type { Category, SiteMedia } from "@/types/api";
 
 export interface SpaceCard {
   id: string;
@@ -15,6 +15,35 @@ export const defaultSpaceCards: SpaceCard[] = [
   { id: "balcony", title: "Balcony", image: "/places/balcony.jpg", link: "/search?q=balcony" },
   { id: "office", title: "Office", image: "/places/office.jpg", link: "/search?q=office" },
 ];
+
+/* Parent category that holds the space sub-categories, by slug. The admin panel
+   can name it any of these; the first match wins. */
+const SPACE_PARENT_SLUGS = ["shop-by-space", "shop-by-spaces", "spaces", "transform-your-home"];
+
+/* Fallback artwork per space, used until the category has its own image */
+const FALLBACK_IMAGES: Record<string, string> = {
+  "living-room": "/places/living-room.jpg",
+  bedroom: "/places/bedroom.jpg",
+  balcony: "/places/balcony.jpg",
+  office: "/places/office.jpg",
+};
+
+/* Map the admin category tree onto space cards — each sub-category of the
+   "Shop by Space" parent becomes a tile linking to its category page, so the
+   products shown there are whatever admin filed under that category. */
+export function spaceCardsFromCategories(tree: Category[] | undefined): SpaceCard[] {
+  const parent = (tree ?? []).find((cat) =>
+    SPACE_PARENT_SLUGS.includes((cat.slug || "").toLowerCase()),
+  );
+  return (parent?.children ?? [])
+    .filter((child) => child.slug)
+    .map((child) => ({
+      id: child.id,
+      title: child.name,
+      image: child.image || FALLBACK_IMAGES[child.slug as string] || "/places/living-room.jpg",
+      link: `/category/${child.slug}`,
+    }));
+}
 
 /* Map admin-managed site media (section: "spaces") onto space cards */
 export function spaceCardsFromMedia(media: SiteMedia[] | undefined): SpaceCard[] {

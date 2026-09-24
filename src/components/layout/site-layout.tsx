@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, UserRound } from "lucide-react";
 import { memo, type ReactNode, useEffect, useState } from "react";
 import { categoriesApi, queryKeys, settingsApi } from "@/api/services";
+import { navCategories } from "@/lib/nav-categories";
 import { displayName } from "@/config/brand";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { useTypewriter } from "@/hooks/use-typewriter";
@@ -154,11 +155,13 @@ export function SiteLayout({ children }: { children: ReactNode }) {
     queryFn: settingsApi.get,
     staleTime: 300_000,
   });
-  const { data: categories = [] } = useQuery({
+  const { data: allCategories = [] } = useQuery({
     queryKey: queryKeys.categories,
     queryFn: categoriesApi.list,
     staleTime: 300_000,
   });
+  /* Home-section trees (Shop by Space) stay out of the shop navigation */
+  const categories = navCategories(allCategories);
 
   const whatsapp = settings?.support?.whatsapp || "918537861040";
   const isCheckout = path.startsWith("/checkout");

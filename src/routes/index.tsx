@@ -10,7 +10,9 @@ import { VideoGallery } from "@/components/home/video-gallery";
 import { SpotlightSection, type SpotlightPromo } from "@/components/home/spotlight-section";
 import { BhiduApprovedSection } from "@/components/home/bhidu-approved-section";
 import { OffersMarquee, offerCardsFromMedia } from "@/components/home/offers-marquee";
-import { ShopBySpaceSection, spaceCardsFromMedia } from "@/components/home/shop-by-space";
+import { ShopBySpaceSection, spaceCardsFromCategories, spaceCardsFromMedia } from "@/components/home/shop-by-space";
+import { SelfWateringSection } from "@/components/home/self-watering-section";
+import { PlantersRedefineSection } from "@/components/home/planters-redefine";
 import { FarmToHomeSection, farmCardsFromMedia } from "@/components/home/farm-to-home";
 import { BrandComparisonSection } from "@/components/home/brand-comparison";
 import { GrowGardenBanner } from "@/components/home/grow-garden-banner";
@@ -18,6 +20,7 @@ import { StoreLocatorSection, storesFromApi } from "@/components/home/store-loca
 import { GardenServicesBand } from "@/components/home/garden-services";
 import { GiftingBand } from "@/components/home/gifting-band";
 import { PressMarquee } from "@/components/home/press-marquee";
+import { navCategories } from "@/lib/nav-categories";
 import { displayName } from "@/config/brand";
 import type { Product } from "@/types/api";
 const categoryPlants = "/images/category-plants.png";
@@ -86,6 +89,7 @@ function HomePage() {
   const sections = useQuery({ queryKey: queryKeys.home, queryFn: homeApi.sections });
   const banners = useQuery({ queryKey: ["banners"], queryFn: homeApi.banners });
   const categories = useQuery({ queryKey: queryKeys.categories, queryFn: categoriesApi.list });
+  const categoryTree = useQuery({ queryKey: queryKeys.categoryTree, queryFn: categoriesApi.tree });
   const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get });
   const recommendations = useQuery({ queryKey: ["recommendations", "home"], queryFn: homeApi.recommendations });
   const storefrontProducts = useQuery({ queryKey: queryKeys.products({ limit: 6 }), queryFn: () => productsApi.list({ limit: 6 }) });
@@ -111,7 +115,10 @@ function HomePage() {
   const spaceMedia = Array.isArray(mediaData)
     ? mediaData.filter((item) => item.section === "spaces")
     : mediaData?.["spaces"] ?? [];
-  const spaceCards = spaceCardsFromMedia(spaceMedia);
+  /* Space tiles come from the "Shop by Space" category tree first (so admin
+     controls both the tiles and the products behind them), then site media. */
+  const spaceCardsFromTree = spaceCardsFromCategories(categoryTree.data);
+  const spaceCards = spaceCardsFromTree.length > 0 ? spaceCardsFromTree : spaceCardsFromMedia(spaceMedia);
   const farmMedia = Array.isArray(mediaData)
     ? mediaData.filter((item) => item.section === "farm")
     : mediaData?.["farm"] ?? [];
@@ -155,7 +162,7 @@ function HomePage() {
         <h2 className="mb-6 text-center font-display text-[2rem] font-bold text-white sm:mb-8 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
         <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-full justify-start gap-4 px-2 sm:gap-6 lg:justify-center lg:gap-6">
-            {(categories.data ?? []).slice(0, 9).map((cat) => (
+            {navCategories(categories.data).slice(0, 9).map((cat) => (
               <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   {cat.image ? (
@@ -167,7 +174,7 @@ function HomePage() {
                 <h2 className="mt-4 line-clamp-2 text-sm font-medium leading-5 text-white sm:text-[15px]">{cat.name}</h2>
               </Link>
             ))}
-            {(categories.data?.length ?? 0) === 0 && browseShortcuts.map(({ name, slug, image }) => (
+            {navCategories(categories.data).length === 0 && browseShortcuts.map(({ name, slug, image }) => (
               <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
@@ -188,6 +195,10 @@ function HomePage() {
       <BhiduApprovedSection products={products} />
 
       <OffersMarquee offers={offerCards} />
+
+      <SelfWateringSection />
+
+      <PlantersRedefineSection products={products} />
 
       <StorefrontProductGrid products={products} />
 

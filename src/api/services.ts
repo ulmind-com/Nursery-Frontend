@@ -3,7 +3,7 @@ import type { Address, AuthResponse, Banner, BlogPost, CheckoutResponse, Combo, 
 
 type Params = Record<string, string | number | boolean | undefined | null>;
 const data = async <T>(request: Promise<{ data: T }>) => (await request).data;
-export const queryKeys = { settings: ["settings"] as const, categories: ["categories"] as const, products: (p: Params = {}) => ["products", p] as const, product: (id: string) => ["product", id] as const, home: ["home"] as const, wishlist: ["wishlist"] as const, orders: ["orders"] as const, blog: ["blog"] as const, stores: ["stores"] as const, gardenServices: ["garden-services"] as const, gifting: ["gifting"] as const, press: ["press"] as const };
+export const queryKeys = { settings: ["settings"] as const, categories: ["categories"] as const, categoryTree: ["categories", "tree"] as const, products: (p: Params = {}) => ["products", p] as const, product: (id: string) => ["product", id] as const, home: ["home"] as const, wishlist: ["wishlist"] as const, orders: ["orders"] as const, blog: ["blog"] as const, stores: ["stores"] as const, gardenServices: ["garden-services"] as const, gifting: ["gifting"] as const, press: ["press"] as const };
 export const settingsApi = { get: () => data<Settings>(api.get("/settings")), geocode: (q: string) => data<unknown>(api.get("/settings/geocode", { params: { q } })) };
 export const categoriesApi = { list: () => data<import("@/types/api").Category[]>(api.get("/categories")), tree: () => data<import("@/types/api").Category[]>(api.get("/categories/tree")) };
 export const brandsApi = { list: () => data<import("@/types/api").Brand[]>(api.get("/brands")) };
