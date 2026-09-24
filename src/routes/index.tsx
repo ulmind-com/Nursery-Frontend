@@ -21,6 +21,7 @@ import { GardenServicesBand } from "@/components/home/garden-services";
 import { GiftingBand } from "@/components/home/gifting-band";
 import { PressMarquee } from "@/components/home/press-marquee";
 import { TrustLottie } from "@/components/home/trust-lottie";
+import { LottieIcon } from "@/components/ui/lottie-icon";
 import { navCategories } from "@/lib/nav-categories";
 import { displayName } from "@/config/brand";
 import type { Product } from "@/types/api";
@@ -167,7 +168,7 @@ function HomePage() {
               <Link key={cat.id} to="/category/$slug" params={{ slug: cat.slug || cat.id }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
                   {cat.image ? (
-                    <img src={cat.image} alt={cat.name} loading="lazy" className="size-full object-contain" />
+                    <LottieIcon src={cat.image} alt={cat.name} />
                   ) : (
                     <span className="flex size-full items-center justify-center rounded-full bg-primary-tint"><Leaf className="size-8 text-primary" /></span>
                   )}
@@ -178,7 +179,7 @@ function HomePage() {
             {navCategories(categories.data).length === 0 && browseShortcuts.map(({ name, slug, image }) => (
               <Link key={name} to="/category/$slug" params={{ slug }} className="group w-[96px] shrink-0 text-center sm:w-[110px] lg:w-[116px]">
                 <div className="mx-auto flex aspect-square items-center justify-center overflow-hidden rounded-full bg-white p-3 sm:p-4 shadow-sm transition-transform duration-300 group-hover:-translate-y-2">
-                  <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
+                  <LottieIcon src={image} alt={name} />
                 </div>
                 <h2 className="mt-4 line-clamp-2 text-sm font-medium leading-5 text-white sm:text-[15px] lg:min-h-10">{name}</h2>
               </Link>
