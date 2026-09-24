@@ -60,6 +60,51 @@ const toCartItem = (item: QuickAddItem): CartItem => ({
  * Adding never opens the cart drawer, so a customer can keep filling the grid;
  * the header count updates and the toast offers a shortcut into the cart.
  */
+/**
+ * Single full-width "Add to Basket" — the storefront card footer.
+ *
+ * Same behaviour as CartActions' add button (flight animation, toast, no
+ * drawer), just the one call to action the card design asks for.
+ */
+export function AddToBasketButton({ item, className }: { item: QuickAddItem; className?: string }) {
+  const { addItem, openCart } = useCart();
+  const [added, setAdded] = useState(false);
+
+  if (item.stock < 1)
+    return (
+      <Button disabled className={cn("h-11 w-full rounded-full text-sm", className)}>
+        Out of stock
+      </Button>
+    );
+
+  const add = (event: MouseEvent<HTMLButtonElement>) => {
+    const card = event.currentTarget.closest("article");
+    const photo = card?.querySelector("img");
+    addItem(toCartItem(item), { openDrawer: false });
+    void flyToCart(item.image ?? photo?.currentSrc ?? photo?.src, photo?.getBoundingClientRect());
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1800);
+    toast.success(`${item.title} added to cart`, {
+      action: { label: "View cart", onClick: openCart },
+    });
+  };
+
+  return (
+    <Button
+      type="button"
+      onClick={add}
+      onPointerEnter={() => {
+        if (item.image) void cutout(item.image);
+      }}
+      aria-label={`Add ${item.title} to basket`}
+      className="h-11 w-full gap-2 rounded-full bg-forest text-sm font-semibold text-forest-foreground hover:bg-forest/90"
+    >
+      {added ? <Check className="size-4" aria-hidden /> : <ShoppingCart className="size-4" aria-hidden />}
+      {added ? "Added" : "Add to Basket"}
+    </Button>
+  );
+}
+
 export function CartActions({ item, className }: { item: QuickAddItem; className?: string }) {
   const { addItem, openCart } = useCart();
   const navigate = useNavigate();

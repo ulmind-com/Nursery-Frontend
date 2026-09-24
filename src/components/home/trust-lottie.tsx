@@ -19,7 +19,7 @@ export function TrustLottie({ src, icon: Icon, label }: { src: string; icon: Luc
           autoplay
           aria-label={label}
           className="size-9"
-          onLoadError={() => setFailed(true)}
+          dotLottieRefCallback={(player) => player?.addEventListener("loadError", () => setFailed(true))}
         />
       )}
     </div>
