@@ -43,7 +43,7 @@ export function HeroCarousel({ banners, shopName }: { banners: Banner[]; shopNam
               )}
               <div className="absolute inset-0 bg-gradient-to-l from-white/95 via-white/60 to-transparent sm:w-2/3 sm:left-auto sm:right-0" />
               <div className="relative flex h-full min-w-0 items-center justify-end px-5 sm:px-10 lg:px-[9%]">
-                <div className="w-[60%] min-w-0 text-forest sm:w-[45%] lg:w-[42%] flex flex-col items-start drop-shadow-md sm:drop-shadow-none">
+                <div className="w-[60%] min-w-0 text-forest sm:w-[45%] lg:w-[42%] flex flex-col items-end text-right drop-shadow-md sm:drop-shadow-none">
                   <h1 className="max-w-[12ch] text-[1.75rem] font-extrabold leading-[1.08] sm:text-[2.6rem] lg:text-[3.35rem] text-forest mix-blend-normal">
                     {slide.title || "Bring life to your space"}
                   </h1>
