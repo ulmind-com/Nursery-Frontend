@@ -3,6 +3,7 @@ import { Check, Copy, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { couponApi } from "@/api/services";
+import { couponMinOrder } from "@/lib/coupons";
 import type { Coupon } from "@/types/api";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +15,11 @@ function money(n: number) {
 
 export function CouponBox({ subtotal, preview = false }: { subtotal: number; preview?: boolean }) {
   const [copied, setCopied] = useState<string | null>(null);
-  const { data, isPending, isError } = useQuery({ queryKey: ["coupons", "active"], queryFn: couponApi.active, staleTime: 5 * 60 * 1000 });
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["coupons", "active"],
+    queryFn: couponApi.active,
+    staleTime: 5 * 60 * 1000,
+  });
   const coupons: Coupon[] = data ?? [];
 
   if (isPending) return <div className="h-20 animate-pulse rounded-md bg-muted" />;
@@ -46,13 +51,15 @@ export function CouponBox({ subtotal, preview = false }: { subtotal: number; pre
       <h2 className="text-lg text-forest">Offers for you:</h2>
       <ul className="mt-2.5 divide-y divide-dashed divide-primary/35 overflow-hidden rounded-md border border-dashed border-primary/55 bg-primary-tint/65">
         {coupons.map((coupon) => {
-          const min = coupon.minimum_order ?? 0;
+          const min = couponMinOrder(coupon);
           const needed = Math.max(0, min - subtotal);
           const locked = needed > 0;
           return (
             <li key={coupon.code} className="flex items-center gap-2.5 px-3.5 py-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-foreground">{coupon.description || coupon.code}</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {coupon.description || coupon.code}
+                </p>
                 <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                   {locked && <Lock className="size-3.5" aria-hidden />}
                   {locked ? `Add ${money(needed)} more to unlock` : "Ready to apply"}
@@ -67,7 +74,12 @@ export function CouponBox({ subtotal, preview = false }: { subtotal: number; pre
                 variant="ghost"
                 className="h-9 shrink-0 gap-2 rounded-full px-3 text-xs font-semibold text-forest"
               >
-                <span>{coupon.code}</span>{copied === coupon.code ? <Check className="size-3.5" aria-label="Saved" /> : <Copy className="size-3.5" aria-label={`Use ${coupon.code}`} />}
+                <span>{coupon.code}</span>
+                {copied === coupon.code ? (
+                  <Check className="size-3.5" aria-label="Saved" />
+                ) : (
+                  <Copy className="size-3.5" aria-label={`Use ${coupon.code}`} />
+                )}
               </Button>
             </li>
           );

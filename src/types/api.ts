@@ -20,7 +20,7 @@ export interface GiftingSection { active?: boolean; title?: string; body?: strin
 export interface GardenBlock { id?: string; kind?: string; title?: string; body?: string; image?: string; author?: string; order?: number; active?: boolean }
 export type GardenBlocks = Record<string, GardenBlock[]>;
 export interface GardenService { id?: string; title: string; summary?: string; description?: string; image?: string; price_from?: string; duration?: string; features?: string[]; order?: number; active?: boolean }
-export interface Coupon { id?: string; code: string; description?: string; discount_amount?: number; discount_pct?: number; minimum_order?: number; max_discount?: number; free_shipping?: boolean; expires_at?: string; active?: boolean; locked?: boolean; needed_more?: number }
+export interface Coupon { id?: string; code: string; description?: string; type?: "percent" | "flat"; value?: number; min_order?: number; max_discount?: number; free_shipping?: boolean; first_order_only?: boolean; valid_from?: string | null; valid_until?: string | null; usage_limit?: number; used_count?: number; active?: boolean; locked?: boolean; needed_more?: number }
 export interface Combo { id: string; name: string; description?: string; products?: Array<{ product: Product; quantity: number }>; price?: number; valid_until?: string; active?: boolean; image?: string }
 export interface Review { id: string; user_name?: string; rating: number; title?: string; comment?: string; images?: string[]; verified_buyer?: boolean; helpful_count?: number; created_at?: string }
 export interface Address { tag: string; name: string; house: string; area: string; city: string; state: string; pincode: string; phone: string; lat?: number | null; lng?: number | null }
@@ -28,7 +28,8 @@ export interface OrderItemInput { product_id: string; qty: number; size_variant?
 export interface OrderItem { product_id: string; product?: Product; title?: string; qty: number; size_variant?: string; pot_type?: string; unit_price?: number; total?: number; image?: string }
 export interface Order { id: string; order_number?: string; status: string; payment_status?: string; payment_method?: string; items: OrderItem[]; address?: Address; subtotal?: number; discount?: number; delivery?: number; tax?: number; total?: number; created_at?: string; tracking_id?: string; tracking_url?: string; estimated_delivery?: string }
 export interface OrderQuote { subtotal: number; discount: number; delivery: number; tax: number; total: number; cod_available?: boolean; coupon_code?: string; message?: string }
-export interface BlogPost { id?: string; slug?: string; key?: string; title: string; excerpt?: string; hero_image?: string; image?: string; author?: string; published_at?: string; date?: string; category?: string; tags?: string[]; content?: string; blocks?: Array<{ type: string; content?: string; image?: string }> }
+export interface BlogBlock { type: "p" | "h2" | "quote" | "link" | string; text?: string; url?: string }
+export interface BlogPost { id?: string; slug?: string; key?: string; title: string; excerpt?: string; hero_image?: string; image?: string; author?: string; published_at?: string; date?: string; tag?: string; category?: string; tags?: string[]; featured?: boolean; published?: boolean; link?: string; link_label?: string; content?: string; body?: BlogBlock[]; blocks?: Array<{ type: string; content?: string; image?: string }> }
 export interface GoogleReview { id?: string; author_name?: string; rating: number; text?: string; time?: string; profile_photo_url?: string }
 export interface Wishlist { ids: string[]; items: Product[] }
 export interface Recommendation { title?: string; products: Product[] }
