@@ -156,7 +156,9 @@ function HomePage() {
 
   return (
     <>
-      <section className="mb-6 min-w-0 overflow-hidden bg-forest px-3 py-5 sm:px-6 sm:py-7 lg:mb-8 lg:px-9 lg:py-8">
+      <HeroCarousel banners={banners.data ?? []} shopName={displayName(settings.data?.shop.name)} />
+
+      <section className="mt-6 min-w-0 overflow-hidden bg-forest px-3 py-5 sm:px-6 sm:py-7 lg:mt-8 lg:px-9 lg:py-8">
         <h2 className="mb-6 text-center font-display text-[2rem] font-bold text-white sm:mb-8 sm:text-[2.75rem] lg:text-[3.25rem]">Our Categories</h2>
         <div className="mx-auto w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] lg:max-w-[1480px] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max min-w-full justify-start gap-4 px-2 sm:gap-6 lg:justify-center lg:gap-6">
@@ -183,8 +185,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      <HeroCarousel banners={banners.data ?? []} shopName={displayName(settings.data?.shop.name)} />
 
       <CategoryTrustStrip />
       
