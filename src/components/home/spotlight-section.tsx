@@ -28,7 +28,9 @@ export function SpotlightSection({ promos }: { promos: SpotlightPromo[] }) {
       {/* Promo Grid - Full Width */}
       <div className="grid w-full grid-cols-1 md:grid-cols-2">
         {promos.map((promo) => (
-          <Link key={promo.id} to={promo.link} className="group relative flex aspect-square w-full overflow-hidden bg-background md:aspect-[4/3] lg:aspect-[16/9] lg:h-[600px]">
+          /* Promo artwork is square and carries its own CTA, so the tile stays
+             square at every width — a wider box crops the button off. */
+          <Link key={promo.id} to={promo.link} className="group relative flex aspect-square w-full overflow-hidden bg-background">
             <img 
               src={promo.image} 
               alt={promo.alt} 
