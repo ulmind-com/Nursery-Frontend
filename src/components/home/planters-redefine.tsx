@@ -1,29 +1,24 @@
 /* "Planters That Redefine Spaces" — centred intro, three outlined benefit
    cards, and a grid of planter products underneath. */
 
-import { LottieIcon } from "@/components/ui/lottie-icon";
 import { ProductCard } from "@/components/product/product-card";
 import type { Product } from "@/types/api";
 
 const ICON_DIR = "/Planters";
-const ANIM_DIR = "/lottie/planters";
 
 const benefits = [
   {
-    icon: `${ANIM_DIR}/strong.json`,
-    fallbackIcon: `${ICON_DIR}/Lightweight.png`,
+    icon: `${ICON_DIR}/Lightweight.png`,
     title: "Lightweight yet strong",
     description: "Made from high-quality, UV & frost resistant Fiberglass.",
   },
   {
-    icon: `${ANIM_DIR}/resistant.json`,
-    fallbackIcon: `${ICON_DIR}/UV%20&%20moisture%20resistant.png`,
+    icon: `${ICON_DIR}/UV%20&%20moisture%20resistant.png`,
     title: "UV & moisture resistant",
     description: "Perfect for both indoor and outdoor spaces.",
   },
   {
-    icon: `${ANIM_DIR}/modern.json`,
-    fallbackIcon: `${ICON_DIR}/Designed%20for%20modern%20spaces.png`,
+    icon: `${ICON_DIR}/Designed%20for%20modern%20spaces.png`,
     title: "Designed for modern spaces",
     description: "Clean, minimal design that fits any décor.",
   },
@@ -46,15 +41,16 @@ export function PlantersRedefineSection({
       </div>
 
       <ul className="mt-10 grid gap-4 sm:gap-6 md:grid-cols-3">
-        {benefits.map(({ icon, fallbackIcon, title: heading, description }) => (
+        {benefits.map(({ icon, title: heading, description }) => (
           <li
             key={heading}
             className="flex items-start gap-4 rounded-2xl border border-border/70 bg-background p-5 transition-shadow hover:shadow-md sm:p-6"
           >
-            <LottieIcon
+            <img
               src={icon}
-              fallback={fallbackIcon}
-              alt={heading}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
               className="mt-0.5 size-12 shrink-0 object-contain sm:size-14"
             />
             <div>
