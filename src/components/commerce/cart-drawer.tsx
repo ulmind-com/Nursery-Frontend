@@ -169,7 +169,7 @@ export function CartDrawer() {
         </div>
 
         {items.length > 0 && (
-          <footer className="border-t border-border bg-background px-5 py-4">
+          <footer className="safe-bottom border-t border-border bg-background px-5 py-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="font-display text-2xl font-extrabold tabular-nums text-forest">{inr(subtotal)}</p>

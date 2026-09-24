@@ -167,12 +167,26 @@
     font-family: var(--font-sans);
     letter-spacing: 0;
     min-width: 320px;
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
   }
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* Phones: stop Safari/Chrome from re-scaling text in landscape, and never
+       let a stray wide element create a sideways scroll. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: clip;
+  }
   h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
   button, a, input, textarea, select { letter-spacing: 0; }
   ::selection { background: color-mix(in oklch, var(--primary) 20%, transparent); }
+}
+
+/* Clears the iPhone home indicator under any bar pinned to the bottom edge. */
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @utility price-num {

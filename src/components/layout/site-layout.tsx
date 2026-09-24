@@ -63,7 +63,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <div className="flex justify-center">
               <BrandLogo name={displayName(settings?.shop.name)} />
             </div>
-            <Button variant="ghost" size="icon" className="relative justify-self-end" onClick={openCart} aria-label={`Cart with ${count} items`}>
+            <Button variant="ghost" size="icon" className="relative justify-self-end" data-cart-target onClick={openCart} aria-label={`Cart with ${count} items`}>
               <ShoppingBag />
               {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
             </Button>
@@ -117,7 +117,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <Button variant="ghost" size="icon" asChild className="lg:hidden"><Link to="/search" search={{}} aria-label="Search"><Search /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/account" aria-label="Account"><UserRound /></Link></Button>
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex"><Link to="/wishlist" aria-label="Wishlist"><Heart /></Link></Button>
-            <Button variant="ghost" size="icon" className="relative" onClick={openCart} aria-label={`Cart with ${count} items`}>
+            <Button variant="ghost" size="icon" className="relative" data-cart-target onClick={openCart} aria-label={`Cart with ${count} items`}>
               <ShoppingBag />
               {count > 0 && <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
             </Button>
@@ -130,8 +130,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           {categories.length === 0 && <NavLinks className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary" activeClassName="text-primary" />}
         </nav>
       </header>
-      <main className="pb-16 lg:pb-0">{children}</main>
-      <Footer settings={settings} />
+      <main>{children}</main>
+      {/* Clears the fixed mobile tab bar so the footer is never cut off. */}
+      <div className="pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+        <Footer settings={settings} />
+      </div>
       <MobileTabBar />
       {whatsapp && (
         <a
@@ -139,9 +142,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           target="_blank"
           rel="noreferrer noopener"
           aria-label="Chat with us on WhatsApp"
-          className="fixed bottom-24 right-4 z-40 transition-transform duration-200 hover:scale-110 lg:bottom-24"
+          className="fixed bottom-[calc(8rem+env(safe-area-inset-bottom,0px))] right-3 z-40 transition-transform duration-200 hover:scale-110 sm:right-4 lg:bottom-24"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552" className="size-16 drop-shadow-xl lg:size-[4.5rem]">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175.216 175.552" className="size-14 drop-shadow-xl sm:size-16 lg:size-[4.5rem]">
             <defs><linearGradient id="wa-bg" x1="85.915" x2="86.535" y1="32.567" y2="137.092" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#57d163"/><stop offset="1" stopColor="#23b33a"/></linearGradient></defs>
             <path fill="url(#wa-bg)" d="M87.184 25.227c-33.733 0-61.166 27.423-61.178 61.13a60.98 60.98 0 0 0 9.349 32.535l1.455 2.313-6.179 22.558 23.146-6.069 2.235 1.324a61.22 61.22 0 0 0 31.129 8.481h.032c33.707 0 61.14-27.426 61.153-61.135a60.75 60.75 0 0 0-17.895-43.251 60.75 60.75 0 0 0-43.247-17.886z"/>
             <path fill="#fff" fillRule="evenodd" d="M68.772 55.603c-1.378-3.061-2.828-3.123-4.137-3.176l-3.524-.043c-1.226 0-3.218.46-4.902 2.3s-6.435 6.287-6.435 15.332 6.588 17.785 7.506 19.013 12.718 20.381 31.405 27.75c15.529 6.124 18.689 4.906 22.061 4.6s10.877-4.447 12.408-8.74 1.532-7.971 1.073-8.74-1.685-1.226-3.525-2.146-10.877-5.367-12.562-5.981-2.91-.919-4.137.921-4.746 5.979-5.819 7.206-2.144 1.381-3.984.462-7.76-2.861-14.784-9.124c-5.465-4.873-9.154-10.891-10.228-12.73s-.114-2.835.808-3.751c.825-.824 1.838-2.147 2.759-3.22s1.224-1.84 1.836-3.065.307-2.301-.153-3.22-4.032-10.011-5.666-13.647"/>
@@ -158,12 +161,12 @@ function MobileTabBar() {
   const item = "flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-semibold text-muted-foreground";
   const active = { className: `${item} text-primary` };
   return (
-    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/98 backdrop-blur lg:hidden">
+    <nav aria-label="Primary" className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/98 backdrop-blur lg:hidden">
       <Link to="/" className={item} activeProps={active} activeOptions={{ exact: true }}><Home className="size-5" />Home</Link>
       <Link to="/plants" search={{}} className={item} activeProps={active}><LayoutGrid className="size-5" />Shop</Link>
       <Link to="/search" search={{}} className={item} activeProps={active}><Search className="size-5" />Search</Link>
       <Link to="/wishlist" className={item} activeProps={active}><Heart className="size-5" />Wishlist</Link>
-      <button type="button" onClick={openCart} className={`${item} relative`}>
+      <button type="button" data-cart-target onClick={openCart} className={`${item} relative`}>
         <ShoppingBag className="size-5" />
         {count > 0 && <span className="absolute right-4 top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{count}</span>}
         Cart
