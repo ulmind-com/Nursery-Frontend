@@ -5,11 +5,14 @@ import { Search } from "lucide-react";
 import { searchApi } from "@/api/services";
 import { ProductGrid } from "@/components/product/product-card";
 import { EmptyState } from "@/components/shared/page-state";
+import { useTypewriter } from "@/hooks/use-typewriter";
+import { SEARCH_PHRASES } from "@/lib/search-phrases";
 import { Input } from "@/components/ui/input";
 import type { Product } from "@/types/api";
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (s: Record<string, unknown>): { q?: string } => (typeof s["q"] === "string" && s["q"] ? { q: s["q"] } : {}),
+  validateSearch: (s: Record<string, unknown>): { q?: string } =>
+    typeof s["q"] === "string" && s["q"] ? { q: s["q"] } : {},
   head: () => ({
     meta: [
       { title: "Search | MyGarden" },
@@ -28,6 +31,7 @@ function SearchPage() {
   const term = s.q ?? "";
   const nav = useNavigate();
   const [q, setQ] = useState(term);
+  const placeholder = useTypewriter(SEARCH_PHRASES);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -48,7 +52,14 @@ function SearchPage() {
       <h1 className="text-3xl sm:text-4xl">Search the nursery</h1>
       <form className="relative mt-6 max-w-2xl" onSubmit={(e) => e.preventDefault()} role="search">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
-        <Input name="q" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search products" placeholder="Search plants, care, planters..." className="h-14 rounded-full pl-12" />
+        <Input
+          name="q"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          aria-label="Search products"
+          placeholder={placeholder}
+          className="h-14 rounded-full pl-12"
+        />
       </form>
       <div className="mt-10">
         {products.length ? (
@@ -56,7 +67,11 @@ function SearchPage() {
         ) : (
           <EmptyState
             title={term ? "No matches yet" : "What are you looking for?"}
-            description={term ? "Try a different plant name or a broader search." : "Search by plant name, room, light level, or gardening need."}
+            description={
+              term
+                ? "Try a different plant name or a broader search."
+                : "Search by plant name, room, light level, or gardening need."
+            }
           />
         )}
       </div>

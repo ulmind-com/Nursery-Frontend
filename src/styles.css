@@ -288,6 +288,11 @@
   animation: offers-marquee 45s linear infinite;
 }
 
+/* Announcement strip — the same drift, quick enough to read every offer */
+@utility animate-announce-marquee {
+  animation: offers-marquee 30s linear infinite;
+}
+
 /* ── Auth card — sliding login / register panel ───────────────────────── */
 .auth-stage {
   position: relative;
