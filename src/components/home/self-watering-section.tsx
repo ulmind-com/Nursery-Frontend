@@ -19,11 +19,13 @@ export function SelfWateringSection({
   title = "About Self-Watering Planters",
   description = "Self-watering planters provide consistent moisture, prevent overwatering, and simplify care for healthy plant growth.",
   image = `${ART_DIR}/care_plant.png`,
+  stepsTitle = "How it works",
   steps = defaultSteps,
 }: {
   title?: string;
   description?: string;
   image?: string;
+  stepsTitle?: string;
   steps?: SelfWateringStep[];
 }) {
   return (
@@ -42,7 +44,7 @@ export function SelfWateringSection({
           <h2 className="text-3xl font-bold leading-tight sm:text-4xl">{title}</h2>
           <p className="mt-4 max-w-lg text-sm leading-6 text-white/85 sm:text-base">{description}</p>
 
-          <h3 className="mt-7 text-xl font-semibold sm:text-2xl">How it works</h3>
+          <h3 className="mt-7 text-xl font-semibold sm:text-2xl">{stepsTitle}</h3>
           <ol className="mt-9 grid max-w-[640px] grid-cols-3 gap-3 sm:gap-6">
             {steps.slice(0, 3).map((step, index) => (
               <li key={step.id} className="relative">

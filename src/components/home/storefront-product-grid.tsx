@@ -153,7 +153,7 @@ function LiveProductCard({ product }: { product: Product }) {
   );
 }
 
-export function StorefrontProductGrid({ products }: { products: Product[] }) {
+export function StorefrontProductGrid({ products, limit = 6 }: { products: Product[]; limit?: number }) {
   const hasLiveProducts = products.length > 0;
 
   return (
@@ -179,7 +179,7 @@ export function StorefrontProductGrid({ products }: { products: Product[] }) {
         <div className="grid grid-cols-2 gap-3 pt-4 sm:gap-5 sm:pt-5 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-8">
           {hasLiveProducts
             ? products
-                .slice(0, 6)
+                .slice(0, limit)
                 .map((product) => <LiveProductCard key={product.id} product={product} />)
             : previewProducts.map((product, index) => (
                 <PreviewCard key={product.id} product={product} index={index} />

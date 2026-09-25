@@ -37,11 +37,16 @@ import { Route as VerifyOtpRouteImport } from './routes/verify-otp'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as AccountAddressesRouteImport } from './routes/account.addresses'
+import { Route as AccountCouponsRouteImport } from './routes/account.coupons'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
+import { Route as AccountReviewsRouteImport } from './routes/account.reviews'
+import { Route as AccountSecurityRouteImport } from './routes/account.security'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as CombosIndexRouteImport } from './routes/combos.index'
+import { Route as CombosIdRouteImport } from './routes/combos.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AccountOrdersIndexRouteImport } from './routes/account.orders.index'
 import { Route as AccountOrdersIdRouteImport } from './routes/account.orders.$id'
@@ -186,6 +191,11 @@ const AccountAddressesRoute = AccountAddressesRouteImport.update({
   path: '/addresses',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountCouponsRoute = AccountCouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
+  getParentRoute: () => AccountRoute,
+} as any)
 const AccountOrdersRoute = AccountOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -194,6 +204,16 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
 const AccountProfileRoute = AccountProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountReviewsRoute = AccountReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountSecurityRoute = AccountSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
   getParentRoute: () => AccountRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -210,6 +230,16 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CombosIndexRoute = CombosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CombosRoute,
+} as any)
+const CombosIdRoute = CombosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => CombosRoute,
 } as any)
 const ProductIdRoute = ProductIdRouteImport.update({
   id: '/product/$id',
@@ -234,7 +264,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/combos': typeof CombosRoute
+  '/combos': typeof CombosRouteWithChildren
   '/contact': typeof ContactRoute
   '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
@@ -255,13 +285,18 @@ export interface FileRoutesByFullPath {
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/account/coupons': typeof AccountCouponsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/account/reviews': typeof AccountReviewsRoute
+  '/account/security': typeof AccountSecurityRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/combos/$id': typeof CombosIdRoute
   '/product/$id': typeof ProductIdRoute
   '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/combos/': typeof CombosIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
 }
@@ -270,7 +305,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/combos': typeof CombosRoute
   '/contact': typeof ContactRoute
   '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
@@ -291,12 +325,17 @@ export interface FileRoutesByTo {
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/account/coupons': typeof AccountCouponsRoute
   '/account/profile': typeof AccountProfileRoute
+  '/account/reviews': typeof AccountReviewsRoute
+  '/account/security': typeof AccountSecurityRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/combos/$id': typeof CombosIdRoute
   '/product/$id': typeof ProductIdRoute
   '/account': typeof AccountIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/combos': typeof CombosIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders': typeof AccountOrdersIndexRoute
 }
@@ -308,7 +347,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/combos': typeof CombosRoute
+  '/combos': typeof CombosRouteWithChildren
   '/contact': typeof ContactRoute
   '/corporate-gifts': typeof CorporateGiftsRoute
   '/garden-services': typeof GardenServicesRoute
@@ -329,13 +368,18 @@ export interface FileRoutesById {
   '/verify-otp': typeof VerifyOtpRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
+  '/account/coupons': typeof AccountCouponsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/profile': typeof AccountProfileRoute
+  '/account/reviews': typeof AccountReviewsRoute
+  '/account/security': typeof AccountSecurityRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/combos/$id': typeof CombosIdRoute
   '/product/$id': typeof ProductIdRoute
   '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/combos/': typeof CombosIndexRoute
   '/account/orders/$id': typeof AccountOrdersIdRoute
   '/account/orders/': typeof AccountOrdersIndexRoute
 }
@@ -369,13 +413,18 @@ export interface FileRouteTypes {
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
+    | '/account/coupons'
     | '/account/orders'
     | '/account/profile'
+    | '/account/reviews'
+    | '/account/security'
     | '/blog/$slug'
     | '/category/$slug'
+    | '/combos/$id'
     | '/product/$id'
     | '/account/'
     | '/blog/'
+    | '/combos/'
     | '/account/orders/$id'
     | '/account/orders/'
   fileRoutesByTo: FileRoutesByTo
@@ -384,7 +433,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/cart'
     | '/checkout'
-    | '/combos'
     | '/contact'
     | '/corporate-gifts'
     | '/garden-services'
@@ -405,12 +453,17 @@ export interface FileRouteTypes {
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
+    | '/account/coupons'
     | '/account/profile'
+    | '/account/reviews'
+    | '/account/security'
     | '/blog/$slug'
     | '/category/$slug'
+    | '/combos/$id'
     | '/product/$id'
     | '/account'
     | '/blog'
+    | '/combos'
     | '/account/orders/$id'
     | '/account/orders'
   id:
@@ -442,13 +495,18 @@ export interface FileRouteTypes {
     | '/verify-otp'
     | '/wishlist'
     | '/account/addresses'
+    | '/account/coupons'
     | '/account/orders'
     | '/account/profile'
+    | '/account/reviews'
+    | '/account/security'
     | '/blog/$slug'
     | '/category/$slug'
+    | '/combos/$id'
     | '/product/$id'
     | '/account/'
     | '/blog/'
+    | '/combos/'
     | '/account/orders/$id'
     | '/account/orders/'
   fileRoutesById: FileRoutesById
@@ -460,7 +518,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
-  CombosRoute: typeof CombosRoute
+  CombosRoute: typeof CombosRouteWithChildren
   ContactRoute: typeof ContactRoute
   CorporateGiftsRoute: typeof CorporateGiftsRoute
   GardenServicesRoute: typeof GardenServicesRoute
@@ -682,6 +740,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAddressesRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/coupons': {
+      id: '/account/coupons'
+      path: '/coupons'
+      fullPath: '/account/coupons'
+      preLoaderRoute: typeof AccountCouponsRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/account/orders': {
       id: '/account/orders'
       path: '/orders'
@@ -694,6 +759,20 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/account/profile'
       preLoaderRoute: typeof AccountProfileRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/reviews': {
+      id: '/account/reviews'
+      path: '/reviews'
+      fullPath: '/account/reviews'
+      preLoaderRoute: typeof AccountReviewsRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/security': {
+      id: '/account/security'
+      path: '/security'
+      fullPath: '/account/security'
+      preLoaderRoute: typeof AccountSecurityRouteImport
       parentRoute: typeof AccountRoute
     }
     '/blog/': {
@@ -716,6 +795,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/combos/': {
+      id: '/combos/'
+      path: '/'
+      fullPath: '/combos/'
+      preLoaderRoute: typeof CombosIndexRouteImport
+      parentRoute: typeof CombosRoute
+    }
+    '/combos/$id': {
+      id: '/combos/$id'
+      path: '/$id'
+      fullPath: '/combos/$id'
+      preLoaderRoute: typeof CombosIdRouteImport
+      parentRoute: typeof CombosRoute
     }
     '/product/$id': {
       id: '/product/$id'
@@ -757,15 +850,21 @@ const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
 
 interface AccountRouteChildren {
   AccountAddressesRoute: typeof AccountAddressesRoute
+  AccountCouponsRoute: typeof AccountCouponsRoute
   AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
   AccountProfileRoute: typeof AccountProfileRoute
+  AccountReviewsRoute: typeof AccountReviewsRoute
+  AccountSecurityRoute: typeof AccountSecurityRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
   AccountAddressesRoute: AccountAddressesRoute,
+  AccountCouponsRoute: AccountCouponsRoute,
   AccountOrdersRoute: AccountOrdersRouteWithChildren,
   AccountProfileRoute: AccountProfileRoute,
+  AccountReviewsRoute: AccountReviewsRoute,
+  AccountSecurityRoute: AccountSecurityRoute,
   AccountIndexRoute: AccountIndexRoute,
 }
 
@@ -784,6 +883,19 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface CombosRouteChildren {
+  CombosIdRoute: typeof CombosIdRoute
+  CombosIndexRoute: typeof CombosIndexRoute
+}
+
+const CombosRouteChildren: CombosRouteChildren = {
+  CombosIdRoute: CombosIdRoute,
+  CombosIndexRoute: CombosIndexRoute,
+}
+
+const CombosRouteWithChildren =
+  CombosRoute._addFileChildren(CombosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -791,7 +903,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
-  CombosRoute: CombosRoute,
+  CombosRoute: CombosRouteWithChildren,
   ContactRoute: ContactRoute,
   CorporateGiftsRoute: CorporateGiftsRoute,
   GardenServicesRoute: GardenServicesRoute,

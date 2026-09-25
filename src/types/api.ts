@@ -10,6 +10,8 @@ export interface Product { id: string; title: string; description?: string; shor
 export interface Category { id: string; name: string; slug?: string; parent_id?: string | null; description?: string; image?: string; icon?: string; children?: Category[] }
 export interface Brand { id?: string; name: string; slug?: string; image?: string }
 export interface Banner { id: string; title?: string; subtitle?: string; image?: string; video?: string; poster?: string; promo_code?: string; cta_label?: string; cta_url?: string; active?: boolean }
+export interface PageSectionItem { id?: string; image?: string; video?: string; poster?: string; lottie?: string; title?: string; subtitle?: string; link?: string; label?: string; [key: string]: unknown }
+export interface PageSection { id: string; page?: string; type: string; title?: string; subtitle?: string; eyebrow?: string; description?: string; image?: string; image_alt?: string; cta_label?: string; cta_link?: string; bg_color?: string; brand_label?: string; local_label?: string; others_label?: string; badge_label?: string; badge_label_2?: string; limit?: number | null; items?: PageSectionItem[]; extras?: Record<string, unknown>; order?: number; active?: boolean }
 export interface HomeSection { id: string; title?: string; type: string; layout?: string; products?: Product[]; product_ids?: string[]; category?: Category; category_id?: string; limit?: number; order?: number; active?: boolean; banner?: Banner; items?: unknown[] }
 export interface SiteMedia { id?: string; section?: string; type?: "image" | "video"; image?: string; video?: string; poster?: string; title?: string; subtitle?: string; cta_label?: string; cta_url?: string }
 export interface StoreLocation { id?: string; name: string; city: string; image?: string; address?: string; map_url?: string; phone?: string; hours?: string; city_order?: number; order?: number; active?: boolean }
@@ -21,8 +23,12 @@ export interface GardenBlock { id?: string; kind?: string; title?: string; body?
 export type GardenBlocks = Record<string, GardenBlock[]>;
 export interface GardenService { id?: string; title: string; summary?: string; description?: string; image?: string; price_from?: string; duration?: string; features?: string[]; order?: number; active?: boolean }
 export interface Coupon { id?: string; code: string; description?: string; type?: "percent" | "flat"; value?: number; min_order?: number; max_discount?: number; free_shipping?: boolean; first_order_only?: boolean; valid_from?: string | null; valid_until?: string | null; usage_limit?: number; used_count?: number; active?: boolean; locked?: boolean; needed_more?: number }
-export interface Combo { id: string; name: string; description?: string; products?: Array<{ product: Product; quantity: number }>; price?: number; valid_until?: string; active?: boolean; image?: string }
+export interface ComboEntry { key: string; product_id: string; title: string; slug?: string | null; image?: string | null; size_variant?: string | null; pot_type?: string | null; sku?: string | null; price: number; mrp?: number | null; stock: number; in_stock: boolean }
+export interface Combo { id: string; name: string; description?: string; qty: number; price: number; product_ids?: string[]; products?: ComboEntry[]; pool_size?: number; is_fixed?: boolean; is_weight_based?: boolean; regular_total?: number | null; savings?: number; weight_target?: number | null; start_date?: string | null; end_date?: string | null; active?: boolean; image?: string }
+export interface ChatMessage { role: "user" | "assistant"; content: string }
+export interface MyReview extends Review { product_id: string; title?: string; text?: string; photos?: string[]; tags?: string[]; edited_at?: string; product?: { id: string; title: string; image?: string | null } | null }
 export interface Review { id: string; user_name?: string; rating: number; title?: string; comment?: string; images?: string[]; verified_buyer?: boolean; helpful_count?: number; created_at?: string }
+export interface ResolvedLocation { address: string; city: string; state: string; pincode: string; country: string; display_name: string; lat: number; lon: number }
 export interface Address { tag: string; name: string; house: string; area: string; city: string; state: string; pincode: string; phone: string; lat?: number | null; lng?: number | null }
 export interface OrderItemInput { product_id: string; qty: number; size_variant?: string | null; pot_type?: string | null }
 export interface OrderItem { product_id: string; product?: Product; title?: string; qty: number; size_variant?: string; pot_type?: string; unit_price?: number; total?: number; image?: string }
@@ -34,7 +40,6 @@ export interface GoogleReview { id?: string; author_name?: string; rating: numbe
 export interface Wishlist { ids: string[]; items: Product[] }
 export interface Recommendation { title?: string; products: Product[] }
 export interface Settings { currency: string; currency_code?: string; tax_rate?: number; shop: { name: string; address?: string; phone?: string; email?: string; state?: string }; delivery?: { free_above?: number; [key: string]: unknown }; support?: { title?: string; note?: string; whatsapp?: string; hours?: string; socials?: Array<{ label: string; href: string }>; [key: string]: unknown }; plant_guarantee?: { enabled: boolean; days?: number; label?: string; description?: string }; cod?: { enabled?: boolean; max_order?: number; label?: string; note?: string }; announcements?: string[] }
-export interface ChatMessage { id: string; role: "user" | "assistant"; content: string }
 export interface User { id: string; name: string; email: string; phone?: string | null; avatar?: string | null; addresses?: Address[]; cart?: CartItem[]; created_at?: string | null }
 export interface AuthResponse { access_token: string; token_type?: string; user: User }
 export interface CheckoutResponse extends Omit<Order, "id" | "status" | "items"> { id?: string; order_id?: string; status?: string; items?: OrderItem[]; razorpay_order_id?: string; razorpay_amount?: number; razorpay_currency?: string; key_id?: string; amount?: number; currency?: string }

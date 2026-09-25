@@ -6,7 +6,13 @@ import type { Product } from "@/types/api";
 
 const ICON_DIR = "/Planters";
 
-const benefits = [
+export interface PlanterBenefit {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const defaultBenefits: PlanterBenefit[] = [
   {
     icon: `${ICON_DIR}/Lightweight.png`,
     title: "Lightweight yet strong",
@@ -27,11 +33,15 @@ const benefits = [
 export function PlantersRedefineSection({
   title = "Planters That Redefine Spaces",
   subtitle = "Our FRP planters are the perfect balance of style and strength—transforming any corner into a modern green retreat.",
+  benefits = defaultBenefits,
   products = [],
+  limit = 4,
 }: {
   title?: string;
   subtitle?: string;
+  benefits?: PlanterBenefit[];
   products?: Product[];
+  limit?: number;
 }) {
   return (
     <section className="mx-auto max-w-[1480px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
@@ -63,7 +73,7 @@ export function PlantersRedefineSection({
 
       {products.length > 0 && (
         <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
-          {products.slice(0, 4).map((product) => (
+          {products.slice(0, limit).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

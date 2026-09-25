@@ -11,6 +11,7 @@ import { SEARCH_PHRASES } from "@/lib/search-phrases";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { PlantAssistant } from "@/components/layout/plant-assistant";
 
 import { CartDrawer } from "@/components/commerce/cart-drawer";
 import type { Settings } from "@/types/api";
@@ -302,6 +303,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <Footer settings={settings} />
       </div>
       <MobileTabBar />
+      <PlantAssistant />
       {whatsapp && (
         <a
           href={`https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`}

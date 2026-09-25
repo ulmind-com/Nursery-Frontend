@@ -4,16 +4,35 @@ export interface VideoItem {
   id: string;
   src: string;
   title: string;
+  poster?: string;
 }
 
-export function VideoGallery({ videos }: { videos: VideoItem[] }) {
+/* Bundled clips — used until the admin panel supplies reel media */
+export const defaultVideos: VideoItem[] = [
+  { id: "v1", src: "/Video/video-1.mp4", title: "Transform your living room" },
+  { id: "v2", src: "/Video/video-2.mp4", title: "Easy care tips for busy days" },
+  { id: "v3", src: "/Video/video-3.mp4", title: "Styling your work desk" },
+  { id: "v4", src: "/Video/video-4.mp4", title: "Pet-friendly plants" },
+  { id: "v5", src: "/Video/video-5.mp4", title: "Morning mist routine" },
+  { id: "v6", src: "/Video/video-6.mp4", title: "Propagating made simple" },
+];
+
+export function VideoGallery({
+  videos,
+  title = "Featured Reels",
+  subtitle = "Get inspired by our beautiful community spaces",
+}: {
+  videos: VideoItem[];
+  title?: string;
+  subtitle?: string;
+}) {
   if (!videos || videos.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-[1480px] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <div className="mb-10 text-center">
-        <h2 className="font-display text-3xl font-extrabold text-forest sm:text-4xl lg:text-[2.75rem]">Featured Reels</h2>
-        <p className="mt-4 text-base text-muted-foreground sm:text-lg">Get inspired by our beautiful community spaces</p>
+        <h2 className="font-display text-3xl font-extrabold text-forest sm:text-4xl lg:text-[2.75rem]">{title}</h2>
+        {subtitle && <p className="mt-4 text-base text-muted-foreground sm:text-lg">{subtitle}</p>}
       </div>
       
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
@@ -24,6 +43,7 @@ export function VideoGallery({ videos }: { videos: VideoItem[] }) {
           >
             <video
               src={video.src}
+              {...(video.poster ? { poster: video.poster } : {})}
               className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
               autoPlay
               loop

@@ -5,7 +5,7 @@ import { money } from "@/components/product/product-card";
 import { previewItemsFor } from "@/components/category/preview-products";
 import type { Product, ProductSize } from "@/types/api";
 
-const bhiduPersonImage = "/images/bhidu-person.png";
+const DEFAULT_PERSON_IMAGE = "/images/bhidu-person.png";
 
 /* Sunburst rays, drawn in CSS so the product cards can sit on top of them */
 const SUNBURST =
@@ -142,7 +142,25 @@ function BhiduProductCard({
 }
 
 /* ── Main section component ── */
-export function BhiduApprovedSection({ products }: { products?: Product[] }) {
+export function BhiduApprovedSection({
+  products,
+  badgeLabel = "Bhidu",
+  badgeLabel2 = "Approved",
+  title = "Plants",
+  ctaLabel = "view all",
+  ctaLink = "/plants",
+  personImage = DEFAULT_PERSON_IMAGE,
+  limit = 6,
+}: {
+  products?: Product[];
+  badgeLabel?: string;
+  badgeLabel2?: string;
+  title?: string;
+  ctaLabel?: string;
+  ctaLink?: string;
+  personImage?: string;
+  limit?: number;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -178,7 +196,7 @@ export function BhiduApprovedSection({ products }: { products?: Product[] }) {
 
       {/* ── Cut-out person, standing on the sunburst ── */}
       <img
-        src={bhiduPersonImage}
+        src={personImage}
         alt=""
         aria-hidden
         className="pointer-events-none absolute bottom-0 right-[2%] hidden h-[92%] w-auto select-none object-contain lg:block xl:right-[4%]"
@@ -192,22 +210,21 @@ export function BhiduApprovedSection({ products }: { products?: Product[] }) {
             <div className="relative shrink-0 pt-6 sm:pt-7">
               {/* BHIDU APPROVED sticker */}
               <span className="absolute left-0 top-0 z-10 inline-flex -rotate-[7deg] flex-col items-start rounded-[6px] bg-[#eaff00] px-2 py-1 text-[10px] font-black uppercase italic leading-[1.05] tracking-[0.02em] text-[#123524] shadow-[0_2px_6px_rgba(0,0,0,0.12)] sm:px-2.5 sm:py-1.5 sm:text-[11px]">
-                <span>Bhidu</span>
-                <span>Approved</span>
+                {badgeLabel && <span>{badgeLabel}</span>}
+                {badgeLabel2 && <span>{badgeLabel2}</span>}
               </span>
               <h2 className="pl-[74px] font-display text-[2.75rem] font-black leading-[0.95] tracking-tight text-[#1f7a1f] sm:pl-[86px] sm:text-[3.5rem] lg:pl-[96px] lg:text-[4.5rem]">
-                Plants
+                {title}
               </h2>
             </div>
 
             <div className="mb-2 flex flex-1 items-center gap-4 sm:mb-3">
               <span className="hidden h-[1.5px] flex-1 bg-forest/40 sm:block" />
               <Link
-                to="/plants"
-                search={{}}
+                to={ctaLink}
                 className="shrink-0 text-base font-medium italic text-forest/85 transition-colors duration-200 hover:text-forest sm:text-lg"
               >
-                view all
+                {ctaLabel}
               </Link>
             </div>
           </div>
@@ -220,7 +237,7 @@ export function BhiduApprovedSection({ products }: { products?: Product[] }) {
               className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:gap-5 lg:gap-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {hasLive
-                ? products.slice(0, 6).map((product) => {
+                ? products.slice(0, limit).map((product) => {
                     const { image, price, mrp } = liveProductDetails(product);
                     return (
                       <BhiduProductCard
@@ -286,7 +303,7 @@ export function BhiduApprovedSection({ products }: { products?: Product[] }) {
         style={{ background: SUNBURST }}
       >
         <img
-          src={bhiduPersonImage}
+          src={personImage}
           alt="Bhidu approved — our plants are handpicked for quality"
           className="mx-auto block h-[260px] w-auto object-contain object-bottom sm:h-[320px]"
         />

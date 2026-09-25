@@ -6,6 +6,7 @@ import {
   Gift,
   Leaf,
   Loader2,
+  LocateFixed,
   Minus,
   PackageCheck,
   Plus,
@@ -26,6 +27,7 @@ import { normalizeApiError } from "@/lib/api";
 import { loadRazorpay, openRazorpay, type RazorpaySuccessResponse } from "@/lib/razorpay";
 import { couponMinOrder } from "@/lib/coupons";
 import { cn } from "@/lib/utils";
+import { INDIAN_STATES, matchState } from "@/lib/india";
 import type { Address, Coupon, OrderQuote } from "@/types/api";
 
 export const Route = createFileRoute("/checkout")({
@@ -48,44 +50,6 @@ const COUPON_KEY = "plant-nursery-coupon";
 const inr = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 
 /** Every state and union territory, so the dropdown never blocks a real address. */
-const INDIAN_STATES = [
-  "Andaman and Nicobar Islands",
-  "Andhra Pradesh",
-  "Arunachal Pradesh",
-  "Assam",
-  "Bihar",
-  "Chandigarh",
-  "Chhattisgarh",
-  "Dadra and Nagar Haveli and Daman and Diu",
-  "Delhi",
-  "Goa",
-  "Gujarat",
-  "Haryana",
-  "Himachal Pradesh",
-  "Jammu and Kashmir",
-  "Jharkhand",
-  "Karnataka",
-  "Kerala",
-  "Ladakh",
-  "Lakshadweep",
-  "Madhya Pradesh",
-  "Maharashtra",
-  "Manipur",
-  "Meghalaya",
-  "Mizoram",
-  "Nagaland",
-  "Odisha",
-  "Puducherry",
-  "Punjab",
-  "Rajasthan",
-  "Sikkim",
-  "Tamil Nadu",
-  "Telangana",
-  "Tripura",
-  "Uttar Pradesh",
-  "Uttarakhand",
-  "West Bengal",
-];
 
 interface DeliveryForm {
   email: string;
@@ -156,6 +120,7 @@ function CheckoutPage() {
   const [busy, setBusy] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [error, setError] = useState("");
+  const [locating, setLocating] = useState(false);
 
   /* Prefill from the signed-in account and anything the cart flow stashed. */
   useEffect(() => {
@@ -277,6 +242,96 @@ function CheckoutPage() {
 
   const set = (key: keyof DeliveryForm) => (value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
+
+  /* Ask the browser for coordinates, turn them into a street address on the
+     server, and fill the fields. Whatever the lookup can't resolve is left
+     alone so a partial answer never wipes something already typed. */
+  /* Ask the browser where we are, turn that into a street address on the
+     server, and fill the fields. Whatever the lookup can't resolve is left
+     alone so a partial answer never wipes something already typed.
+
+     The high-accuracy pass asks the OS for a GPS/CoreLocation fix, which fails
+     outright on a desktop with Location Services switched off. That failure is
+     not the end of the road — the coarse, network-derived fix usually still
+     works — so a POSITION_UNAVAILABLE or TIMEOUT is retried without it, and
+     only the second failure reaches the customer. */
+  const useMyLocation = () => {
+    if (!("geolocation" in navigator)) {
+      toast.error("This browser can't share your location — please type the address.");
+      return;
+    }
+    if (typeof window !== "undefined" && !window.isSecureContext) {
+      toast.error("Location needs a secure (https) connection — please type the address.");
+      return;
+    }
+
+    setLocating(true);
+
+    const fill = async (position: GeolocationPosition) => {
+      try {
+        const found = await settingsApi.reverseGeocode(position.coords.latitude, position.coords.longitude);
+        const state = matchState(found.state);
+        setForm((current) => ({
+          ...current,
+          address: found.address || current.address,
+          city: found.city || current.city,
+          state: state ?? current.state,
+          pincode: /^[1-9][0-9]{5}$/.test(found.pincode) ? found.pincode : current.pincode,
+        }));
+        if (found.country && found.country !== "India") {
+          toast.warning("We only deliver within India — please check the address.");
+        } else if (!found.pincode) {
+          toast.warning("Location found, but add your PIN code to continue.");
+        } else {
+          toast.success("Address filled from your location", { description: found.display_name });
+        }
+      } catch (locationError) {
+        toast.error(normalizeApiError(locationError).message);
+      } finally {
+        setLocating(false);
+      }
+    };
+
+    const giveUp = (positionError: GeolocationPositionError) => {
+      setLocating(false);
+      if (positionError.code === positionError.PERMISSION_DENIED) {
+        toast.error("Location access was blocked", {
+          description: "Allow location for this site in your browser, then try again.",
+        });
+        return;
+      }
+      if (positionError.code === positionError.TIMEOUT) {
+        toast.error("Location is taking too long", {
+          description: "Try again, or type the address yourself.",
+        });
+        return;
+      }
+      toast.error("Your device couldn't provide a location", {
+        description:
+          "Turn on Location Services for this browser in your system settings, or type the address yourself.",
+      });
+    };
+
+    /* Second attempt: coarse fix, a longer window, and a recent cached
+       position is good enough for filling in an address. */
+    const retryCoarse = (firstError: GeolocationPositionError) => {
+      if (firstError.code === firstError.PERMISSION_DENIED) {
+        giveUp(firstError);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(fill, giveUp, {
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 600000,
+      });
+    };
+
+    navigator.geolocation.getCurrentPosition(fill, retryCoarse, {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 60000,
+    });
+  };
 
   async function applyCoupon(next = couponInput.trim().toUpperCase()) {
     setCoupon(next);
@@ -488,6 +543,25 @@ function CheckoutPage() {
                   onChange={set("lastName")}
                   autoComplete="family-name"
                 />
+                <div className="sm:col-span-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={useMyLocation}
+                    disabled={locating}
+                    className="h-11 w-full gap-2 rounded-[6px] border-[#c9c9c9] text-sm font-semibold text-[#008B5E] hover:bg-[#008B5E]/5 sm:w-auto"
+                  >
+                    {locating ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <LocateFixed className="size-4" aria-hidden="true" />
+                    )}
+                    {locating ? "Finding your location…" : "Use my current location"}
+                  </Button>
+                  <p className="mt-1.5 text-xs text-[#6b6b6b]">
+                    Fills the address, city, state and PIN code for you.
+                  </p>
+                </div>
                 <Field
                   id="address"
                   label="Address"

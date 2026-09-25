@@ -7,7 +7,21 @@ export interface SpotlightPromo {
   alt: string;
 }
 
-export function SpotlightSection({ promos }: { promos: SpotlightPromo[] }) {
+/* Bundled artwork — used until the admin panel supplies spotlight promos */
+export const defaultSpotlightPromos: SpotlightPromo[] = [
+  { id: "sp1", image: "/images/spotlight-1.png", link: "/search?q=Peace%20Lily", alt: "Starring Peace Lily" },
+  { id: "sp2", image: "/images/spotlight-2.png", link: "/search?q=Kadi%20Patta", alt: "Kadi Patta Plant New Launch" },
+];
+
+export function SpotlightSection({
+  promos,
+  title = "In the Spotlight",
+  subtitle = "One for the Tadka, One for the Drama",
+}: {
+  promos: SpotlightPromo[];
+  title?: string;
+  subtitle?: string;
+}) {
   if (!promos || promos.length === 0) return null;
 
   return (
@@ -17,12 +31,12 @@ export function SpotlightSection({ promos }: { promos: SpotlightPromo[] }) {
         <div className="relative inline-block">
           <div className="absolute bottom-1.5 left-[-12px] right-[-12px] top-1.5 -z-10 bg-[#eaff00]" />
           <h2 className="font-display text-3xl font-extrabold text-black sm:text-4xl lg:text-5xl">
-            In the Spotlight
+            {title}
           </h2>
         </div>
-        <p className="mt-4 text-base font-medium text-black sm:text-lg">
-          One for the Tadka, One for the Drama
-        </p>
+        {subtitle && (
+          <p className="mt-4 text-base font-medium text-black sm:text-lg">{subtitle}</p>
+        )}
       </div>
 
       {/* Promo Grid - Full Width */}
