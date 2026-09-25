@@ -44,12 +44,31 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+/* Firebase's sign-in popup lives on *.firebaseapp.com, which serves
+   Cross-Origin-Opener-Policy: same-origin. With no COOP of our own the browser
+   severs the opener link, so the SDK can't poll `popup.closed` and logs
+   "Cross-Origin-Opener-Policy policy would block the window.closed call" on
+   every check. `same-origin-allow-popups` keeps the handle usable while still
+   isolating us from unrelated origins. */
+const COOP = "same-origin-allow-popups";
+
+function withPopupPolicy(response: Response): Response {
+  if (response.headers.get("cross-origin-opener-policy")) return response;
+  const headers = new Headers(response.headers);
+  headers.set("cross-origin-opener-policy", COOP);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withPopupPolicy(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

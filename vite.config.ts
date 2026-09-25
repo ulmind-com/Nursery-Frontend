@@ -11,6 +11,10 @@ const nitro = process.env["NETLIFY"] ? ({ preset: "netlify" } as const) : true;
 
 export default defineConfig({
   nitro,
+  // Dev only — the built app sets the same header from src/server.ts.
+  vite: {
+    server: { headers: { "Cross-Origin-Opener-Policy": "same-origin-allow-popups" } },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
