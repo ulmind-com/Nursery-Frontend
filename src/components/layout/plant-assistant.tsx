@@ -1,8 +1,8 @@
-import { Leaf, LogIn, MessageCircle, X } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Leaf, MessageCircle, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { chatApi } from "@/api/services";
+import { chatApi, ordersApi, queryKeys } from "@/api/services";
 import { normalizeApiError } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,20 @@ const newId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Math.random());
 
 export function PlantAssistant() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const asked = useRef(false);
+
+  /* The assistant exists to help with an order — it can look one up, cancel it
+     or file a return. Someone who has never bought anything has nothing for it
+     to do, so the launcher stays hidden until there is at least one order.
+     The account screens ask for the same list, so this shares their cache
+     rather than costing a second request. */
+  const orders = useQuery({ queryKey: queryKeys.orders, queryFn: ordersApi.list, enabled: isAuthenticated });
+  const hasOrdered = (orders.data?.length ?? 0) > 0;
 
   /* Quick questions are fetched once, the first time the panel is opened by a
      signed-in customer — they're order-aware, so they need the session. */
@@ -61,6 +69,8 @@ export function PlantAssistant() {
     }
   };
 
+  if (!isAuthenticated || !hasOrdered) return null;
+
   return (
     <>
       <Button
@@ -87,80 +97,59 @@ export function PlantAssistant() {
             </div>
           </div>
 
-          {!loading && !isAuthenticated ? (
-            /* The agent can act on real orders, so it only talks to a signed-in
-               customer — say so plainly instead of failing on send. */
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
-              <Leaf className="size-8 text-primary" aria-hidden="true" />
-              <div>
-                <h3 className="font-display text-xl">Sign in to chat</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  The assistant can look up your orders and arrange a return, so it needs to know who you are.
-                </p>
-              </div>
-              <Button asChild className="h-11 rounded-full px-7">
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <LogIn className="size-4" aria-hidden="true" /> Sign in
-                </Link>
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Conversation>
-                <ConversationContent className="gap-5">
-                  {turns.length === 0 && (
-                    <div className="mx-auto max-w-xs py-8 text-center">
-                      <Leaf className="mx-auto mb-4 size-8 text-primary" />
-                      <h3 className="font-display text-xl">How can we help your plants thrive?</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Ask about light, watering, care, or an order.
-                      </p>
-                      {suggestions.length > 0 && (
-                        <div className="mt-5 flex flex-wrap justify-center gap-2">
-                          {suggestions.slice(0, 6).map((question) => (
-                            <button
-                              key={question}
-                              type="button"
-                              onClick={() => void ask(question)}
-                              className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-forest transition hover:border-primary hover:bg-primary-tint"
-                            >
-                              {question}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+          <Conversation>
+            <ConversationContent className="gap-5">
+              {turns.length === 0 && (
+                <div className="mx-auto max-w-xs py-8 text-center">
+                  <Leaf className="mx-auto mb-4 size-8 text-primary" />
+                  <h3 className="font-display text-xl">How can we help your plants thrive?</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Ask about light, watering, care, or an order.
+                  </p>
+                  {suggestions.length > 0 && (
+                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                      {suggestions.slice(0, 6).map((question) => (
+                        <button
+                          key={question}
+                          type="button"
+                          onClick={() => void ask(question)}
+                          className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-forest transition hover:border-primary hover:bg-primary-tint"
+                        >
+                          {question}
+                        </button>
+                      ))}
                     </div>
                   )}
+                </div>
+              )}
 
-                  {turns.map((turn) => (
-                    <Message key={turn.id} from={turn.role}>
-                      <MessageContent className={turn.role === "user" ? "bg-primary text-primary-foreground" : undefined}>
-                        <MessageResponse>{turn.content}</MessageResponse>
-                      </MessageContent>
-                    </Message>
-                  ))}
+              {turns.map((turn) => (
+                <Message key={turn.id} from={turn.role}>
+                  <MessageContent className={turn.role === "user" ? "bg-primary text-primary-foreground" : undefined}>
+                    <MessageResponse>{turn.content}</MessageResponse>
+                  </MessageContent>
+                </Message>
+              ))}
 
-                  {pending && (
-                    <Message from="assistant">
-                      <MessageContent>
-                        <Shimmer>Thinking...</Shimmer>
-                      </MessageContent>
-                    </Message>
-                  )}
-                  <ConversationScrollButton />
-                </ConversationContent>
-              </Conversation>
+              {pending && (
+                <Message from="assistant">
+                  <MessageContent>
+                    <Shimmer>Thinking...</Shimmer>
+                  </MessageContent>
+                </Message>
+              )}
+              <ConversationScrollButton />
+            </ConversationContent>
+          </Conversation>
 
-              <div className="border-t p-3">
-                <PromptInput onSubmit={({ text }: { text: string }) => void ask(text)}>
-                  <PromptInputTextarea placeholder="Ask about your plants..." />
-                  <PromptInputFooter className="justify-end">
-                    <PromptInputSubmit status={pending ? "submitted" : "ready"} disabled={pending} />
-                  </PromptInputFooter>
-                </PromptInput>
-              </div>
-            </>
-          )}
+          <div className="border-t p-3">
+            <PromptInput onSubmit={({ text }: { text: string }) => void ask(text)}>
+              <PromptInputTextarea placeholder="Ask about your plants..." />
+              <PromptInputFooter className="justify-end">
+                <PromptInputSubmit status={pending ? "submitted" : "ready"} disabled={pending} />
+              </PromptInputFooter>
+            </PromptInput>
+          </div>
         </section>
       )}
     </>
