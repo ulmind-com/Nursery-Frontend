@@ -7,6 +7,7 @@
  * invitation to sign in instead.
  */
 
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -53,14 +54,24 @@ export function initials(name: string | undefined): string {
     .join("");
 }
 
-export function Avatar({ src, name, size = 56 }: { src?: string | null | undefined; name?: string | undefined; size?: number }) {
+export function Avatar({ src, name, size = 56, className }: { src?: string | null | undefined; name?: string | undefined; size?: number; className?: string }) {
+  /* Google and Facebook photo URLs go stale or start refusing hotlinks, and a
+     broken image icon is worse than no photo at all — fall back to initials. */
+  const [broken, setBroken] = useState(false);
+  useEffect(() => setBroken(false), [src]);
   return (
     <span
-      className="relative grid shrink-0 place-items-center overflow-hidden rounded-full bg-primary-tint ring-2 ring-primary/25"
+      className={`relative grid shrink-0 place-items-center overflow-hidden rounded-full bg-primary-tint ring-2 ring-primary/25 ${className ?? ""}`}
       style={{ width: size, height: size }}
     >
-      {src ? (
-        <img src={src} alt={name ?? ""} className="size-full object-cover" />
+      {src && !broken ? (
+        <img
+          src={src}
+          alt={name ?? ""}
+          referrerPolicy="no-referrer"
+          onError={() => setBroken(true)}
+          className="size-full object-cover"
+        />
       ) : (
         <span className="font-display font-bold text-primary" style={{ fontSize: size * 0.36 }}>
           {initials(name)}

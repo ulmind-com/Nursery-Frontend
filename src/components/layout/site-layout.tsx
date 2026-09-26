@@ -8,9 +8,12 @@ import { displayName } from "@/config/brand";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { useTypewriter } from "@/hooks/use-typewriter";
 import { SEARCH_PHRASES } from "@/lib/search-phrases";
+import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar } from "@/components/account/account-shell";
+import { AccountMenu } from "@/components/layout/account-menu";
 import { SupportChat } from "@/components/support/support-chat";
 
 import { CartDrawer } from "@/components/commerce/cart-drawer";
@@ -250,11 +253,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                 <Search />
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex">
-              <Link to="/account" aria-label="Account">
-                <UserRound />
-              </Link>
-            </Button>
+            <AccountMenu />
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex">
               <Link to="/wishlist" aria-label="Wishlist">
                 <Heart />
@@ -349,8 +348,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 
 function MobileTabBar() {
   const { count, openCart } = useCart();
+  const { user, isAuthenticated } = useAuth();
+  /* Six thumb targets across a 375px phone: no side padding on the items and a
+     tight label, so nothing wraps on the narrowest screens we support. */
   const item =
-    "flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-semibold text-muted-foreground";
+    "flex min-w-0 flex-1 flex-col items-center gap-1 px-0.5 py-2 text-[10px] font-semibold text-muted-foreground";
   const active = { className: `${item} text-primary` };
   return (
     <nav
@@ -373,15 +375,29 @@ function MobileTabBar() {
         <Heart className="size-5" />
         Wishlist
       </Link>
-      <button type="button" data-cart-target onClick={openCart} className={`${item} relative`}>
-        <ShoppingBag className="size-5" />
-        {count > 0 && (
-          <span className="absolute right-4 top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-            {count}
-          </span>
-        )}
+      <button type="button" data-cart-target onClick={openCart} className={item}>
+        {/* The badge hangs off the icon, not the tab — the tabs got narrower
+            when Profile joined them, and a tab-anchored badge drifts. */}
+        <span className="relative">
+          <ShoppingBag className="size-5" />
+          {count > 0 && (
+            <span className="absolute -right-2 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+              {count}
+            </span>
+          )}
+        </span>
         Cart
       </button>
+      {/* Signed in, the tab shows the customer's own photo — the account is
+          where they left it, not a generic icon to go looking for. */}
+      <Link to={isAuthenticated ? "/account" : "/login"} className={item} activeProps={active}>
+        {isAuthenticated ? (
+          <Avatar src={user?.avatar} name={user?.name} size={20} className="ring-1" />
+        ) : (
+          <UserRound className="size-5" />
+        )}
+        {isAuthenticated ? "Profile" : "Sign in"}
+      </Link>
     </nav>
   );
 }
