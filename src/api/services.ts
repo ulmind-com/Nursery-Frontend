@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { Address, AuthResponse, Banner, BlogPost, ChatMessage, MyReview, CheckoutResponse, Combo, Coupon, GoogleReview, HomeSection, Order, OrderItemInput, OrderQuote, PageSection, Pagination, ResolvedLocation, Product, Review, Settings, SiteMedia, User } from "@/types/api";
+import type { Address, AuthResponse, Banner, BlogPost, ChatMessage, MyReview, CheckoutResponse, Combo, Coupon, GoogleReview, HomeSection, Order, OrderItemInput, OrderQuote, PageSection, Pagination, ResolvedLocation, Product, Review, Settings, SiteMedia, SupportOpening, SupportReply, User } from "@/types/api";
 
 type Params = Record<string, string | number | boolean | undefined | null>;
 const data = async <T>(request: Promise<{ data: T }>) => (await request).data;
@@ -32,7 +32,12 @@ export const uploadApi = {
   },
 };
 export const chatApi = {
+  /** Greeting + live order card + the quick actions that apply right now. */
+  open: (params: { order_id?: string | undefined; product_id?: string | undefined } = {}) => data<SupportOpening>(api.get("/chat/open", { params })),
   suggestions: (order_id?: string) => data<{ questions: string[] }>(api.get("/chat/suggestions", { params: order_id ? { order_id } : {} })),
-  send: (messages: ChatMessage[], order_id?: string) => data<{ reply: string }>(api.post("/chat", { messages, ...(order_id ? { order_id } : {}) })),
+  /** Tapped chips — answered straight from the database, so they work even when the model is down. */
+  action: (body: { action: string; order_id?: string | undefined; product_id?: string | undefined; reason?: string | undefined; messages?: ChatMessage[] | undefined }) =>
+    data<SupportReply>(api.post("/chat/action", body)),
+  send: (messages: ChatMessage[], order_id?: string) => data<SupportReply>(api.post("/chat", { messages, ...(order_id ? { order_id } : {}) })),
 };
 export const miscApi = { combos: () => data<Combo[]>(api.get("/combos")), googleReviews: () => data<GoogleReview[]>(api.get("/google-reviews")), googleSummary: () => data<{ count: number; average: number; breakdown?: Record<string, number> }>(api.get("/google-reviews/summary")), waitlist: (body: { product_id: string; email?: string; size_variant?: string }) => data<unknown>(api.post("/waitlist", body)), chatSuggestions: () => data<string[] | { suggestions: string[] }>(api.get("/chat/suggestions")), chat: (message: string, order_id?: string) => data<{ response?: string; reply?: string; message?: string }>(api.post("/chat", { message, ...(order_id ? { order_id } : {}) })) };

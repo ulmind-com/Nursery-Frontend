@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronLeft, Download, Loader2, MapPin, Package, RotateCcw, Truck, XCircle } from "lucide-react";
+import { ChevronLeft, Download, Headset, Loader2, MapPin, Package, RotateCcw, Truck, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ordersApi, queryKeys } from "@/api/services";
 import { AccountShell } from "@/components/account/account-shell";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { ErrorState, PageSkeleton } from "@/components/shared/page-state";
 import { useCart } from "@/contexts/cart-context";
+import { useSupportChat } from "@/contexts/support-chat-context";
 import { normalizeApiError } from "@/lib/api";
 import { tokenStore } from "@/lib/token";
 
@@ -45,6 +46,7 @@ function OrderDetail() {
 
   const q = useQuery({ queryKey: ["order", id], queryFn: () => ordersApi.get(id) });
   const [cancelOpen, setCancelOpen] = useState(false);
+  const support = useSupportChat();
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -159,6 +161,10 @@ function OrderDetail() {
           </Button>
           <Button variant="outline" className="h-10 rounded-full" onClick={downloadInvoice} disabled={busy}>
             <Download className="size-4" aria-hidden="true" /> Invoice
+          </Button>
+          {/* Opens Help & Support already pointed at this order. */}
+          <Button variant="outline" className="h-10 rounded-full" onClick={() => support.open({ orderId: order.id })}>
+            <Headset className="size-4" aria-hidden="true" /> Need help?
           </Button>
           {canCancel && (
             <Button

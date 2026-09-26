@@ -46,3 +46,23 @@ export interface CheckoutResponse extends Omit<Order, "id" | "status" | "items">
 export interface CartItem { product_id: string; title: string; image?: string; qty: number; size_variant?: string; pot_type?: string; unit_price: number; mrp?: number; stock?: number; sku?: string }
 export interface ApiValidationDetail { loc?: Array<string | number>; msg?: string; type?: string }
 export interface ApiError { status?: number; message: string; details?: ApiValidationDetail[] }
+
+/* ── Support chat ───────────────────────────────────────────────────────── */
+export interface SupportAction { id: string; label: string; icon?: string; tone?: "danger" | "default" }
+export interface SupportOrderItem { product_id: string; title?: string; image?: string | null; qty?: number; size_variant?: string | null }
+export interface SupportOrderCard {
+  id: string; short: string; status: string; status_label: string; status_short: string; status_line: string;
+  stage_index: number; stages: Array<{ key: string; label: string }>;
+  cancellable: boolean; final: boolean; total?: number; currency?: string;
+  tracking_id?: string | null; tracking_url?: string | null; placed_at?: string | null;
+  items: SupportOrderItem[];
+}
+export interface SupportConfirm { action: string; reasons: string[]; cta: string; dismiss: string }
+export interface SupportReply {
+  reply: string; order: SupportOrderCard | null; actions: SupportAction[];
+  confirm?: SupportConfirm; timeline?: boolean; done?: boolean; escalated?: boolean; ticket_id?: string;
+}
+export interface SupportOpening {
+  greeting: string[]; prompt: string; order: SupportOrderCard | null;
+  actions: SupportAction[]; questions: string[];
+}

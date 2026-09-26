@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CartProvider } from "@/contexts/cart-context";
+import { SupportChatProvider } from "@/contexts/support-chat-context";
 import { SiteLayout } from "@/components/layout/site-layout";
 
 import appCss from "../styles.css?url";
@@ -123,7 +124,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider><CartProvider><SiteLayout><Outlet /></SiteLayout><Toaster position="top-center" richColors /></CartProvider></AuthProvider>
+      <AuthProvider><CartProvider><SupportChatProvider><SiteLayout><Outlet /></SiteLayout><Toaster position="top-center" richColors /></SupportChatProvider></CartProvider></AuthProvider>
     </QueryClientProvider>
   );
 }

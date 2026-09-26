@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Headset, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { queryKeys, settingsApi } from "@/api/services";
 import { PageSkeleton } from "@/components/shared/page-state";
+import { useAuth } from "@/contexts/auth-context";
+import { useSupportChat } from "@/contexts/support-chat-context";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -19,6 +21,8 @@ export const Route = createFileRoute("/support")({
 });
 
 function SupportPage() {
+  const { isAuthenticated } = useAuth();
+  const chat = useSupportChat();
   const { data: settings, isLoading } = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
   if (isLoading) return <PageSkeleton />;
   const support = settings?.support;
@@ -39,6 +43,15 @@ function SupportPage() {
         <p className="mx-auto mt-5 max-w-xl leading-7 text-muted-foreground">
           {support?.note || "Questions about an order, a delivery, or how to care for a new plant? Our nursery team is happy to help."}
         </p>
+        {isAuthenticated && (
+          <button
+            type="button"
+            onClick={() => chat.open()}
+            className="mx-auto mt-7 flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform duration-200 hover:scale-[1.03]"
+          >
+            <Headset className="size-4" /> Start live chat
+          </button>
+        )}
       </section>
       <section className="mx-auto max-w-3xl px-6 py-14">
         {rows.length ? (
