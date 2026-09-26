@@ -15,7 +15,6 @@ import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/pro
 import { ReviewsSection } from "@/components/product/reviews-section";
 import { ComparisonSection } from "@/components/product/comparison-section";
 import { ProductFaqSection } from "@/components/product/product-faq-section";
-import { AskAboutPlant } from "@/components/support/ask-about-plant";
 import { useCart } from "@/contexts/cart-context";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { normalizeApiError } from "@/lib/api";
@@ -592,7 +591,6 @@ function LiveProductPage({ product: p }: { product: Product }) {
       <ComparisonSection comparison={p.comparison} />
       {similar.data && similar.data.length > 0 && <YouMayAlsoLike items={similar.data.map(alsoLikeFromProduct)} />}
       <ProductFaqSection faq={p.faq} fallbackImage={imgs[0]} />
-      <AskAboutPlant productId={p.id} title={p.title} />
 
       <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-40 flex items-center gap-2 border-t bg-background p-3 lg:hidden">
         <Button variant="outline" size="icon" className="size-11 shrink-0" aria-label="Add to wishlist"><Heart /></Button>

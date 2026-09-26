@@ -6,19 +6,22 @@
  *    not by the language model. Tracking and cancelling an order are real
  *    operations, so tapping them can never fail into "sorry, I'm having
  *    trouble" the way a model call can.
- * 2. **Nothing is stored server-side.** The transcript lives in this browser
+ * 2. **It opens from the account area only.** There is no floating launcher
+ *    on the storefront — a customer reaches support from their profile or
+ *    straight off an order, which is also what gives the conversation its
+ *    context.
+ * 3. **Nothing is stored server-side.** The transcript lives in this browser
  *    under a per-order key and is thrown away the moment the order reaches a
  *    final state — delivered or cancelled — so a finished order leaves no
  *    conversation behind.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, CalendarDays, CheckCheck, ChevronRight, Headset, Leaf, Loader2,
-  MapPin, MessageCircle, Send, Sparkles, X, XCircle,
+  MapPin, Send, Sparkles, X, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { chatApi, ordersApi, queryKeys } from "@/api/services";
+import { chatApi } from "@/api/services";
 import { normalizeApiError } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { useSupportChat } from "@/contexts/support-chat-context";
@@ -462,12 +465,7 @@ function Panel({ orderId, productId, onClose }: { orderId?: string | undefined; 
 
 export function SupportChat() {
   const { isAuthenticated } = useAuth();
-  const { isOpen, context, open, close } = useSupportChat();
-
-  /* The launcher is for people with something to talk about — the account
-     screens already hold this list, so it costs no extra request. */
-  const orders = useQuery({ queryKey: queryKeys.orders, queryFn: ordersApi.list, enabled: isAuthenticated });
-  const hasOrdered = (orders.data?.length ?? 0) > 0;
+  const { isOpen, context, close } = useSupportChat();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -484,18 +482,6 @@ export function SupportChat() {
 
   return (
     <>
-      {!isOpen && hasOrdered && (
-        <button
-          type="button"
-          onClick={() => open()}
-          aria-label="Open help and support"
-          className="group fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] right-4 z-40 flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-forest text-primary-foreground shadow-[0_10px_30px_-8px_rgba(16,100,60,0.55)] transition-transform duration-200 hover:scale-105 active:scale-95 sm:right-5 lg:bottom-6"
-        >
-          <span className="absolute inset-0 animate-ping rounded-full bg-primary/25 [animation-duration:3s]" />
-          <MessageCircle className="relative size-6" />
-        </button>
-      )}
-
       {isOpen && (
         <>
           {/* Mobile: full screen. Desktop: docked panel. */}

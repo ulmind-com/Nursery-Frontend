@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Package } from "lucide-react";
+import { ArrowRight, Headset, Package } from "lucide-react";
 import { ordersApi, queryKeys, reviewsApi, wishlistApi } from "@/api/services";
 import { ACCOUNT_LINKS, AccountShell } from "@/components/account/account-shell";
 import { OrderStatusPill } from "@/components/account/order-bits";
 import { money } from "@/components/product/product-card";
 import { useAuth } from "@/contexts/auth-context";
+import { useSupportChat } from "@/contexts/support-chat-context";
 
 export const Route = createFileRoute("/account/")({
   head: () => ({
@@ -31,6 +32,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 
 function Overview() {
   const { user } = useAuth();
+  const support = useSupportChat();
   const orders = useQuery({ queryKey: queryKeys.orders, queryFn: ordersApi.list, enabled: Boolean(user) });
   const wishlist = useQuery({ queryKey: queryKeys.wishlist, queryFn: wishlistApi.ids, enabled: Boolean(user) });
   const reviews = useQuery({ queryKey: queryKeys.myReviews, queryFn: reviewsApi.mine, enabled: Boolean(user) });
@@ -115,6 +117,28 @@ function Overview() {
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* Support lives here rather than on a floating button across the store:
+          the assistant works off the customer's orders, so this is where it
+          has something to say. It opens on their latest live order. */}
+      <section className="mt-6">
+        <button
+          type="button"
+          onClick={() => support.open()}
+          className="group flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-forest p-5 text-left text-primary-foreground shadow-lg shadow-primary/20 transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]"
+        >
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur">
+            <Headset className="size-5" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold">Help &amp; Support</span>
+            <span className="mt-0.5 block text-sm text-primary-foreground/80">
+              Track or cancel an order, or talk to the nursery team.
+            </span>
+          </span>
+          <ArrowRight className="size-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+        </button>
       </section>
 
       {reviews.data && reviews.data.length > 0 && (
