@@ -902,15 +902,30 @@ function CheckoutPage() {
                 <PriceLine label="Tax (incl. GST)" value={inr(quote.tax)} />
               )}
 
+              {/* A total is the number the customer is deciding on, so it always
+                  shows one. Until the address produces a quote that number is
+                  the cart itself, said plainly — a bare dash reads as broken,
+                  which is exactly what it looked like when a quote failed. */}
               <div className="flex items-end justify-between pt-4">
                 <span className="text-base font-bold">Total</span>
                 <span className="flex items-baseline gap-2">
                   <span className="text-xs font-medium text-[#707070]">INR</span>
-                  <span className="text-[22px] font-bold tabular-nums">
-                    {quote ? inr(quote.total) : "—"}
+                  <span
+                    className={`text-[22px] font-bold tabular-nums ${quoting ? "animate-pulse text-[#707070]" : ""}`}
+                  >
+                    {inr(quote?.total ?? cartSubtotal)}
                   </span>
                 </span>
               </div>
+              {!quote && (
+                <p className="text-right text-xs font-medium text-[#707070]">
+                  {quoting
+                    ? "Working out shipping and tax…"
+                    : error
+                      ? "Shipping and tax couldn't be worked out just now."
+                      : "Shipping and tax are added once your address is in."}
+                </p>
+              )}
               {quote && quote.discount > 0 && (
                 <p className="text-right text-xs font-semibold text-[#008B5E]">
                   You save {inr(quote.discount)} on this order 🌿
