@@ -478,13 +478,13 @@
   .auth-card.is-register :is(.auth-hero, .auth-pane).is-login { display: none; }
 }
 
-/* Cart reward rail — the lit stretch never sits still: a glow breathes under it
-   while a highlight sweeps from the start to wherever the cart has reached, so
-   progress reads as something live rather than a painted-on bar. (The global
-   reduced-motion rule above already stills both.) */
-@keyframes reward-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(168, 214, 47, 0.5), 0 0 18px rgba(0, 164, 91, 0.25); }
-  50% { box-shadow: 0 0 16px rgba(237, 239, 53, 0.95), 0 0 34px rgba(124, 200, 60, 0.5); }
+/* Cart reward rail — the lit stretch never sits still. A green-to-yellow band
+   flows along it end to end, a pale highlight rides over the top, and a soft
+   aura sits underneath, so progress reads as something alive rather than a
+   painted-on bar. (The global reduced-motion rule above already stills it.) */
+@keyframes reward-flow {
+  from { background-position: 0 0; }
+  to { background-position: 100px 0; }
 }
 
 @keyframes reward-sheen {
@@ -492,5 +492,11 @@
   55%, 100% { transform: translateX(310%); }
 }
 
-.reward-fill { animation: reward-glow 2.2s ease-in-out infinite; }
+.reward-fill {
+  background-image: repeating-linear-gradient(90deg, #178a46 0px, #7cc63c 25px, #e9ef36 50px, #7cc63c 75px, #178a46 100px);
+  background-size: 100px 100%;
+  box-shadow: 0 0 10px rgba(201, 224, 43, 0.7), 0 0 24px rgba(23, 138, 70, 0.4);
+  animation: reward-flow 1.6s linear infinite;
+}
+
 .reward-sheen { animation: reward-sheen 2.6s ease-in-out infinite; }

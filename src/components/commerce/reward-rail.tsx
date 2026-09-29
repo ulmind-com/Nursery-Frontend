@@ -122,10 +122,7 @@ function Track({ fill, dark }: { fill: number; dark: boolean }) {
     >
       <div
         className="reward-fill absolute inset-y-0 left-0 overflow-hidden rounded-full transition-[width] duration-500 ease-out"
-        style={{
-          width: `${fill}%`,
-          background: "linear-gradient(90deg,#00A45B 0%,#3FBA53 38%,#9BD62F 68%,#EDEF35 100%)",
-        }}
+        style={{ width: `${fill}%` }}
       >
         <span
           aria-hidden="true"
