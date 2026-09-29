@@ -4,6 +4,7 @@
 import type {
   Banner,
   BlogPost,
+  Combo,
   Category,
   GardenServiceSection,
   GiftingSection,
@@ -31,6 +32,12 @@ export interface HomeData {
   categoryTree: Category[] | undefined;
   settings: Settings | undefined;
   products: Product[];
+  /* Products flagged `is_bestseller`, fetched separately so the Bestsellers
+     band is not limited to whatever the storefront grid happened to load. */
+  bestsellers: Product[];
+  /* Products the catalogue marks as easy to care for. */
+  lowEffort: Product[];
+  combos: Combo[];
   rails: HomeRail[];
   reviews: GoogleReview[];
   blogPosts: BlogPost[];
@@ -47,10 +54,13 @@ export const FALLBACK_HOME_SECTIONS: PageSection[] = [
   "hero",
   "category_strip",
   "trust_strip",
+  "bestsellers",
   "video_reel",
   "spotlight",
+  "low_effort",
   "bhidu",
   "offers",
+  "combos",
   "self_watering",
   "planters",
   "product_grid",

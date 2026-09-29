@@ -5,6 +5,21 @@ import type { ApiError, ApiValidationDetail } from "@/types/api";
 export const api = axios.create({
   baseURL: import.meta.env["VITE_API_BASE_URL"] || "https://nursery-backend-c8yw.onrender.com",
   timeout: 45000,
+  // A multi-select filter sends its values as the same key repeated — which is
+  // what FastAPI reads a `list[str]` from. Axios would otherwise write
+  // `sunlight[]=`, a key the API does not have, so the filter would be dropped
+  // and the grid would quietly ignore it.
+  paramsSerializer: {
+    serialize: (params: Record<string, unknown>) => {
+      const search = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === "") return;
+        if (Array.isArray(value)) value.forEach((entry) => search.append(key, String(entry)));
+        else search.append(key, String(value));
+      });
+      return search.toString();
+    },
+  },
 });
 api.interceptors.request.use((config) => {
   const token = tokenStore.get();

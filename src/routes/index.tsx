@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   blogApi,
+  combosApi,
   categoriesApi,
   gardenServicesApi,
   giftingApi,
@@ -47,12 +48,15 @@ function HomePage() {
   const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get });
   const recommendations = useQuery({ queryKey: ["recommendations", "home"], queryFn: homeApi.recommendations });
   const storefrontProducts = useQuery({ queryKey: queryKeys.products({ limit: 12 }), queryFn: () => productsApi.list({ limit: 12 }) });
+  const bestsellerQuery = useQuery({ queryKey: queryKeys.products({ is_bestseller: true, limit: 10 }), queryFn: () => productsApi.list({ is_bestseller: true, limit: 10 }) });
+  const lowEffortQuery = useQuery({ queryKey: queryKeys.products({ difficulty: "Easy", limit: 10 }), queryFn: () => productsApi.list({ difficulty: "Easy", limit: 10 }) });
   const googleReviews = useQuery({ queryKey: ["google-reviews"], queryFn: miscApi.googleReviews });
   const posts = useQuery({ queryKey: queryKeys.blog, queryFn: () => blogApi.list() });
   const storesQuery = useQuery({ queryKey: queryKeys.stores, queryFn: storesApi.list });
   const gardenServices = useQuery({ queryKey: queryKeys.gardenServices, queryFn: gardenServicesApi.get });
   const gifting = useQuery({ queryKey: queryKeys.gifting, queryFn: giftingApi.get });
   const press = useQuery({ queryKey: queryKeys.press, queryFn: pressApi.get });
+  const combos = useQuery({ queryKey: queryKeys.combos, queryFn: combosApi.list });
 
   const recommended: Product[] = Array.isArray(recommendations.data)
     ? recommendations.data.flatMap((entry) => ("products" in entry ? entry.products || [] : [entry as Product]))
@@ -93,6 +97,17 @@ function HomePage() {
   const productResult = storefrontProducts.data;
   const products: Product[] = Array.isArray(productResult) ? productResult : productResult?.items ?? [];
 
+  /* A catalogue with nothing flagged yet still deserves a band, so it falls
+     back to the storefront products rather than rendering nothing. */
+  const bestsellerResult = bestsellerQuery.data;
+  const flagged: Product[] = Array.isArray(bestsellerResult) ? bestsellerResult : bestsellerResult?.items ?? [];
+  const bestsellers: Product[] = flagged.length > 0 ? flagged : products;
+
+  /* "Easy" is the same difficulty the card reads to show its Low Maintenance
+     badge, so the band and the badges can never disagree. */
+  const lowEffortResult = lowEffortQuery.data;
+  const lowEffort: Product[] = Array.isArray(lowEffortResult) ? lowEffortResult : lowEffortResult?.items ?? [];
+
   const ctx: HomeData = {
     banners: banners.data ?? [],
     shopName: displayName(settings.data?.shop.name),
@@ -100,6 +115,9 @@ function HomePage() {
     categoryTree: categoryTree.data,
     settings: settings.data,
     products,
+    bestsellers,
+    lowEffort,
+    combos: combos.data ?? [],
     rails,
     reviews: reviews,
     blogPosts: posts.data?.items ?? [],

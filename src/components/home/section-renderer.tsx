@@ -20,6 +20,8 @@ import { OffersMarquee, defaultOfferCards } from "@/components/home/offers-marqu
 import { SelfWateringSection } from "@/components/home/self-watering-section";
 import { PlantersRedefineSection } from "@/components/home/planters-redefine";
 import { StorefrontProductGrid } from "@/components/home/storefront-product-grid";
+import { ProductBand } from "@/components/home/product-band";
+import { ComboBand } from "@/components/home/combo-band";
 import { ShopBySpaceSection, spaceCardsFromCategories, defaultSpaceCards } from "@/components/home/shop-by-space";
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail } from "@/components/home/section-rail";
@@ -123,6 +125,34 @@ export function SectionRenderer({ section, ctx }: { section: PageSection; ctx: H
         />
       );
 
+    case "bestsellers":
+      return (
+        <ProductBand
+          products={ctx.bestsellers}
+          title={text(section.title) ?? "Bestsellers"}
+          {...defined({
+            subtitle: text(section.subtitle),
+            ctaLabel: text(section.cta_label),
+            ctaLink: text(section.cta_link),
+            limit: section.limit ?? undefined,
+          })}
+        />
+      );
+
+    case "low_effort":
+      return (
+        <ProductBand
+          products={ctx.lowEffort}
+          title={text(section.title) ?? "Low-Effort Plants"}
+          {...defined({
+            subtitle: text(section.subtitle),
+            ctaLabel: text(section.cta_label),
+            ctaLink: text(section.cta_link),
+            limit: section.limit ?? undefined,
+          })}
+        />
+      );
+
     case "video_reel": {
       const videos = items
         .filter((item) => str(item, "video"))
@@ -170,6 +200,20 @@ export function SectionRenderer({ section, ctx }: { section: PageSection; ctx: H
       }));
       return <OffersMarquee offers={offers.length > 0 ? offers : defaultOfferCards} {...defined({ title: text(section.title) })} />;
     }
+
+    case "combos":
+      return (
+        <ComboBand
+          combos={ctx.combos}
+          {...defined({
+            title: text(section.title),
+            subtitle: text(section.subtitle),
+            ctaLabel: text(section.cta_label),
+            ctaLink: text(section.cta_link),
+            limit: section.limit ?? undefined,
+          })}
+        />
+      );
 
     case "self_watering": {
       const steps = withImage.map((item, index) => ({

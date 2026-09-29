@@ -7,6 +7,7 @@ export const queryKeys = { myReviews: ["reviews", "mine"] as const, settings: ["
 export const settingsApi = { get: () => data<Settings>(api.get("/settings")), geocode: (q: string) => data<unknown>(api.get("/settings/geocode", { params: { q } })), reverseGeocode: (lat: number, lon: number) => data<ResolvedLocation>(api.get("/settings/reverse-geocode", { params: { lat, lon } })) };
 export const categoriesApi = { list: () => data<import("@/types/api").Category[]>(api.get("/categories")), tree: () => data<import("@/types/api").Category[]>(api.get("/categories/tree")) };
 export const brandsApi = { list: () => data<import("@/types/api").Brand[]>(api.get("/brands")) };
+export const facetsApi = { get: (category_id?: string) => data<import("@/types/api").Facets>(api.get("/products/facets", { params: category_id ? { category_id } : {} })) };
 export const productsApi = { list: (params: Params = {}) => data<Product[] | Pagination<Product>>(api.get("/products", { params })), get: (id: string) => data<Product>(api.get(`/products/${id}`)) };
 export const homeApi = { sections: () => data<HomeSection[]>(api.get("/home-sections/resolved")), banners: () => data<Banner[]>(api.get("/banners")), media: () => data<Record<string, SiteMedia[]> | SiteMedia[]>(api.get("/site-media")), recommendations: () => data<Product[] | Array<{ title?: string; products?: Product[] }>>(api.get("/recommendations/home")) };
 export const combosApi = { list: () => data<Combo[]>(api.get("/combos")), get: (id: string) => data<Combo>(api.get(`/combos/${id}`)) };

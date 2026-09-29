@@ -648,3 +648,15 @@ export interface SupportOpening {
   actions: SupportAction[];
   questions: string[];
 }
+
+/** The catalogue filter sidebar, derived by the API from the products it holds. */
+export interface FacetOption { value: string; count: number }
+export interface FacetGroup { param: string; label: string; options: FacetOption[] }
+export interface FacetFlag { param: string; label: string; count: number }
+export interface Facets {
+  total: number;
+  availability: Array<{ value: string; label: string; count: number }>;
+  price: { min: number; max: number };
+  groups: FacetGroup[];
+  flags: FacetFlag[];
+}

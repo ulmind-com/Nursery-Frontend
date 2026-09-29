@@ -21,16 +21,30 @@ import { normalizeApiError } from "@/lib/api";
 import type { Product, ProductSize, Review } from "@/types/api";
 
 export const Route = createFileRoute("/product/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Product ${params.id} | MyGarden` },
-      { name: "description", content: "Plant details, care guidance, sizes, and availability." },
-      { property: "og:title", content: "Shop this plant | MyGarden" },
-      { property: "og:description", content: "Plant details, care guidance, sizes, and availability." },
-      { property: "og:type", content: "product" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  /* The page is shared and indexed by this title, so it has to be the plant's
+     name rather than its id. A failed load still renders — the component has
+     its own query — so the meta just falls back to the generic copy. */
+  loader: ({ params }) => productsApi.get(params.id).catch(() => null),
+  head: ({ loaderData }) => {
+    const product = loaderData as Product | null;
+    const title = product?.title ? `${product.title} | MyGarden` : "Shop this plant | MyGarden";
+    const description =
+      product?.short_description ||
+      product?.description ||
+      "Plant details, care guidance, sizes, and availability.";
+    const image = product?.images?.[0] ?? product?.sizes?.find((size) => size.images?.length)?.images?.[0];
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        ...(image ? [{ property: "og:image", content: image }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+    };
+  },
   component: ProductPage,
 });
 
@@ -133,8 +147,20 @@ function ProductPage() {
 function Gallery({ images, title, activeImage, onChange }: { images: string[]; title: string; activeImage: number; onChange: (index: number) => void }) {
   const hero = images[Math.min(activeImage, Math.max(images.length - 1, 0))];
   const hasThumbnails = images.length > 1;
+  /* The caption promised a zoom the image never did. It does now: the pointer
+     position becomes the transform origin, so the picture magnifies around
+     whatever the cursor is over. */
+  const [origin, setOrigin] = useState<string | null>(null);
+
+  const track = (event: React.MouseEvent<HTMLDivElement>) => {
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - box.left) / box.width) * 100;
+    const y = ((event.clientY - box.top) / box.height) * 100;
+    setOrigin(`${x}% ${y}%`);
+  };
+
   return (
-    <div className={`grid min-w-0 self-start p-0 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1"}`}>
+    <div className={`grid min-w-0 self-start p-0 ${hasThumbnails ? "gap-4 lg:grid-cols-[76px_minmax(0,1fr)]" : "grid-cols-1 gap-3"}`}>
       {hasThumbnails && (
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[610px] lg:flex-col lg:overflow-y-auto lg:pr-1">
           {images.map((src, index) => (
@@ -144,10 +170,35 @@ function Gallery({ images, title, activeImage, onChange }: { images: string[]; t
           ))}
         </div>
       )}
-      <div data-gallery-hero className="order-1 aspect-[1.04/1] overflow-hidden rounded-sm bg-primary-tint lg:order-2">
-        {hero ? <img src={hero} alt={title} width={1024} height={1280} className="size-full object-cover" /> : <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>}
+      <div
+        data-gallery-hero
+        onMouseMove={hero ? track : undefined}
+        onMouseLeave={() => setOrigin(null)}
+        className="order-1 aspect-[1.04/1] cursor-zoom-in overflow-hidden rounded-sm bg-primary-tint lg:order-2"
+      >
+        {hero ? (
+          <img
+            src={hero}
+            alt={title}
+            width={1024}
+            height={1280}
+            /* The pointer position already lives in state, so the scale comes
+               from there too — one source of truth, and no dependence on a
+               hover variant the build may not emit. */
+            style={origin ? { transformOrigin: origin, transform: "scale(2)" } : undefined}
+            className="size-full object-cover transition-transform duration-200 ease-out"
+          />
+        ) : (
+          <span className="flex size-full items-center justify-center text-sm text-muted-foreground">Image coming soon</span>
+        )}
       </div>
-      <p className="order-3 hidden items-center justify-center gap-3 text-xs text-muted-foreground sm:flex lg:col-start-2"><ScanSearch className="size-3.5" /> Roll over image to zoom in</p>
+      {/* Sits under the hero in both layouts — `col-start-2` only makes sense
+          when the thumbnail rail is actually there to be the first column. */}
+      {hero && (
+        <p className={`order-3 hidden items-center justify-center gap-2 text-xs text-muted-foreground sm:flex ${hasThumbnails ? "lg:col-start-2" : ""}`}>
+          <ScanSearch className="size-3.5" /> Roll over image to zoom in
+        </p>
+      )}
     </div>
   );
 }
