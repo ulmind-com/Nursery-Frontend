@@ -14,6 +14,7 @@ import {
 import { useRef, useState } from "react";
 import { queryKeys, recommendationApi, settingsApi } from "@/api/services";
 import { RewardRail } from "@/components/commerce/reward-rail";
+import { SlideToCheckout } from "@/components/commerce/slide-to-checkout";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
@@ -307,15 +308,8 @@ export function CartDrawer() {
                   />
                 </button>
               </div>
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full bg-forest px-10 text-sm font-bold uppercase tracking-wide text-forest-foreground hover:bg-forest/90"
-                onClick={closeCart}
-              >
-                <Link to="/checkout">Checkout</Link>
-              </Button>
             </div>
+            <SlideToCheckout onDone={closeCart} className="mt-3" />
             {showBreakdown && (
               <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
                 <p className="flex justify-between">

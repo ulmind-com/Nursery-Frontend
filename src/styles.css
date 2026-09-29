@@ -500,3 +500,19 @@
 }
 
 .reward-sheen { animation: reward-sheen 2.6s ease-in-out infinite; }
+
+/* "Slide to checkout" — a highlight drifts across the label so the control
+   reads as something to drag rather than a line of text. */
+@keyframes slide-hint {
+  from { background-position: -140% 0; }
+  to { background-position: 240% 0; }
+}
+
+.slide-hint {
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.55) 42%, #fff 50%, rgba(255, 255, 255, 0.55) 58%, rgba(255, 255, 255, 0.55) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: slide-hint 2.6s linear infinite;
+}
