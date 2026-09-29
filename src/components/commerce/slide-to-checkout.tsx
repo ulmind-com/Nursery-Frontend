@@ -75,32 +75,32 @@ export function SlideToCheckout({
     <div
       ref={trackRef}
       className={cn(
-        "relative flex h-[56px] w-full select-none items-center overflow-hidden rounded-full bg-[#14261C]",
+        "relative flex h-[58px] w-full select-none items-center overflow-hidden rounded-2xl bg-[#1e2521]",
         className,
       )}
     >
-      {/* What has been dragged so far, in the same green-to-lime the reward rail uses. */}
+      {/* The stretch already dragged, warmed to the knob so the two read as one. */}
       <div
-        className="absolute inset-y-1 left-1 rounded-full transition-[width] duration-200 ease-out"
+        className="absolute inset-y-[5px] left-[5px] rounded-[13px] transition-[width] ease-out"
         style={{
           width: `${offset + KNOB}px`,
-          background: "linear-gradient(90deg,#178a46 0%,#3FBA53 55%,#9BD62F 100%)",
+          background: "linear-gradient(90deg,#E85D0A 0%,#F97316 60%,#FBA94C 100%)",
           transitionDuration: dragging ? "0ms" : "260ms",
         }}
       />
 
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 text-[15px] font-bold tracking-tight transition-opacity duration-200"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 pl-[52px] pr-2 text-[15px] font-bold tracking-tight transition-opacity duration-200"
         style={{ opacity: done ? 0 : Math.max(0, 1 - progress * 1.6) }}
       >
         <span className="slide-hint">Slide to checkout</span>
-        <Lock className="size-[15px] text-white/70" />
+        <Lock className="size-[14px] text-white/65" />
       </span>
 
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex items-center justify-center text-[15px] font-bold tracking-tight text-white transition-opacity duration-200"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center pl-[52px] pr-2 text-[14px] font-bold tracking-tight text-white transition-opacity duration-200"
         style={{ opacity: done ? 1 : 0 }}
       >
         Taking you to checkout…
@@ -115,7 +115,7 @@ export function SlideToCheckout({
         onPointerCancel={end}
         onKeyDown={onKeyDown}
         className={cn(
-          "absolute left-1 flex size-12 touch-none items-center justify-center rounded-full bg-white text-[#14261C] shadow-[0_2px_10px_rgba(0,0,0,0.28)] outline-none transition-transform duration-200 ease-out focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#14261C]",
+          "absolute left-[5px] flex size-12 touch-none items-center justify-center rounded-[13px] bg-[#F26B21] text-[#1e2521] shadow-[0_2px_10px_rgba(0,0,0,0.3)] outline-none transition-transform ease-out focus-visible:ring-2 focus-visible:ring-[#F26B21] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e2521]",
           dragging ? "cursor-grabbing scale-[1.04]" : "cursor-grab",
         )}
         style={{
@@ -123,7 +123,11 @@ export function SlideToCheckout({
           transitionDuration: dragging ? "0ms" : "260ms",
         }}
       >
-        {done ? <Check className="size-5 text-[#178a46]" /> : <ArrowRight className="size-5" />}
+        {done ? (
+          <Check className="size-5" strokeWidth={3} />
+        ) : (
+          <ArrowRight className="size-5" strokeWidth={2.6} />
+        )}
       </button>
     </div>
   );

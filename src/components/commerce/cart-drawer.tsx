@@ -60,6 +60,14 @@ export function CartDrawer() {
     enabled: isOpen,
   });
   const [showBreakdown, setShowBreakdown] = useState(false);
+  /* Every line's MRP over what it actually costs — the number the footer shows
+     struck through, so the saving is visible before checkout confirms it. */
+  const savings = items.reduce(
+    (total, item) =>
+      total +
+      (item.mrp && item.mrp > item.unit_price ? (item.mrp - item.unit_price) * item.qty : 0),
+    0,
+  );
   const railRef = useRef<HTMLDivElement>(null);
 
   const scrollRail = (direction: -1 | 1) => {
@@ -290,26 +298,40 @@ export function CartDrawer() {
         </div>
 
         {items.length > 0 && (
-          <footer className="safe-bottom border-t border-border bg-background px-5 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-display text-2xl font-extrabold tabular-nums text-forest">
-                  {inr(subtotal)}
+          <footer className="safe-bottom border-t border-border bg-background px-5 pb-5 pt-4">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0">
+                <p className="text-[11px] font-medium text-muted-foreground">Estimated total</p>
+                <p className="flex items-baseline gap-1.5 tabular-nums">
+                  {savings > 0 && (
+                    <span className="text-xs text-muted-foreground line-through">
+                      {inr(subtotal + savings)}
+                    </span>
+                  )}
+                  <span className="font-display text-2xl font-extrabold text-forest">
+                    {inr(subtotal)}
+                  </span>
                 </p>
+                {savings > 0 && (
+                  <p className="text-[11px] font-bold text-primary">You save {inr(savings)}</p>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowBreakdown((v) => !v)}
                   aria-expanded={showBreakdown}
-                  className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground"
+                  className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"
                 >
                   Inclusive of all taxes
                   <ChevronDown
-                    className={`size-4 transition-transform duration-200 ${showBreakdown ? "rotate-180" : ""}`}
+                    className={`size-3.5 transition-transform duration-200 ${showBreakdown ? "rotate-180" : ""}`}
                   />
                 </button>
               </div>
+              <SlideToCheckout onDone={closeCart} className="min-w-0 flex-1" />
             </div>
-            <SlideToCheckout onDone={closeCart} className="mt-3" />
+            <p className="mt-3 text-center text-[11px] font-medium text-muted-foreground">
+              🔒 100% secure · UPI · Cards · Net banking
+            </p>
             {showBreakdown && (
               <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
                 <p className="flex justify-between">
