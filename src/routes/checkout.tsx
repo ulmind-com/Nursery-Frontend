@@ -26,6 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GIFT_NOTE_KEY, GIFT_ORDER_KEY } from "@/components/product/purchase-extras";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
+import { ConfettiBurst, OrderSuccessOverlay } from "@/components/shared/celebration";
 import { normalizeApiError } from "@/lib/api";
 import { loadRazorpay, openRazorpay, type RazorpaySuccessResponse } from "@/lib/razorpay";
 import { couponMinOrder } from "@/lib/coupons";
@@ -147,6 +148,10 @@ function CheckoutPage() {
      pick, so the auto-applier never argues with a deliberate choice. */
   const [couponTouched, setCouponTouched] = useState(false);
   const [autoApplied, setAutoApplied] = useState(false);
+  /* Re-keyed on every automatic code so a second, better offer fires its own
+     burst rather than sitting on the finished one. */
+  const [confettiKey, setConfettiKey] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<{ orderId: string; amount: string; method: "razorpay" | "cod" } | null>(null);
 
   /* Contact details come from the account, but the delivery address never
      fills itself — the customer picks a saved one or types a new one, so a
@@ -426,6 +431,7 @@ function CheckoutPage() {
       /* storage unavailable */
     }
     if (!next) {
+      setConfettiKey(null);
       toast.success("Coupon removed.");
       return;
     }
@@ -433,6 +439,7 @@ function CheckoutPage() {
       toast.info(`“${next}” saved — add your delivery address to see the discount.`);
       return;
     }
+    if (auto) setConfettiKey(next);
     toast.success(auto ? `Best offer “${next}” applied for you` : `“${next}” applied.`);
   }
 
@@ -463,7 +470,15 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offerBoard, coupon, couponTouched]);
 
-  async function finishOrder(orderId: string) {
+  /* Cart and storage are cleared up front so nothing can be re-submitted while
+     the celebration is on screen; the redirect waits for it to finish. */
+  function finishOrder(orderId: string, method: "razorpay" | "cod") {
+    const amount = inr(quote?.total ?? cartSubtotal);
+    clearOrderState();
+    setPlaced({ orderId, amount, method });
+  }
+
+  function clearOrderState() {
     clear();
     try {
       window.localStorage.removeItem(GIFT_ORDER_KEY);
@@ -472,13 +487,12 @@ function CheckoutPage() {
     } catch {
       /* storage unavailable */
     }
-    await navigate({ to: "/account/orders/$id", params: { id: orderId } });
   }
 
   async function verifyPayment(orderId: string, response: RazorpaySuccessResponse) {
     try {
       const verified = await ordersApi.verify({ order_id: orderId, ...response });
-      await finishOrder(verified.id || orderId);
+      finishOrder(verified.id || orderId, "razorpay");
     } catch (caught) {
       setBusy(false);
       toast.error(`Payment verification failed: ${normalizeApiError(caught).message}`);
@@ -514,7 +528,7 @@ function CheckoutPage() {
       void rememberAddress(form);
 
       if (payment === "cod") {
-        await finishOrder(orderId);
+        finishOrder(orderId, "cod");
         return;
       }
       if (!order.razorpay_order_id || !order.key_id || typeof amountPaise !== "number") {
@@ -552,6 +566,19 @@ function CheckoutPage() {
       setError(message);
       toast.error(message);
     }
+  }
+
+  /* Placing the order empties the cart, which would otherwise drop this page
+     straight into its empty state — so the celebration owns the screen until it
+     hands over to the order. */
+  if (placed) {
+    return (
+      <OrderSuccessOverlay
+        amount={placed.amount}
+        method={placed.method}
+        onDone={() => void navigate({ to: "/account/orders/$id", params: { id: placed.orderId } })}
+      />
+    );
   }
 
   if (!items.length) {
@@ -1020,7 +1047,8 @@ function CheckoutPage() {
             </div>
 
             {coupon && (
-              <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-[#b9e3cf] bg-[#effaf4] px-3.5 py-3">
+              <div className="relative mt-3 flex items-start gap-2.5 rounded-lg border border-[#b9e3cf] bg-[#effaf4] px-3.5 py-3">
+                {confettiKey && <ConfettiBurst key={confettiKey} />}
                 <BadgeCheck className="mt-px size-[18px] shrink-0 text-[#008B5E]" />
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-bold text-[#00663f]">
