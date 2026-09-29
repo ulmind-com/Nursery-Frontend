@@ -15,6 +15,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useSupportChat } from "@/contexts/support-chat-context";
 import { normalizeApiError } from "@/lib/api";
 import { tokenStore } from "@/lib/token";
+import type { OrderItem } from "@/types/api";
 
 export const Route = createFileRoute("/account/orders/$id")({
   head: () => ({
@@ -37,6 +38,12 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
     </div>
   );
 }
+
+/* Orders come back with the unit price under `price`; a few older documents use
+   `unit_price`, and only some carry a pre-computed line `total`. Reading just
+   one of them left the page showing ₹0 against every item. */
+const unitPriceOf = (item: OrderItem) => item.price ?? item.unit_price ?? 0;
+const lineTotalOf = (item: OrderItem) => item.total ?? unitPriceOf(item) * (item.qty || 1);
 
 function OrderDetail() {
   const { id } = Route.useParams();
@@ -84,7 +91,7 @@ function OrderDetail() {
           ...(item.image ? { image: item.image } : {}),
           qty: item.qty || 1,
           ...(item.size_variant ? { size_variant: item.size_variant } : {}),
-          unit_price: item.unit_price ?? 0,
+          unit_price: unitPriceOf(item),
           stock: 99,
         },
         { openDrawer: false },
@@ -205,9 +212,10 @@ function OrderDetail() {
                   )}
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {item.size_variant ? `Size ${item.size_variant} · ` : ""}Qty {item.qty}
+                    {item.qty > 1 ? ` · ${money(unitPriceOf(item))} each` : ""}
                   </p>
                 </div>
-                <p className="price-num shrink-0 text-sm font-bold text-forest">{money(item.total ?? 0)}</p>
+                <p className="price-num shrink-0 text-sm font-bold text-forest">{money(lineTotalOf(item))}</p>
               </li>
             ))}
           </ul>

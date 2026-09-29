@@ -20,6 +20,10 @@ const reviewSchema = z.object({
   comment: z.string().trim().min(5, { message: "Please write at least a few words" }).max(1000, { message: "Review must be under 1000 characters" }),
 });
 
+/* The API returns the review body as `text`; the design-preview samples carry
+   `comment`. Reading only one of them left every real review blank. */
+const bodyOf = (review: Review) => review.text || review.comment || "";
+
 const dateLabel = (value: string | undefined): string | undefined => {
   if (!value) return undefined;
   const parsed = new Date(value);
@@ -82,7 +86,8 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
   const displayCount = total || count || 0;
 
   const create = useMutation({
-    mutationFn: (body: { rating: number; title: string; comment: string }) => reviewsApi.create({ product_id: productId, ...body }),
+    mutationFn: (body: { rating: number; title: string; comment: string }) =>
+      reviewsApi.create({ product_id: productId, rating: body.rating, title: body.title, text: body.comment }),
     onSuccess: () => {
       toast.success("Thanks! Your review is submitted.");
       setFormOpen(false);
@@ -114,7 +119,9 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
     create.mutate(parsed.data);
   };
 
-  const canWrite = !preview && isAuthenticated && canReview.data?.can_review !== false;
+  /* `can` is false both before delivery and once a review already exists, so the
+     hint below tells the customer which of the two it is. */
+  const canWrite = !preview && isAuthenticated && canReview.data?.can === true;
 
   return (
     <section className="border-t border-border py-12">
@@ -151,7 +158,11 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
               </Button>
             ) : (
               <p className="max-w-56 text-center text-xs text-muted-foreground md:text-right">
-                {isAuthenticated ? "Reviews can be written after you receive this product." : "Sign in after your purchase to write a review."}
+                {!isAuthenticated
+                  ? "Sign in after your purchase to write a review."
+                  : canReview.data?.already
+                    ? "You've already reviewed this product."
+                    : "Reviews can be written after you receive this product."}
               </p>
             )}
           </div>
@@ -202,11 +213,22 @@ export function ReviewsSection({ productId, preview = false, fallbackReviews = [
                   <Stars value={review.rating} size="size-4" />
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="text-sm font-semibold text-foreground">{review.user_name || "Verified customer"}</span>
-                    {review.verified_buyer && <span className="rounded bg-primary-tint px-1.5 py-0.5 text-[11px] font-semibold text-primary-soft-foreground">Verified</span>}
+                    {/* The API only accepts a review once the order is delivered, so every
+                        real review is a verified buyer; previews say so themselves. */}
+                    {(review.verified_buyer ?? !preview) && <span className="rounded bg-primary-tint px-1.5 py-0.5 text-[11px] font-semibold text-primary-soft-foreground">Verified</span>}
                     {dateLabel(review.created_at) && <span className="text-xs text-muted-foreground">{dateLabel(review.created_at)}</span>}
                   </div>
                   {review.title && <h3 className="mt-2 text-base font-semibold text-foreground">{review.title}</h3>}
-                  {review.comment && <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{review.comment}</p>}
+                  {bodyOf(review) && <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{bodyOf(review)}</p>}
+                  {review.photos && review.photos.length > 0 && (
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {review.photos.map((photo) => (
+                        <li key={photo}>
+                          <img src={photo} alt="" loading="lazy" className="size-16 rounded-lg border border-border object-cover" />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {!preview && (
                     <button type="button" onClick={() => vote.mutate(review.id)} className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors duration-200 hover:text-primary motion-reduce:transition-none">
                       <ThumbsUp className="size-3.5" /> Helpful{typeof review.helpful_count === "number" ? ` (${review.helpful_count})` : ""}

@@ -385,7 +385,12 @@ export interface Review {
   user_name?: string;
   rating: number;
   title?: string;
+  /* The API stores the review body as `text`; `comment` is only kept for the
+     hand-written design-preview samples. */
+  text?: string;
   comment?: string;
+  photos?: string[];
+  tags?: string[];
   images?: string[];
   verified_buyer?: boolean;
   helpful_count?: number;
@@ -426,6 +431,9 @@ export interface OrderItem {
   qty: number;
   size_variant?: string;
   pot_type?: string;
+  /* The API stores the unit price as `price`; `unit_price`/`total` are only
+     sent by some older order documents, so readers fall back across all three. */
+  price?: number;
   unit_price?: number;
   total?: number;
   image?: string;
