@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  BadgeCheck,
   Banknote,
+  Check,
   ChevronDown,
   Gift,
   Leaf,
   Loader2,
   LocateFixed,
+  MapPin,
   Minus,
   PackageCheck,
   Plus,
@@ -17,7 +20,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { couponApi, ordersApi, queryKeys, settingsApi } from "@/api/services";
+import { authApi, couponApi, ordersApi, queryKeys, settingsApi } from "@/api/services";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GIFT_NOTE_KEY, GIFT_ORDER_KEY } from "@/components/product/purchase-extras";
@@ -28,7 +31,7 @@ import { loadRazorpay, openRazorpay, type RazorpaySuccessResponse } from "@/lib/
 import { couponMinOrder } from "@/lib/coupons";
 import { cn } from "@/lib/utils";
 import { INDIAN_STATES, matchState } from "@/lib/india";
-import type { Address, Coupon, OrderQuote } from "@/types/api";
+import type { Address, ApplicableCoupon, Coupon, OrderQuote } from "@/types/api";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -78,9 +81,16 @@ const toAddress = (form: DeliveryForm): Address => ({
   phone: form.phone.trim(),
 });
 
+/** `is_default` rides along inside the stored address object. */
+type SavedAddress = Address & { is_default?: boolean };
+
+/** Same address, typed twice, is still one address — keyed on what identifies it. */
+const addressKey = (entry: Address) =>
+  `${entry.house}|${entry.pincode}|${entry.phone}`.toLowerCase().replace(/\s+/g, " ").trim();
+
 function CheckoutPage() {
   const { items, subtotal: cartSubtotal, clear, updateQty, removeItem } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const navigate = useNavigate();
   const { data: settings } = useQuery({
     queryKey: queryKeys.settings,
@@ -93,9 +103,20 @@ function CheckoutPage() {
     staleTime: 300_000,
     retry: false,
   });
+  /* The nursery ranks every live coupon against this cart — which is what lets
+     the best saving apply itself instead of the customer hunting for a code. */
+  const { data: offerBoard } = useQuery({
+    queryKey: ["coupons", "applicable", Math.round(cartSubtotal)],
+    queryFn: () => couponApi.applicable(cartSubtotal),
+    enabled: isAuthenticated && cartSubtotal > 0,
+    staleTime: 60_000,
+    retry: false,
+  });
 
-  const savedAddress = user?.addresses?.[0];
-  const savedName = (savedAddress?.name || user?.name || "").trim().split(/\s+/).filter(Boolean);
+  const savedAddresses = useMemo<SavedAddress[]>(
+    () => (user?.addresses as SavedAddress[] | undefined) ?? [],
+    [user?.addresses],
+  );
 
   const [form, setForm] = useState<DeliveryForm>({
     email: "",
@@ -121,20 +142,17 @@ function CheckoutPage() {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [error, setError] = useState("");
   const [locating, setLocating] = useState(false);
+  const [pickedAddress, setPickedAddress] = useState<number | null>(null);
+  /* A code the customer typed or dismissed themselves outranks the automatic
+     pick, so the auto-applier never argues with a deliberate choice. */
+  const [couponTouched, setCouponTouched] = useState(false);
+  const [autoApplied, setAutoApplied] = useState(false);
 
-  /* Prefill from the signed-in account and anything the cart flow stashed. */
+  /* Contact details come from the account, but the delivery address never
+     fills itself — the customer picks a saved one or types a new one, so a
+     stale address can't quietly ship an order to the wrong door. */
   useEffect(() => {
-    setForm((current) => ({
-      ...current,
-      email: current.email || user?.email || "",
-      firstName: current.firstName || savedName[0] || "",
-      lastName: current.lastName || savedName.slice(1).join(" "),
-      address: current.address || savedAddress?.house || "",
-      city: current.city || savedAddress?.city || "",
-      state: savedAddress?.state && !current.city ? savedAddress.state : current.state,
-      pincode: current.pincode || savedAddress?.pincode || "",
-      phone: current.phone || savedAddress?.phone || user?.phone || "",
-    }));
+    setForm((current) => ({ ...current, email: current.email || user?.email || "" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -153,7 +171,8 @@ function CheckoutPage() {
   // Quantity edits keep the line count the same, so the quote listens to a
   // signature of the whole cart rather than to items.length.
   const cartSignature = useMemo(
-    () => items.map((item) => `${item.product_id}:${item.size_variant ?? ""}:${item.qty}`).join("|"),
+    () =>
+      items.map((item) => `${item.product_id}:${item.size_variant ?? ""}:${item.qty}`).join("|"),
     [items],
   );
 
@@ -203,6 +222,22 @@ function CheckoutPage() {
       } catch (caught) {
         if (token !== quoteToken.current) return null;
         const message = normalizeApiError(caught).message;
+        /* A coupon the order no longer qualifies for used to take the whole
+           checkout down with it — a red banner and no total. Drop the code,
+           say so plainly, and let the effect re-quote without it. */
+        if (code && /coupon|offer|promo|discount/i.test(message)) {
+          setCouponTouched(true);
+          setCoupon("");
+          setCouponInput("");
+          setAutoApplied(false);
+          try {
+            window.localStorage.removeItem(COUPON_KEY);
+          } catch {
+            /* storage unavailable */
+          }
+          toast.info(`“${code}” couldn't be applied — removed so you can continue.`);
+          return null;
+        }
         setQuote(null);
         lastQuoteError.current = message;
         setError(message);
@@ -240,8 +275,49 @@ function CheckoutPage() {
     form.phone,
   ]);
 
-  const set = (key: keyof DeliveryForm) => (value: string) =>
+  const set = (key: keyof DeliveryForm) => (value: string) => {
+    // Typing over a filled-in field means this is no longer that saved address.
+    if (key !== "email") setPickedAddress(null);
     setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  /* Choosing a saved address fills the form — and because the quote effect
+     watches those fields, shipping for that PIN code recalculates on its own. */
+  const fillFrom = (entry: SavedAddress, index: number) => {
+    const parts = (entry.name || "").trim().split(/\s+/).filter(Boolean);
+    setPickedAddress(index);
+    setForm((current) => ({
+      ...current,
+      firstName: parts[0] ?? "",
+      lastName: parts.slice(1).join(" "),
+      address: [entry.house, entry.area]
+        .map((part) => part?.trim())
+        .filter(Boolean)
+        .join(", "),
+      city: entry.city ?? "",
+      state: matchState(entry.state) ?? current.state,
+      pincode: entry.pincode ?? "",
+      phone: entry.phone || current.phone,
+    }));
+    toast.success(`Delivering to your ${(entry.tag || "saved").toLowerCase()} address`);
+  };
+
+  /* "Save this information" writes the address into the account once the order
+     is really placed. The address book is a convenience, so a failure here is
+     swallowed — it must never turn a paid order into an error. */
+  const rememberAddress = async (nextForm: DeliveryForm) => {
+    if (!saveInfo || !isAuthenticated) return;
+    const entry = toAddress(nextForm);
+    if (savedAddresses.some((saved) => addressKey(saved) === addressKey(entry))) return;
+    try {
+      await authApi.update({
+        addresses: [...savedAddresses, { ...entry, is_default: savedAddresses.length === 0 }],
+      });
+      await refreshUser();
+    } catch {
+      /* the order is placed; the address book can wait */
+    }
+  };
 
   /* Ask the browser for coordinates, turn them into a street address on the
      server, and fill the fields. Whatever the lookup can't resolve is left
@@ -269,7 +345,10 @@ function CheckoutPage() {
 
     const fill = async (position: GeolocationPosition) => {
       try {
-        const found = await settingsApi.reverseGeocode(position.coords.latitude, position.coords.longitude);
+        const found = await settingsApi.reverseGeocode(
+          position.coords.latitude,
+          position.coords.longitude,
+        );
         const state = matchState(found.state);
         setForm((current) => ({
           ...current,
@@ -333,21 +412,56 @@ function CheckoutPage() {
     });
   };
 
-  async function applyCoupon(next = couponInput.trim().toUpperCase()) {
+  /* Setting the code is all this does. The quote effect already watches
+     `coupon`, so quoting here as well fired two requests for one click — and
+     whichever landed second decided whether the discount stuck. */
+  function applyCoupon(next = couponInput.trim().toUpperCase(), auto = false) {
     setCoupon(next);
     setCouponInput(next);
+    setAutoApplied(Boolean(next) && auto);
+    if (!auto) setCouponTouched(true);
     try {
       window.localStorage.setItem(COUPON_KEY, next);
     } catch {
       /* storage unavailable */
     }
-    if (!complete) {
-      toast.info("Add your delivery address to apply this offer.");
+    if (!next) {
+      toast.success("Coupon removed.");
       return;
     }
-    const applied = await refreshQuote(payment, next, form);
-    if (applied) toast.success(next ? `${next} applied.` : "Coupon removed.");
+    if (!complete) {
+      toast.info(`“${next}” saved — add your delivery address to see the discount.`);
+      return;
+    }
+    toast.success(auto ? `Best offer “${next}” applied for you` : `“${next}” applied.`);
   }
+
+  /* Automatic best offer. It reads the ranked board rather than guessing, so it
+     only ever picks a code this cart actually qualifies for, and it steps aside
+     the moment the customer picks or removes one themselves. */
+  useEffect(() => {
+    if (!offerBoard) return;
+    const current = coupon ? offerBoard.offers.find((offer) => offer.code === coupon) : undefined;
+    // Only a code the board itself knows about can be retired here — a code
+    // typed by hand that the board never listed is the customer's business.
+    if (current && !current.applicable) {
+      setCoupon("");
+      setCouponInput("");
+      setAutoApplied(false);
+      try {
+        window.localStorage.removeItem(COUPON_KEY);
+      } catch {
+        /* storage unavailable */
+      }
+      toast.info(`“${coupon}” no longer applies to this cart.`);
+      return;
+    }
+    if (couponTouched || !offerBoard.best_code || offerBoard.best_code === coupon) return;
+    // Never downgrade a coupon that is already the better deal.
+    if (current?.applicable && current.discount >= offerBoard.best_discount) return;
+    applyCoupon(offerBoard.best_code, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offerBoard, coupon, couponTouched]);
 
   async function finishOrder(orderId: string) {
     clear();
@@ -397,6 +511,7 @@ function CheckoutPage() {
       const orderId = order.id || order.order_id;
       const amountPaise = order.razorpay_amount ?? order.amount;
       if (!orderId) throw new Error("The nursery did not return an order reference.");
+      void rememberAddress(form);
 
       if (payment === "cod") {
         await finishOrder(orderId);
@@ -463,6 +578,22 @@ function CheckoutPage() {
   const shopName = settings?.shop.name || "MyGarden";
   const totalLabel = quote ? inr(quote.total) : quoting ? "Calculating…" : "Total after address";
   const codBlocked = quote?.cod_available === false;
+  const appliedOffer = coupon ? offerBoard?.offers.find((o) => o.code === coupon) : undefined;
+  const savedByCoupon = quote?.discount ?? appliedOffer?.discount ?? 0;
+  /* Signed-out visitors never get a ranked board, so the plain active list is
+     ranked locally rather than showing nothing at all. */
+  const offerRows: ApplicableCoupon[] = offerBoard
+    ? offerBoard.offers.filter((offer) => offer.code !== coupon).slice(0, 3)
+    : coupons
+        .filter((entry: Coupon) => entry.code !== coupon)
+        .slice(0, 2)
+        .map((entry: Coupon) => ({
+          code: entry.code,
+          ...(entry.description ? { description: entry.description } : {}),
+          applicable: cartSubtotal >= couponMinOrder(entry),
+          discount: 0,
+          needed_more: Math.max(0, couponMinOrder(entry) - cartSubtotal),
+        }));
 
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] antialiased">
@@ -519,6 +650,63 @@ function CheckoutPage() {
             {/* ── Delivery ── */}
             <section>
               <h2 className="mb-4 text-[19px] font-bold tracking-tight">Delivery</h2>
+
+              {savedAddresses.length > 0 && (
+                <div className="mb-6">
+                  <p className="mb-2.5 text-[13px] font-semibold text-[#333]">
+                    Deliver to a saved address
+                  </p>
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {savedAddresses.map((entry, index) => {
+                      const selected = pickedAddress === index;
+                      return (
+                        <button
+                          key={`${addressKey(entry)}-${index}`}
+                          type="button"
+                          onClick={() => fillFrom(entry, index)}
+                          aria-pressed={selected}
+                          className={cn(
+                            "rounded-lg border px-3.5 py-3 text-left transition-colors",
+                            selected
+                              ? "border-[#008B5E] bg-[#f2faf6] ring-1 ring-[#008B5E]"
+                              : "border-[#d9d9d9] bg-white hover:border-[#008B5E]/60 hover:bg-[#fafcfb]",
+                          )}
+                        >
+                          <span className="flex items-center justify-between gap-2">
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <MapPin className="size-3.5 shrink-0 text-[#008B5E]" />
+                              <span className="truncate text-[13px] font-bold">
+                                {entry.tag || "Address"}
+                              </span>
+                              {entry.is_default && (
+                                <span className="shrink-0 rounded-full bg-[#e8f6ef] px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-[#00663f]">
+                                  Default
+                                </span>
+                              )}
+                            </span>
+                            {selected && <Check className="size-4 shrink-0 text-[#008B5E]" />}
+                          </span>
+                          <span className="mt-1 block truncate text-xs font-medium text-[#333]">
+                            {entry.name}
+                          </span>
+                          <span className="mt-0.5 block text-xs leading-relaxed text-[#6b6b6b]">
+                            {[entry.house, entry.area, entry.city, entry.state]
+                              .map((part) => part?.trim())
+                              .filter(Boolean)
+                              .join(", ")}{" "}
+                            — {entry.pincode}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-xs text-[#6b6b6b]">
+                    Tap one to fill the form below, or type a new address. Shipping is worked out
+                    for whichever PIN code ends up in the form.
+                  </p>
+                </div>
+              )}
+
               <div className="grid gap-3 sm:grid-cols-2">
                 <SelectField
                   id="country"
@@ -832,13 +1020,33 @@ function CheckoutPage() {
             </div>
 
             {coupon && (
-              <button
-                type="button"
-                onClick={() => void applyCoupon("")}
-                className="mt-2 text-xs font-medium text-[#707070] underline underline-offset-2 hover:text-[#b42318]"
-              >
-                Remove “{coupon}”
-              </button>
+              <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-[#b9e3cf] bg-[#effaf4] px-3.5 py-3">
+                <BadgeCheck className="mt-px size-[18px] shrink-0 text-[#008B5E]" />
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-bold text-[#00663f]">
+                    “{coupon}” applied
+                    {autoApplied && (
+                      <span className="rounded-full bg-[#008B5E] px-2 py-px text-[9px] font-bold uppercase tracking-wide text-white">
+                        Best offer · auto
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[#3f7a5f]">
+                    {savedByCoupon > 0
+                      ? `You save ${inr(savedByCoupon)} on this order.`
+                      : quoting
+                        ? "Working out your saving…"
+                        : "Your saving shows up once the delivery address is in."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => applyCoupon("")}
+                  className="shrink-0 text-xs font-semibold text-[#707070] underline underline-offset-2 transition-colors hover:text-[#b42318]"
+                >
+                  Remove
+                </button>
+              </div>
             )}
 
             {/* Rewards */}
@@ -861,16 +1069,14 @@ function CheckoutPage() {
             )}
 
             {/* Offers */}
-            {coupons.length > 0 && (
+            {offerRows.length > 0 && (
               <div className="mt-5 space-y-3">
-                {coupons.slice(0, 2).map((offer: Coupon) => (
+                {offerRows.map((offer) => (
                   <OfferRow
                     key={offer.code}
                     offer={offer}
-                    cartSubtotal={cartSubtotal}
-                    applied={offer.code === coupon}
                     disabled={quoting || busy}
-                    onApply={() => void applyCoupon(offer.code)}
+                    onApply={() => applyCoupon(offer.code)}
                   />
                 ))}
               </div>
@@ -1200,46 +1406,58 @@ function QtyStepper({
   );
 }
 
+/** One offer, ranked by the nursery: usable ones in colour, locked ones greyed
+ *  out with the gap still to close. */
 function OfferRow({
   offer,
-  cartSubtotal,
   onApply,
   disabled,
-  applied,
 }: {
-  offer: Coupon;
-  cartSubtotal: number;
+  offer: ApplicableCoupon;
   onApply: () => void;
   disabled: boolean;
-  applied: boolean;
 }) {
-  const minimum = couponMinOrder(offer);
-  const remaining = Math.max(0, minimum - cartSubtotal);
+  const locked = !offer.applicable;
 
   return (
-    <div className="rounded-lg border border-[#f2e5cf] bg-[#fdf9ef] p-4">
+    <div
+      className={cn(
+        "rounded-lg border p-4",
+        locked ? "border-[#e6e6e6] bg-[#f7f7f7]" : "border-[#f2e5cf] bg-[#fdf9ef]",
+      )}
+    >
       <div className="flex items-center justify-between gap-3">
         <span className="flex min-w-0 items-center gap-2">
-          <Tag className="size-4 shrink-0 text-[#d97706]" />
+          <Tag className={cn("size-4 shrink-0", locked ? "text-[#9a9a9a]" : "text-[#d97706]")} />
           <strong className="truncate text-sm font-bold">{offer.code}</strong>
+          {offer.discount > 0 && (
+            <span className="shrink-0 rounded-full bg-[#e8f6ef] px-2 py-px text-[10px] font-bold text-[#00663f]">
+              Save {inr(offer.discount)}
+            </span>
+          )}
         </span>
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          disabled={disabled || remaining > 0 || applied}
+          disabled={disabled || locked}
           onClick={onApply}
           className="h-7 shrink-0 rounded-md bg-[#f6ecd9] px-3.5 text-xs font-bold text-[#7a5a1e] hover:bg-[#ebdabc] disabled:opacity-50"
         >
-          {applied ? "Applied" : "Apply"}
+          Apply
         </Button>
       </div>
       {offer.description && (
         <p className="mt-2 text-xs leading-relaxed text-[#5f5f5f]">{offer.description}</p>
       )}
-      {remaining > 0 && (
-        <p className="mt-3 border-t border-[#f2e5cf] pt-3 text-[11px] font-bold text-[#b45309]">
-          Add {inr(remaining)} more to unlock this offer
+      {offer.needed_more > 0 && (
+        <p
+          className={cn(
+            "mt-3 border-t pt-3 text-[11px] font-bold text-[#b45309]",
+            locked ? "border-[#e6e6e6]" : "border-[#f2e5cf]",
+          )}
+        >
+          Add {inr(offer.needed_more)} more to unlock this offer
         </p>
       )}
     </div>
