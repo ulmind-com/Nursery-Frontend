@@ -14,6 +14,9 @@ export const LOTTIE = {
   confetti: "/lottie/Confetti.json",
 } as const;
 
+/** Wide enough to throw confetti clear of the box it celebrates. */
+const SIZE = 420;
+
 function usesReducedMotion(): boolean {
   if (typeof window === "undefined" || !window.matchMedia) return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -35,12 +38,25 @@ export function ConfettiBurst({ durationMs = 5200 }: { durationMs?: number }) {
   if (done) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-20 overflow-visible">
+    /* Laid out inline rather than with utility classes: the burst has to have a
+       real size to draw into, and an arbitrary-value class that the build does
+       not emit would silently collapse it to nothing. */
+    <div
+      aria-hidden
+      style={{ position: "absolute", inset: 0, zIndex: 20, pointerEvents: "none", overflow: "visible" }}
+    >
       <DotLottieReact
         src={LOTTIE.confetti}
         autoplay
         loop={false}
-        className="absolute left-1/2 top-1/2 size-[420px] -translate-x-1/2 -translate-y-1/2"
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: SIZE,
+          height: SIZE,
+          transform: "translate(-50%, -50%)",
+        }}
       />
     </div>
   );
@@ -85,7 +101,12 @@ export function OrderSuccessOverlay({
       <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-background px-8 pb-9 pt-6 text-center shadow-2xl">
         <ConfettiBurst />
         <div className="relative z-10">
-          <DotLottieReact src={LOTTIE.success} autoplay loop={false} className="mx-auto size-40" />
+          <DotLottieReact
+            src={LOTTIE.success}
+            autoplay
+            loop={false}
+            style={{ width: 160, height: 160, margin: "0 auto" }}
+          />
           <h2 className="font-display text-2xl font-extrabold text-forest sm:text-3xl">
             {paid ? "Order confirmed" : "Payment successful"}
           </h2>

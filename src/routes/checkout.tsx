@@ -435,11 +435,19 @@ function CheckoutPage() {
       toast.success("Coupon removed.");
       return;
     }
+    /* A discount landing is worth the confetti however it got here — the
+       automatic pick and a code typed by hand both count. Keyed on the moment
+       rather than the code, so re-applying the same one fires it again.
+
+       This sits above the address check on purpose: the coupon is accepted
+       right here, and the branch below only decides whether the saving can be
+       shown yet. Below it, the confetti never fired until an address was in. */
+    setConfettiKey(`${next}-${Date.now()}`);
+
     if (!complete) {
       toast.info(`“${next}” saved — add your delivery address to see the discount.`);
       return;
     }
-    if (auto) setConfettiKey(next);
     toast.success(auto ? `Best offer “${next}” applied for you` : `“${next}” applied.`);
   }
 
