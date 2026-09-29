@@ -79,12 +79,12 @@ export function SlideToCheckout({
         className,
       )}
     >
-      {/* The stretch already dragged, warmed to the knob so the two read as one. */}
+      {/* The stretch already dragged, in the same greens as the reward rail. */}
       <div
         className="absolute inset-y-[5px] left-[5px] rounded-[13px] transition-[width] ease-out"
         style={{
           width: `${offset + KNOB}px`,
-          background: "linear-gradient(90deg,#E85D0A 0%,#F97316 60%,#FBA94C 100%)",
+          background: "linear-gradient(90deg,#00753D 0%,#00A45B 55%,#5FC63F 100%)",
           transitionDuration: dragging ? "0ms" : "260ms",
         }}
       />
@@ -115,7 +115,7 @@ export function SlideToCheckout({
         onPointerCancel={end}
         onKeyDown={onKeyDown}
         className={cn(
-          "absolute left-[5px] flex size-12 touch-none items-center justify-center rounded-[13px] bg-[#F26B21] text-[#1e2521] shadow-[0_2px_10px_rgba(0,0,0,0.3)] outline-none transition-transform ease-out focus-visible:ring-2 focus-visible:ring-[#F26B21] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e2521]",
+          "absolute left-[5px] flex size-12 touch-none items-center justify-center rounded-[13px] bg-[#00A45B] text-white shadow-[0_2px_10px_rgba(0,0,0,0.3)] outline-none transition-transform ease-out focus-visible:ring-2 focus-visible:ring-[#5FC63F] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e2521]",
           dragging ? "cursor-grabbing scale-[1.04]" : "cursor-grab",
         )}
         style={{
