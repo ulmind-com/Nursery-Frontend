@@ -121,13 +121,21 @@ function Track({ fill, dark }: { fill: number; dark: boolean }) {
       className={cn("relative h-[9px] w-full rounded-full", dark ? "bg-white/12" : "bg-[#ececec]")}
     >
       <div
-        className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out"
+        className="reward-fill absolute inset-y-0 left-0 overflow-hidden rounded-full transition-[width] duration-500 ease-out"
         style={{
           width: `${fill}%`,
           background: "linear-gradient(90deg,#00A45B 0%,#3FBA53 38%,#9BD62F 68%,#EDEF35 100%)",
-          boxShadow: "0 0 10px rgba(168,214,47,0.7), 0 0 22px rgba(0,164,91,0.35)",
         }}
-      />
+      >
+        <span
+          aria-hidden="true"
+          className="reward-sheen absolute inset-y-0 left-0 w-1/3 rounded-full"
+          style={{
+            background:
+              "linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.85) 50%,transparent 100%)",
+          }}
+        />
+      </div>
     </div>
   );
 }

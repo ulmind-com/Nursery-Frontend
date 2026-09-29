@@ -477,3 +477,20 @@
   .auth-card:not(.is-register) :is(.auth-hero, .auth-pane).is-register { display: none; }
   .auth-card.is-register :is(.auth-hero, .auth-pane).is-login { display: none; }
 }
+
+/* Cart reward rail — the lit stretch never sits still: a glow breathes under it
+   while a highlight sweeps from the start to wherever the cart has reached, so
+   progress reads as something live rather than a painted-on bar. (The global
+   reduced-motion rule above already stills both.) */
+@keyframes reward-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(168, 214, 47, 0.5), 0 0 18px rgba(0, 164, 91, 0.25); }
+  50% { box-shadow: 0 0 16px rgba(237, 239, 53, 0.95), 0 0 34px rgba(124, 200, 60, 0.5); }
+}
+
+@keyframes reward-sheen {
+  0% { transform: translateX(-110%); }
+  55%, 100% { transform: translateX(310%); }
+}
+
+.reward-fill { animation: reward-glow 2.2s ease-in-out infinite; }
+.reward-sheen { animation: reward-sheen 2.6s ease-in-out infinite; }
