@@ -1,70 +1,642 @@
-export interface Pagination<T> { items: T[]; total: number; page?: number; skip?: number; limit?: number; has_more?: boolean }
-export interface ProductSize { name: string; pot_size?: string | null; pot_type?: string | null; pot_color?: string | null; height?: string | null; price: number; mrp?: number | null; discount_pct?: number | null; stock: number; images?: string[]; sku?: string | null }
-export interface PlantSpecification { plant_type?: string; sunlight?: string; difficulty?: string; difficulty_level?: string; watering?: string; medicinal?: boolean; fragrant?: boolean; pet_safe?: boolean; air_purifying?: boolean; flowering?: boolean; water_schedule?: string; [key: string]: unknown }
-export interface ProductComparisonCell { status: "positive" | "negative" | "mixed"; title?: string; detail?: string; badge?: string }
-export interface ProductComparisonRow { label: string; local: ProductComparisonCell; brand: ProductComparisonCell; others: ProductComparisonCell }
-export interface ProductComparison { title?: string; brand_label?: string; local_label?: string; others_label?: string; image: string; image_alt?: string; image_title?: string; image_subtitle?: string; rows: ProductComparisonRow[] }
-export interface ProductFaqItem { question: string; answer: string }
-export interface ProductFaq { title?: string; image?: string; image_alt?: string; items: ProductFaqItem[] }
-export interface Product { id: string; title: string; description?: string; short_description?: string; tags?: string[]; brand?: string | Brand; category_id?: string; sku?: string; shipping_weight?: number; mrp?: number; price?: number; discount_pct?: number; discount_on?: string; cgst?: number; sgst?: number; igst?: number; images?: string[]; sizes?: ProductSize[]; plant_spec?: PlantSpecification; care_instructions?: string | string[]; care_tips?: string | string[]; includes?: string | string[]; reasons_to_buy?: string | string[]; buy_reasons?: string | string[]; why_buy?: string | string[]; reason_image?: string; lifestyle_image?: string; comparison?: ProductComparison; faq?: ProductFaq; warranty?: string; stock?: number; low_stock_threshold?: number; rating?: number; review_count?: number; sold_count?: number; is_active?: boolean; is_featured?: boolean; is_bestseller?: boolean; is_new_arrival?: boolean; slug?: string }
-export interface Category { id: string; name: string; slug?: string; parent_id?: string | null; description?: string; image?: string; icon?: string; children?: Category[] }
-export interface Brand { id?: string; name: string; slug?: string; image?: string }
-export interface Banner { id: string; title?: string; subtitle?: string; image?: string; video?: string; poster?: string; promo_code?: string; cta_label?: string; cta_url?: string; active?: boolean }
-export interface PageSectionItem { id?: string; image?: string; video?: string; poster?: string; lottie?: string; title?: string; subtitle?: string; link?: string; label?: string; [key: string]: unknown }
-export interface PageSection { id: string; page?: string; type: string; title?: string; subtitle?: string; eyebrow?: string; description?: string; image?: string; image_alt?: string; cta_label?: string; cta_link?: string; bg_color?: string; brand_label?: string; local_label?: string; others_label?: string; badge_label?: string; badge_label_2?: string; limit?: number | null; items?: PageSectionItem[]; extras?: Record<string, unknown>; order?: number; active?: boolean }
-export interface HomeSection { id: string; title?: string; type: string; layout?: string; products?: Product[]; product_ids?: string[]; category?: Category; category_id?: string; limit?: number; order?: number; active?: boolean; banner?: Banner; items?: unknown[] }
-export interface SiteMedia { id?: string; section?: string; type?: "image" | "video"; image?: string; video?: string; poster?: string; title?: string; subtitle?: string; cta_label?: string; cta_url?: string }
-export interface StoreLocation { id?: string; name: string; city: string; image?: string; address?: string; map_url?: string; phone?: string; hours?: string; city_order?: number; order?: number; active?: boolean }
-export interface GardenServiceSection { title?: string; body?: string; image?: string; cta_label?: string; active?: boolean; hero_title?: string; hero_subtitle?: string; hero_image?: string; hero_cta_label?: string; hero_overlay?: boolean; page_title?: string; page_subtitle?: string; page_image?: string; services_title?: string; services_note?: string; why_title?: string; why_points?: string[]; split_image_1?: string; split_image_2?: string; form_title?: string; form_note?: string; form_cta_label?: string; locations?: string[]; phone?: string; hours?: string; whatsapp?: string; process_title?: string; process_note?: string; clients_title?: string; clients_note?: string; projects_title?: string; steps_title?: string; testimonials_title?: string; about_title?: string; about_body?: string; faq_title?: string; seo_body?: string; contact_note?: string }
-export interface PressSection { active?: boolean; title?: string }
-export interface PressLogo { id?: string; name: string; image: string; url?: string; order?: number; active?: boolean }
-export interface GiftingSection { active?: boolean; title?: string; body?: string; brands_line?: string; image?: string; primary_label?: string; primary_url?: string; secondary_label?: string; secondary_url?: string }
-export interface GardenBlock { id?: string; kind?: string; title?: string; body?: string; image?: string; author?: string; order?: number; active?: boolean }
+export interface Pagination<T> {
+  items: T[];
+  total: number;
+  page?: number;
+  skip?: number;
+  limit?: number;
+  has_more?: boolean;
+}
+export interface ProductSize {
+  name: string;
+  pot_size?: string | null;
+  pot_type?: string | null;
+  pot_color?: string | null;
+  height?: string | null;
+  price: number;
+  mrp?: number | null;
+  discount_pct?: number | null;
+  stock: number;
+  images?: string[];
+  sku?: string | null;
+}
+export interface PlantSpecification {
+  plant_type?: string;
+  sunlight?: string;
+  difficulty?: string;
+  difficulty_level?: string;
+  watering?: string;
+  medicinal?: boolean;
+  fragrant?: boolean;
+  pet_safe?: boolean;
+  air_purifying?: boolean;
+  flowering?: boolean;
+  water_schedule?: string;
+  [key: string]: unknown;
+}
+export interface ProductComparisonCell {
+  status: "positive" | "negative" | "mixed";
+  title?: string;
+  detail?: string;
+  badge?: string;
+}
+export interface ProductComparisonRow {
+  label: string;
+  local: ProductComparisonCell;
+  brand: ProductComparisonCell;
+  others: ProductComparisonCell;
+}
+export interface ProductComparison {
+  title?: string;
+  brand_label?: string;
+  local_label?: string;
+  others_label?: string;
+  image: string;
+  image_alt?: string;
+  image_title?: string;
+  image_subtitle?: string;
+  rows: ProductComparisonRow[];
+}
+export interface ProductFaqItem {
+  question: string;
+  answer: string;
+}
+export interface ProductFaq {
+  title?: string;
+  image?: string;
+  image_alt?: string;
+  items: ProductFaqItem[];
+}
+export interface Product {
+  id: string;
+  title: string;
+  description?: string;
+  short_description?: string;
+  tags?: string[];
+  brand?: string | Brand;
+  category_id?: string;
+  sku?: string;
+  shipping_weight?: number;
+  mrp?: number;
+  price?: number;
+  discount_pct?: number;
+  discount_on?: string;
+  cgst?: number;
+  sgst?: number;
+  igst?: number;
+  images?: string[];
+  sizes?: ProductSize[];
+  plant_spec?: PlantSpecification;
+  care_instructions?: string | string[];
+  care_tips?: string | string[];
+  includes?: string | string[];
+  reasons_to_buy?: string | string[];
+  buy_reasons?: string | string[];
+  why_buy?: string | string[];
+  reason_image?: string;
+  lifestyle_image?: string;
+  comparison?: ProductComparison;
+  faq?: ProductFaq;
+  warranty?: string;
+  stock?: number;
+  low_stock_threshold?: number;
+  rating?: number;
+  review_count?: number;
+  sold_count?: number;
+  is_active?: boolean;
+  is_featured?: boolean;
+  is_bestseller?: boolean;
+  is_new_arrival?: boolean;
+  slug?: string;
+}
+export interface Category {
+  id: string;
+  name: string;
+  slug?: string;
+  parent_id?: string | null;
+  description?: string;
+  image?: string;
+  icon?: string;
+  children?: Category[];
+}
+export interface Brand {
+  id?: string;
+  name: string;
+  slug?: string;
+  image?: string;
+}
+export interface Banner {
+  id: string;
+  title?: string;
+  subtitle?: string;
+  image?: string;
+  video?: string;
+  poster?: string;
+  promo_code?: string;
+  cta_label?: string;
+  cta_url?: string;
+  active?: boolean;
+}
+export interface PageSectionItem {
+  id?: string;
+  image?: string;
+  video?: string;
+  poster?: string;
+  lottie?: string;
+  title?: string;
+  subtitle?: string;
+  link?: string;
+  label?: string;
+  [key: string]: unknown;
+}
+export interface PageSection {
+  id: string;
+  page?: string;
+  type: string;
+  title?: string;
+  subtitle?: string;
+  eyebrow?: string;
+  description?: string;
+  image?: string;
+  image_alt?: string;
+  cta_label?: string;
+  cta_link?: string;
+  bg_color?: string;
+  brand_label?: string;
+  local_label?: string;
+  others_label?: string;
+  badge_label?: string;
+  badge_label_2?: string;
+  limit?: number | null;
+  items?: PageSectionItem[];
+  extras?: Record<string, unknown>;
+  order?: number;
+  active?: boolean;
+}
+export interface HomeSection {
+  id: string;
+  title?: string;
+  type: string;
+  layout?: string;
+  products?: Product[];
+  product_ids?: string[];
+  category?: Category;
+  category_id?: string;
+  limit?: number;
+  order?: number;
+  active?: boolean;
+  banner?: Banner;
+  items?: unknown[];
+}
+export interface SiteMedia {
+  id?: string;
+  section?: string;
+  type?: "image" | "video";
+  image?: string;
+  video?: string;
+  poster?: string;
+  title?: string;
+  subtitle?: string;
+  cta_label?: string;
+  cta_url?: string;
+}
+export interface StoreLocation {
+  id?: string;
+  name: string;
+  city: string;
+  image?: string;
+  address?: string;
+  map_url?: string;
+  phone?: string;
+  hours?: string;
+  city_order?: number;
+  order?: number;
+  active?: boolean;
+}
+export interface GardenServiceSection {
+  title?: string;
+  body?: string;
+  image?: string;
+  cta_label?: string;
+  active?: boolean;
+  hero_title?: string;
+  hero_subtitle?: string;
+  hero_image?: string;
+  hero_cta_label?: string;
+  hero_overlay?: boolean;
+  page_title?: string;
+  page_subtitle?: string;
+  page_image?: string;
+  services_title?: string;
+  services_note?: string;
+  why_title?: string;
+  why_points?: string[];
+  split_image_1?: string;
+  split_image_2?: string;
+  form_title?: string;
+  form_note?: string;
+  form_cta_label?: string;
+  locations?: string[];
+  phone?: string;
+  hours?: string;
+  whatsapp?: string;
+  process_title?: string;
+  process_note?: string;
+  clients_title?: string;
+  clients_note?: string;
+  projects_title?: string;
+  steps_title?: string;
+  testimonials_title?: string;
+  about_title?: string;
+  about_body?: string;
+  faq_title?: string;
+  seo_body?: string;
+  contact_note?: string;
+}
+export interface PressSection {
+  active?: boolean;
+  title?: string;
+}
+export interface PressLogo {
+  id?: string;
+  name: string;
+  image: string;
+  url?: string;
+  order?: number;
+  active?: boolean;
+}
+export interface GiftingSection {
+  active?: boolean;
+  title?: string;
+  body?: string;
+  brands_line?: string;
+  image?: string;
+  primary_label?: string;
+  primary_url?: string;
+  secondary_label?: string;
+  secondary_url?: string;
+}
+export interface GardenBlock {
+  id?: string;
+  kind?: string;
+  title?: string;
+  body?: string;
+  image?: string;
+  author?: string;
+  order?: number;
+  active?: boolean;
+}
 export type GardenBlocks = Record<string, GardenBlock[]>;
-export interface GardenService { id?: string; title: string; summary?: string; description?: string; image?: string; price_from?: string; duration?: string; features?: string[]; order?: number; active?: boolean }
-export interface Coupon { id?: string; code: string; description?: string; type?: "percent" | "flat"; value?: number; min_order?: number; max_discount?: number; free_shipping?: boolean; first_order_only?: boolean; valid_from?: string | null; valid_until?: string | null; usage_limit?: number; used_count?: number; active?: boolean; locked?: boolean; needed_more?: number }
-export interface ApplicableCoupon { code: string; type?: "percent" | "flat"; value?: number; min_order?: number; max_discount?: number; description?: string; first_order_only?: boolean; free_shipping?: boolean; applicable: boolean; discount: number; needed_more: number }
-export interface ApplicableCoupons { offers: ApplicableCoupon[]; best_code: string | null; best_discount: number }
-export interface ComboEntry { key: string; product_id: string; title: string; slug?: string | null; image?: string | null; size_variant?: string | null; pot_type?: string | null; sku?: string | null; price: number; mrp?: number | null; stock: number; in_stock: boolean }
-export interface Combo { id: string; name: string; description?: string; qty: number; price: number; product_ids?: string[]; products?: ComboEntry[]; pool_size?: number; is_fixed?: boolean; is_weight_based?: boolean; regular_total?: number | null; savings?: number; weight_target?: number | null; start_date?: string | null; end_date?: string | null; active?: boolean; image?: string }
-export interface ChatMessage { role: "user" | "assistant"; content: string }
-export interface MyReview extends Review { product_id: string; title?: string; text?: string; photos?: string[]; tags?: string[]; edited_at?: string; product?: { id: string; title: string; image?: string | null } | null }
-export interface Review { id: string; user_name?: string; rating: number; title?: string; comment?: string; images?: string[]; verified_buyer?: boolean; helpful_count?: number; created_at?: string }
-export interface ResolvedLocation { address: string; city: string; state: string; pincode: string; country: string; display_name: string; lat: number; lon: number }
-export interface Address { tag: string; name: string; house: string; area: string; city: string; state: string; pincode: string; phone: string; lat?: number | null; lng?: number | null }
-export interface OrderItemInput { product_id: string; qty: number; size_variant?: string | null; pot_type?: string | null }
-export interface OrderItem { product_id: string; product?: Product; title?: string; qty: number; size_variant?: string; pot_type?: string; unit_price?: number; total?: number; image?: string }
-export interface Order { id: string; order_number?: string; status: string; payment_status?: string; payment_method?: string; items: OrderItem[]; address?: Address; subtotal?: number; discount?: number; delivery?: number; tax?: number; total?: number; created_at?: string; tracking_id?: string; tracking_url?: string; estimated_delivery?: string }
-export interface OrderQuote { subtotal: number; discount: number; delivery: number; tax: number; total: number; cod_available?: boolean; coupon_code?: string; message?: string }
-export interface BlogBlock { type: "p" | "h2" | "quote" | "link" | string; text?: string; url?: string }
-export interface BlogPost { id?: string; slug?: string; key?: string; title: string; excerpt?: string; hero_image?: string; image?: string; author?: string; published_at?: string; date?: string; tag?: string; category?: string; tags?: string[]; featured?: boolean; published?: boolean; link?: string; link_label?: string; content?: string; body?: BlogBlock[]; blocks?: Array<{ type: string; content?: string; image?: string }> }
-export interface GoogleReview { id?: string; author_name?: string; rating: number; text?: string; time?: string; profile_photo_url?: string }
-export interface Wishlist { ids: string[]; items: Product[] }
-export interface Recommendation { title?: string; products: Product[] }
-export interface Settings { currency: string; currency_code?: string; tax_rate?: number; shop: { name: string; address?: string; phone?: string; email?: string; state?: string }; delivery?: { free_above?: number; [key: string]: unknown }; support?: { title?: string; note?: string; whatsapp?: string; hours?: string; socials?: Array<{ label: string; href: string }>; [key: string]: unknown }; plant_guarantee?: { enabled: boolean; days?: number; label?: string; description?: string }; cod?: { enabled?: boolean; max_order?: number; label?: string; note?: string }; announcements?: string[] }
-export interface User { id: string; name: string; email: string; phone?: string | null; avatar?: string | null; addresses?: Address[]; cart?: CartItem[]; created_at?: string | null }
-export interface AuthResponse { access_token: string; token_type?: string; user: User }
-export interface CheckoutResponse extends Omit<Order, "id" | "status" | "items"> { id?: string; order_id?: string; status?: string; items?: OrderItem[]; razorpay_order_id?: string; razorpay_amount?: number; razorpay_currency?: string; key_id?: string; amount?: number; currency?: string }
-export interface CartItem { product_id: string; title: string; image?: string; qty: number; size_variant?: string; pot_type?: string; unit_price: number; mrp?: number; stock?: number; sku?: string }
-export interface ApiValidationDetail { loc?: Array<string | number>; msg?: string; type?: string }
-export interface ApiError { status?: number; message: string; details?: ApiValidationDetail[] }
+export interface GardenService {
+  id?: string;
+  title: string;
+  summary?: string;
+  description?: string;
+  image?: string;
+  price_from?: string;
+  duration?: string;
+  features?: string[];
+  order?: number;
+  active?: boolean;
+}
+export interface Coupon {
+  id?: string;
+  code: string;
+  description?: string;
+  type?: "percent" | "flat";
+  value?: number;
+  min_order?: number;
+  max_discount?: number;
+  free_shipping?: boolean;
+  first_order_only?: boolean;
+  valid_from?: string | null;
+  valid_until?: string | null;
+  usage_limit?: number;
+  used_count?: number;
+  active?: boolean;
+  locked?: boolean;
+  needed_more?: number;
+}
+export interface ApplicableCoupon {
+  code: string;
+  type?: "percent" | "flat";
+  value?: number;
+  min_order?: number;
+  max_discount?: number;
+  description?: string;
+  first_order_only?: boolean;
+  free_shipping?: boolean;
+  applicable: boolean;
+  discount: number;
+  needed_more: number;
+}
+export interface ApplicableCoupons {
+  offers: ApplicableCoupon[];
+  best_code: string | null;
+  best_discount: number;
+}
+export interface ComboEntry {
+  key: string;
+  product_id: string;
+  title: string;
+  slug?: string | null;
+  image?: string | null;
+  size_variant?: string | null;
+  pot_type?: string | null;
+  sku?: string | null;
+  price: number;
+  mrp?: number | null;
+  stock: number;
+  in_stock: boolean;
+}
+export interface Combo {
+  id: string;
+  name: string;
+  description?: string;
+  qty: number;
+  price: number;
+  product_ids?: string[];
+  products?: ComboEntry[];
+  pool_size?: number;
+  is_fixed?: boolean;
+  is_weight_based?: boolean;
+  regular_total?: number | null;
+  savings?: number;
+  weight_target?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  active?: boolean;
+  image?: string;
+}
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+export interface MyReview extends Review {
+  product_id: string;
+  title?: string;
+  text?: string;
+  photos?: string[];
+  tags?: string[];
+  edited_at?: string;
+  product?: { id: string; title: string; image?: string | null } | null;
+}
+export interface Review {
+  id: string;
+  user_name?: string;
+  rating: number;
+  title?: string;
+  comment?: string;
+  images?: string[];
+  verified_buyer?: boolean;
+  helpful_count?: number;
+  created_at?: string;
+}
+export interface ResolvedLocation {
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+  display_name: string;
+  lat: number;
+  lon: number;
+}
+export interface Address {
+  tag: string;
+  name: string;
+  house: string;
+  area: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+  lat?: number | null;
+  lng?: number | null;
+}
+export interface OrderItemInput {
+  product_id: string;
+  qty: number;
+  size_variant?: string | null;
+  pot_type?: string | null;
+}
+export interface OrderItem {
+  product_id: string;
+  product?: Product;
+  title?: string;
+  qty: number;
+  size_variant?: string;
+  pot_type?: string;
+  unit_price?: number;
+  total?: number;
+  image?: string;
+}
+export interface Order {
+  id: string;
+  order_number?: string;
+  status: string;
+  payment_status?: string;
+  payment_method?: string;
+  items: OrderItem[];
+  address?: Address;
+  subtotal?: number;
+  discount?: number;
+  delivery?: number;
+  tax?: number;
+  total?: number;
+  created_at?: string;
+  tracking_id?: string;
+  tracking_url?: string;
+  estimated_delivery?: string;
+}
+export interface OrderQuote {
+  subtotal: number;
+  discount: number;
+  delivery: number;
+  tax: number;
+  total: number;
+  cod_available?: boolean;
+  coupon_code?: string;
+  message?: string;
+}
+export interface BlogBlock {
+  type: "p" | "h2" | "quote" | "link" | string;
+  text?: string;
+  url?: string;
+}
+export interface BlogPost {
+  id?: string;
+  slug?: string;
+  key?: string;
+  title: string;
+  excerpt?: string;
+  hero_image?: string;
+  image?: string;
+  author?: string;
+  published_at?: string;
+  date?: string;
+  tag?: string;
+  category?: string;
+  tags?: string[];
+  featured?: boolean;
+  published?: boolean;
+  link?: string;
+  link_label?: string;
+  content?: string;
+  body?: BlogBlock[];
+  blocks?: Array<{ type: string; content?: string; image?: string }>;
+}
+export interface GoogleReview {
+  id?: string;
+  author_name?: string;
+  rating: number;
+  text?: string;
+  time?: string;
+  profile_photo_url?: string;
+}
+export interface Wishlist {
+  ids: string[];
+  items: Product[];
+}
+export interface Recommendation {
+  title?: string;
+  products: Product[];
+}
+export interface RewardMilestone {
+  amount: number;
+  label: string;
+  caption?: string;
+  icon?: string;
+  kind?: "shipping" | "gift" | "discount" | string;
+}
+export interface RewardsConfig {
+  enabled?: boolean;
+  show_in_cart?: boolean;
+  show_sticky_bar?: boolean;
+  teaser?: string;
+  unlocked?: string;
+  milestones?: RewardMilestone[];
+}
+export interface Settings {
+  currency: string;
+  currency_code?: string;
+  tax_rate?: number;
+  shop: { name: string; address?: string; phone?: string; email?: string; state?: string };
+  delivery?: { free_above?: number; [key: string]: unknown };
+  support?: {
+    title?: string;
+    note?: string;
+    whatsapp?: string;
+    hours?: string;
+    socials?: Array<{ label: string; href: string }>;
+    [key: string]: unknown;
+  };
+  plant_guarantee?: { enabled: boolean; days?: number; label?: string; description?: string };
+  cod?: { enabled?: boolean; max_order?: number; label?: string; note?: string };
+  rewards?: RewardsConfig;
+  announcements?: string[];
+}
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  avatar?: string | null;
+  addresses?: Address[];
+  cart?: CartItem[];
+  created_at?: string | null;
+}
+export interface AuthResponse {
+  access_token: string;
+  token_type?: string;
+  user: User;
+}
+export interface CheckoutResponse extends Omit<Order, "id" | "status" | "items"> {
+  id?: string;
+  order_id?: string;
+  status?: string;
+  items?: OrderItem[];
+  razorpay_order_id?: string;
+  razorpay_amount?: number;
+  razorpay_currency?: string;
+  key_id?: string;
+  amount?: number;
+  currency?: string;
+}
+export interface CartItem {
+  product_id: string;
+  title: string;
+  image?: string;
+  qty: number;
+  size_variant?: string;
+  pot_type?: string;
+  unit_price: number;
+  mrp?: number;
+  stock?: number;
+  sku?: string;
+}
+export interface ApiValidationDetail {
+  loc?: Array<string | number>;
+  msg?: string;
+  type?: string;
+}
+export interface ApiError {
+  status?: number;
+  message: string;
+  details?: ApiValidationDetail[];
+}
 
 /* ── Support chat ───────────────────────────────────────────────────────── */
-export interface SupportAction { id: string; label: string; icon?: string; tone?: "danger" | "default" }
-export interface SupportOrderItem { product_id: string; title?: string; image?: string | null; qty?: number; size_variant?: string | null }
+export interface SupportAction {
+  id: string;
+  label: string;
+  icon?: string;
+  tone?: "danger" | "default";
+}
+export interface SupportOrderItem {
+  product_id: string;
+  title?: string;
+  image?: string | null;
+  qty?: number;
+  size_variant?: string | null;
+}
 export interface SupportOrderCard {
-  id: string; short: string; status: string; status_label: string; status_short: string; status_line: string;
-  stage_index: number; stages: Array<{ key: string; label: string }>;
-  cancellable: boolean; final: boolean; total?: number; currency?: string;
-  tracking_id?: string | null; tracking_url?: string | null; placed_at?: string | null;
+  id: string;
+  short: string;
+  status: string;
+  status_label: string;
+  status_short: string;
+  status_line: string;
+  stage_index: number;
+  stages: Array<{ key: string; label: string }>;
+  cancellable: boolean;
+  final: boolean;
+  total?: number;
+  currency?: string;
+  tracking_id?: string | null;
+  tracking_url?: string | null;
+  placed_at?: string | null;
   items: SupportOrderItem[];
 }
-export interface SupportConfirm { action: string; reasons: string[]; cta: string; dismiss: string }
+export interface SupportConfirm {
+  action: string;
+  reasons: string[];
+  cta: string;
+  dismiss: string;
+}
 export interface SupportReply {
-  reply: string; order: SupportOrderCard | null; actions: SupportAction[];
-  confirm?: SupportConfirm; timeline?: boolean; done?: boolean; escalated?: boolean; ticket_id?: string;
+  reply: string;
+  order: SupportOrderCard | null;
+  actions: SupportAction[];
+  confirm?: SupportConfirm;
+  timeline?: boolean;
+  done?: boolean;
+  escalated?: boolean;
+  ticket_id?: string;
 }
 export interface SupportOpening {
-  greeting: string[]; prompt: string; order: SupportOrderCard | null;
-  actions: SupportAction[]; questions: string[];
+  greeting: string[];
+  prompt: string;
+  order: SupportOrderCard | null;
+  actions: SupportAction[];
+  questions: string[];
 }

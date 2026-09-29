@@ -17,6 +17,7 @@ import { AccountMenu } from "@/components/layout/account-menu";
 import { SupportChat } from "@/components/support/support-chat";
 
 import { CartDrawer } from "@/components/commerce/cart-drawer";
+import { RewardBar } from "@/components/commerce/reward-rail";
 import type { Settings } from "@/types/api";
 
 function NavLinks({
@@ -342,6 +343,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </a>
       )}
       <CartDrawer />
+      <RewardBar />
     </div>
   );
 }
