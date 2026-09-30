@@ -45,7 +45,11 @@ export function NatureAcrossIndiaSection({
   }, []);
 
   return (
-    <section className="bg-white pt-14 lg:pt-20">
+    <>
+      {/* The footer carries an `mt-10` that every page relies on; cancelling it
+          here lets the illustration rest straight on the green band without
+          changing that spacing anywhere else. */}
+      <section className="-mb-10 bg-white pt-10 lg:pt-12">
       <style>{`
         @keyframes mygarden-pin-drop {
           0%   { opacity: 0; transform: translateY(-30px) scale(0.6); }
@@ -89,13 +93,13 @@ export function NatureAcrossIndiaSection({
         <div
           ref={mapRef}
           data-pins-dropped={dropped}
-          className="flex flex-col items-center pb-12 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:pb-16"
+          className="flex flex-col items-center pb-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:pb-10"
         >
           <svg
             viewBox={INDIA_VIEWBOX}
             role="img"
             aria-label={`Delivery reach across India — ${statValue} cities covered`}
-            className="h-auto w-full max-w-[520px]"
+            className="h-auto w-full max-w-[430px]"
           >
             <g fill="#ffffff" stroke="#d8d4cb" strokeWidth="1" strokeLinejoin="round">
               {INDIA_STATE_PATHS.map((d, index) => (
@@ -119,7 +123,7 @@ export function NatureAcrossIndiaSection({
             ))}
           </svg>
 
-          <div className="mt-2 w-full max-w-[520px] text-left lg:-mt-24 lg:self-end lg:text-right">
+          <div className="mt-2 w-full max-w-[430px] text-left lg:-mt-20 lg:self-end lg:text-right">
             <p className="text-5xl font-bold leading-none text-[#0f7a3d] sm:text-6xl lg:text-7xl">{statValue}</p>
             <p className="mt-3 max-w-[360px] text-sm leading-6 text-[#4a4a46] sm:text-base lg:ml-auto">{statLabel}</p>
           </div>
@@ -129,9 +133,10 @@ export function NatureAcrossIndiaSection({
           src={image}
           alt="Two people planting a sapling together"
           loading="lazy"
-          className="block w-full max-w-[560px] self-end object-contain lg:col-start-1 lg:row-start-2"
+          className="block w-full max-w-[640px] self-end object-contain lg:col-start-1 lg:row-start-2"
         />
       </div>
-    </section>
+      </section>
+    </>
   );
 }
