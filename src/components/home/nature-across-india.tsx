@@ -45,7 +45,7 @@ export function NatureAcrossIndiaSection({
   }, []);
 
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section className="bg-white pt-14 lg:pt-20">
       <style>{`
         @keyframes mygarden-pin-drop {
           0%   { opacity: 0; transform: translateY(-30px) scale(0.6); }
@@ -60,8 +60,14 @@ export function NatureAcrossIndiaSection({
           transform-box: fill-box;
           transform-origin: center;
         }
+        @keyframes mygarden-pin-bob {
+          0%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+          50%      { opacity: 1; transform: translateY(-5px) scale(1.06); }
+        }
         [data-pins-dropped="true"] .mygarden-pin {
-          animation: mygarden-pin-drop 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+          animation:
+            mygarden-pin-drop 900ms cubic-bezier(0.22, 1, 0.36, 1) both,
+            mygarden-pin-bob 2200ms ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
           .mygarden-pin { opacity: 1; }
@@ -69,22 +75,22 @@ export function NatureAcrossIndiaSection({
         }
       `}</style>
 
-      <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-10">
-        <div>
+      {/* The copy, the map and the illustration are siblings rather than two
+          stacked columns, so the illustration can be the last thing in the grid
+          and sit flush on the footer while the rest keeps its bottom spacing. */}
+      <div className="mx-auto grid max-w-[1280px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-8 lg:gap-y-0 lg:px-10">
+        <div className="lg:col-start-1 lg:row-start-1">
           <h2 className="max-w-[460px] text-3xl font-bold leading-tight text-[#12100e] sm:text-4xl lg:text-[2.75rem]">
             {title}
           </h2>
           <p className="mt-4 max-w-[420px] text-base leading-7 text-[#4a4a46] sm:text-lg">{subtitle}</p>
-
-          <img
-            src={image}
-            alt="Two people planting a sapling together"
-            loading="lazy"
-            className="mt-8 w-full max-w-[560px] object-contain lg:mt-12"
-          />
         </div>
 
-        <div ref={mapRef} data-pins-dropped={dropped} className="flex flex-col items-center">
+        <div
+          ref={mapRef}
+          data-pins-dropped={dropped}
+          className="flex flex-col items-center pb-12 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:pb-16"
+        >
           <svg
             viewBox={INDIA_VIEWBOX}
             role="img"
@@ -98,7 +104,9 @@ export function NatureAcrossIndiaSection({
             </g>
             {INDIA_PINS.map((pin, index) => (
               <g key={pin.id} transform={`translate(${pin.x} ${pin.y})`}>
-                <g className="mygarden-pin" style={{ animationDelay: `${index * 60}ms` }}>
+                {/* Two delays: when this marker drops, then when it starts to
+                    bob — the second waits out the drop so they never overlap. */}
+                <g className="mygarden-pin" style={{ animationDelay: `${index * 60}ms, ${index * 60 + 900}ms` }}>
                   <circle r="10" fill="#e8f3df" stroke="#5a9e2f" strokeWidth="1.5" />
                   {/* A leaf, matching the mark the brand uses elsewhere. */}
                   <path
@@ -116,6 +124,13 @@ export function NatureAcrossIndiaSection({
             <p className="mt-3 max-w-[360px] text-sm leading-6 text-[#4a4a46] sm:text-base lg:ml-auto">{statLabel}</p>
           </div>
         </div>
+
+        <img
+          src={image}
+          alt="Two people planting a sapling together"
+          loading="lazy"
+          className="block w-full max-w-[560px] self-end object-contain lg:col-start-1 lg:row-start-2"
+        />
       </div>
     </section>
   );
