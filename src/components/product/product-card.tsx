@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Flower2, Heart, Leaf, PawPrint, Sparkles, Star, Wind } from "lucide-react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { AddToBasketButton, type QuickAddItem } from "@/components/product/cart-actions";
+import { LOTTIE_ICONS } from "@/components/shared/lottie-icon";
 import type { Product, ProductSize } from "@/types/api";
 
 export const money = (value: number) =>
@@ -29,17 +31,25 @@ function sizeLabel(name: string) {
 /* Admin types a colour name ("Ivory") or a hex ("#1B4DB1"); both work as CSS. */
 const swatchColor = (value: string) => (value.startsWith("#") ? value : value.toLowerCase());
 
+interface BenefitPill {
+  icon: typeof Leaf;
+  lottie?: string;
+  label: string;
+  tone: string;
+}
+
 /* Up to two benefit pills, straight from the plant spec the admin fills in. */
-function benefitPills(product: Product) {
+function benefitPills(product: Product): BenefitPill[] {
   const spec = product.plant_spec ?? {};
   const difficulty = String(spec.difficulty ?? spec.difficulty_level ?? "").toLowerCase();
-  return [
-    spec.pet_safe ? { icon: PawPrint, label: "Pet Safe", tone: "bg-[#eef2ff] text-[#3730a3]" } : null,
-    spec.air_purifying ? { icon: Wind, label: "Air Purifying", tone: "bg-[#e6f6ef] text-forest" } : null,
-    difficulty === "easy" ? { icon: Leaf, label: "Low Maintenance", tone: "bg-[#fdf3e3] text-[#8a5a1a]" } : null,
+  const all: (BenefitPill | null)[] = [
+    spec.pet_safe ? { icon: PawPrint, lottie: LOTTIE_ICONS.petSafe, label: "Pet Safe", tone: "bg-[#eef2ff] text-[#3730a3]" } : null,
+    spec.air_purifying ? { icon: Wind, lottie: LOTTIE_ICONS.airPurifying, label: "Air Purifying", tone: "bg-[#e6f6ef] text-forest" } : null,
+    difficulty === "easy" ? { icon: Leaf, lottie: LOTTIE_ICONS.lowMaintenance, label: "Low Maintenance", tone: "bg-[#fdf3e3] text-[#8a5a1a]" } : null,
     spec.flowering ? { icon: Flower2, label: "Flowering", tone: "bg-[#fdeef4] text-[#9d2b5a]" } : null,
     spec.fragrant ? { icon: Sparkles, label: "Fragrant", tone: "bg-[#f3eefd] text-[#5b3a9d]" } : null,
-  ].filter((pill): pill is { icon: typeof Leaf; label: string; tone: string } => pill !== null).slice(0, 2);
+  ];
+  return all.filter((pill): pill is BenefitPill => pill !== null).slice(0, 2);
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -119,7 +129,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <span className="absolute bottom-3 right-3 flex size-9 translate-y-2 items-center justify-center rounded-full bg-white/95 text-forest opacity-0 shadow-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <Heart className="size-4" aria-hidden />
+          <DotLottieReact src={LOTTIE_ICONS.heartBeat} loop autoplay className="size-6" />
         </span>
 
         {stock < 1 && (
@@ -157,9 +167,13 @@ export function ProductCard({ product }: { product: Product }) {
 
         {pills.length > 0 && (
           <ul className="mt-2.5 flex flex-wrap gap-1.5">
-            {pills.map(({ icon: Icon, label, tone }) => (
+            {pills.map(({ icon: Icon, lottie, label, tone }) => (
               <li key={label} className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium ${tone}`}>
-                <Icon className="size-3" aria-hidden />
+                {lottie ? (
+                  <DotLottieReact src={lottie} loop autoplay className="size-4" />
+                ) : (
+                  <Icon className="size-3" aria-hidden />
+                )}
                 {label}
               </li>
             ))}

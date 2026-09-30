@@ -15,6 +15,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Avatar } from "@/components/account/account-shell";
 import { AccountMenu } from "@/components/layout/account-menu";
 import { SupportChat } from "@/components/support/support-chat";
+import { LottieIcon, LOTTIE_ICONS } from "@/components/shared/lottie-icon";
 
 import { CartDrawer } from "@/components/commerce/cart-drawer";
 import { RewardBar } from "@/components/commerce/reward-rail";
@@ -138,7 +139,9 @@ function HeaderSearch() {
         if (q) void navigate({ to: "/search", search: { q } });
       }}
     >
-      <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-forest" />
+      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-forest">
+        <LottieIcon src={LOTTIE_ICONS.magnifier} fallback={Search} className="size-4" autoplay loop label="Search" />
+      </span>
       <input
         value={search}
         onChange={(event) => setSearch(event.target.value)}
@@ -188,7 +191,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               onClick={openCart}
               aria-label={`Cart with ${count} items`}
             >
-              <ShoppingBag />
+              <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-5" label="Cart" />
               {count > 0 && (
                 <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                   {count}
@@ -251,13 +254,13 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center justify-end gap-0.5">
             <Button variant="ghost" size="icon" asChild className="lg:hidden">
               <Link to="/search" search={{}} aria-label="Search">
-                <Search />
+                <LottieIcon src={LOTTIE_ICONS.search} fallback={Search} className="size-5" label="Search" />
               </Link>
             </Button>
             <AccountMenu />
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex">
               <Link to="/wishlist" aria-label="Wishlist">
-                <Heart />
+                <LottieIcon src={LOTTIE_ICONS.heartPinch} fallback={Heart} className="size-5" label="Wishlist" />
               </Link>
             </Button>
             <Button
@@ -268,7 +271,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               onClick={openCart}
               aria-label={`Cart with ${count} items`}
             >
-              <ShoppingBag />
+              <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-5" label="Cart" />
               {count > 0 && (
                 <span className="absolute right-0 top-0 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                   {count}
@@ -370,18 +373,18 @@ function MobileTabBar() {
         Shop
       </Link>
       <Link to="/search" search={{}} className={item} activeProps={active}>
-        <Search className="size-5" />
+        <LottieIcon src={LOTTIE_ICONS.search} fallback={Search} className="size-5" label="Search" />
         Search
       </Link>
       <Link to="/wishlist" className={item} activeProps={active}>
-        <Heart className="size-5" />
+        <LottieIcon src={LOTTIE_ICONS.heartPinch} fallback={Heart} className="size-5" label="Wishlist" />
         Wishlist
       </Link>
       <button type="button" data-cart-target onClick={openCart} className={item}>
         {/* The badge hangs off the icon, not the tab — the tabs got narrower
             when Profile joined them, and a tab-anchored badge drifts. */}
         <span className="relative">
-          <ShoppingBag className="size-5" />
+          <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-5" label="Cart" />
           {count > 0 && (
             <span className="absolute -right-2 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
               {count}

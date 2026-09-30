@@ -7,6 +7,7 @@ import { ProductGrid } from "@/components/product/product-card";
 import { EmptyState } from "@/components/shared/page-state";
 import { useTypewriter } from "@/hooks/use-typewriter";
 import { SEARCH_PHRASES } from "@/lib/search-phrases";
+import { LottieIcon, LOTTIE_ICONS } from "@/components/shared/lottie-icon";
 import { Input } from "@/components/ui/input";
 import type { Product } from "@/types/api";
 
@@ -51,7 +52,9 @@ function SearchPage() {
     <div className="mx-auto max-w-[1480px] px-4 py-10 sm:px-6 lg:px-10">
       <h1 className="text-3xl sm:text-4xl">Search the nursery</h1>
       <form className="relative mt-6 max-w-2xl" onSubmit={(e) => e.preventDefault()} role="search">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
+        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+          <LottieIcon src={LOTTIE_ICONS.search} fallback={Search} className="size-5" autoplay loop label="Search" />
+        </span>
         <Input
           name="q"
           value={q}

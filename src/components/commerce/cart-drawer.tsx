@@ -18,6 +18,7 @@ import { SlideToCheckout } from "@/components/commerce/slide-to-checkout";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
+import { LottieIcon, LOTTIE_ICONS } from "@/components/shared/lottie-icon";
 import type { CartItem, Product } from "@/types/api";
 
 const inr = (value: number) => `₹${value.toLocaleString("en-IN")}`;
@@ -102,7 +103,7 @@ export function CartDrawer() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <span className="flex size-16 items-center justify-center rounded-full bg-primary-soft text-forest">
-                <ShoppingBag className="size-7" />
+              <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-7" autoplay loop label="Empty cart" />
               </span>
               <p className="mt-5 font-display text-xl font-bold text-forest">Your cart is empty</p>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -285,7 +286,7 @@ export function CartDrawer() {
                             }}
                             className="flex size-9 items-center justify-center rounded-full bg-forest text-forest-foreground transition-colors duration-200 hover:bg-forest/90 disabled:opacity-40"
                           >
-                            <ShoppingBag className="size-4" />
+                            <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-4" label="Add to cart" />
                           </button>
                         </div>
                       </div>
