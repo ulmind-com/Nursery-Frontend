@@ -16,6 +16,7 @@ import {
   storesApi,
 } from "@/api/services";
 import { SectionRenderer } from "@/components/home/section-renderer";
+import { NatureAcrossIndiaSection } from "@/components/home/nature-across-india";
 import { FALLBACK_HOME_SECTIONS, type HomeData, type HomeRail } from "@/components/home/home-data";
 import { displayName } from "@/config/brand";
 import type { GoogleReview, Product } from "@/types/api";
@@ -136,6 +137,9 @@ function HomePage() {
       {layout.map((section) => (
         <SectionRenderer key={section.id} section={section} ctx={ctx} />
       ))}
+      {/* Closes the page whatever the stored band order is, so it always sits
+          directly above the footer. */}
+      <NatureAcrossIndiaSection />
     </>
   );
 }
