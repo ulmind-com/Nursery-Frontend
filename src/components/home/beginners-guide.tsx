@@ -58,7 +58,7 @@ export function BeginnersGuideSection({
   image?: string;
 }) {
   return (
-    <section className="relative overflow-hidden bg-[#faf7ef] py-14 lg:py-20">
+    <section className="relative overflow-hidden bg-[#faf7ef] py-10 lg:py-12">
       {/* Decorative foliage — purely ornamental, so it never takes pointer events. */}
       <img
         src={`${ART_DIR}/top leaves image.png`}
@@ -78,14 +78,14 @@ export function BeginnersGuideSection({
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <h2 className="text-center text-3xl font-bold leading-tight text-[#12100e] sm:text-4xl lg:text-5xl">{title}</h2>
 
-        <div className="mt-10 grid items-center gap-8 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)_minmax(0,1fr)] lg:gap-6">
-          <ul className="order-2 flex flex-col gap-10 lg:order-1 lg:gap-32">
+        <div className="mt-6 grid items-center gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)_minmax(0,1fr)] lg:gap-6">
+          <ul className="order-2 flex flex-col gap-8 lg:order-1 lg:gap-24">
             {leftTips.map((tip) => (
               <Tip key={tip.id} tip={tip} side="left" />
             ))}
           </ul>
 
-          <div className="order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-none">
+          <div className="order-1 mx-auto w-full max-w-[240px] lg:order-2 lg:max-w-none">
             <img
               src={image}
               alt="Potted indoor plant in a white ceramic pot"
@@ -94,14 +94,14 @@ export function BeginnersGuideSection({
             />
           </div>
 
-          <ul className="order-3 flex flex-col gap-10 lg:gap-32">
+          <ul className="order-3 flex flex-col gap-8 lg:gap-24">
             {rightTips.map((tip) => (
               <Tip key={tip.id} tip={tip} side="right" />
             ))}
           </ul>
         </div>
 
-        <p className="mt-8 text-center text-base font-medium leading-7 text-[#12100e] sm:text-lg lg:-mt-2 lg:text-xl">{bottomTip}</p>
+        <p className="mt-6 text-center text-base font-medium leading-7 text-[#12100e] sm:text-lg lg:-mt-2 lg:text-xl">{bottomTip}</p>
       </div>
     </section>
   );
