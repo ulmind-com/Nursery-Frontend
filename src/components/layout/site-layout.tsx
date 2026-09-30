@@ -140,7 +140,7 @@ function HeaderSearch() {
       }}
     >
       <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-forest">
-        <LottieIcon src={LOTTIE_ICONS.magnifier} fallback={Search} className="size-4" autoplay loop label="Search" />
+        <LottieIcon src={LOTTIE_ICONS.magnifier} fallback={Search} className="size-5" label="Search" />
       </span>
       <input
         value={search}

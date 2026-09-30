@@ -286,7 +286,7 @@ export function CartDrawer() {
                             }}
                             className="flex size-9 items-center justify-center rounded-full bg-forest text-forest-foreground transition-colors duration-200 hover:bg-forest/90 disabled:opacity-40"
                           >
-                            <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-4" label="Add to cart" />
+                            <LottieIcon src={LOTTIE_ICONS.shoppingBag} fallback={ShoppingBag} className="size-5" label="Add to cart" />
                           </button>
                         </div>
                       </div>

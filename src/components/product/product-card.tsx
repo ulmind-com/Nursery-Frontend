@@ -170,7 +170,7 @@ export function ProductCard({ product }: { product: Product }) {
             {pills.map(({ icon: Icon, lottie, label, tone }) => (
               <li key={label} className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium ${tone}`}>
                 {lottie ? (
-                  <DotLottieReact src={lottie} loop autoplay className="size-4" />
+                  <DotLottieReact src={lottie} loop autoplay className="size-5" />
                 ) : (
                   <Icon className="size-3" aria-hidden />
                 )}

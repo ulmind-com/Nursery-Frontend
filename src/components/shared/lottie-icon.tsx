@@ -29,8 +29,8 @@ export function LottieIcon({
   src,
   fallback: Icon,
   className = "size-5",
-  loop = false,
-  autoplay = false,
+  loop = true,
+  autoplay = true,
   label,
 }: LottieIconProps) {
   const [failed, setFailed] = useState(false);
