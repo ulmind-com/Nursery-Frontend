@@ -25,6 +25,7 @@ import { ComboBand } from "@/components/home/combo-band";
 import { ShopBySpaceSection, spaceCardsFromCategories, defaultSpaceCards } from "@/components/home/shop-by-space";
 import { TrustBar } from "@/components/home/trust-bar";
 import { ProductRail } from "@/components/home/section-rail";
+import { BeginnersGuideSection } from "@/components/home/beginners-guide";
 import { FarmToHomeSection, defaultFarmCards } from "@/components/home/farm-to-home";
 import { BrandComparisonSection, type ComparisonRow } from "@/components/home/brand-comparison";
 import { GrowGardenBanner } from "@/components/home/grow-garden-banner";
@@ -269,6 +270,8 @@ export function SectionRenderer({ section, ctx }: { section: PageSection; ctx: H
       return <TrustBar settings={ctx.settings} />;
 
     case "product_rails":
+      /* The care-basics band closes the rails, so it follows them here rather
+         than as its own band — the stored layout has no slot for it yet. */
       return (
         <>
           {ctx.rails.map((rail) => (
@@ -276,6 +279,7 @@ export function SectionRenderer({ section, ctx }: { section: PageSection; ctx: H
               <ProductRail {...(rail.eyebrow ? { eyebrow: rail.eyebrow } : {})} title={rail.title} products={rail.products} />
             </div>
           ))}
+          <BeginnersGuideSection />
         </>
       );
 
