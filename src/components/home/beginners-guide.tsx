@@ -24,22 +24,31 @@ function Arrow({ flip = false }: { flip?: boolean }) {
   return (
     <svg
       aria-hidden="true"
-      viewBox="0 0 140 16"
-      className={`hidden h-4 shrink-0 text-[#0f7a5a] lg:block lg:w-[124px] ${flip ? "rotate-180" : ""}`}
+      viewBox="0 0 116 14"
+      className={`hidden h-3.5 shrink-0 text-[#2b7a63] lg:block lg:w-[116px] ${flip ? "rotate-180" : ""}`}
       fill="none"
     >
-      <path d="M0 8h126" stroke="currentColor" strokeWidth="2" />
-      <path d="M126 2l12 6-12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M0 7h104" stroke="currentColor" strokeWidth="1.75" />
+      <path d="M103 1.5L115 7l-12 5.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function Tip({ tip, side }: { tip: BeginnerGuideTip; side: "left" | "right" }) {
+  /* The arrow floats in the space between the note and the plant rather than
+     hanging off the text, so both gaps stay even however the note wraps. */
+  const arrow = (
+    <span className="hidden flex-1 justify-center lg:flex">
+      <Arrow flip={side === "right"} />
+    </span>
+  );
   return (
-    <li className="flex items-center gap-3 lg:gap-5">
-      {side === "right" ? <Arrow flip /> : null}
-      <p className="flex-1 text-base font-medium leading-7 text-[#12100e] sm:text-lg lg:text-xl lg:leading-8">{tip.text}</p>
-      {side === "left" ? <Arrow /> : null}
+    <li className="flex items-center">
+      {side === "right" ? arrow : null}
+      <p className="w-full text-base font-medium leading-7 text-[#12100e] sm:text-lg lg:w-[340px] lg:flex-none lg:text-xl lg:leading-8">
+        {tip.text}
+      </p>
+      {side === "left" ? arrow : null}
     </li>
   );
 }
@@ -48,7 +57,7 @@ export function BeginnersGuideSection({
   title = "A Beginners Guide",
   leftTips = defaultLeftTips,
   rightTips = defaultRightTips,
-  bottomTip = "Water only when the top soil feels dry",
+  bottomTip = "Water when the top soil feels dry",
   image = `${ART_DIR}/tree.png`,
 }: {
   title?: string;
