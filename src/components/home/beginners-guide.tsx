@@ -19,18 +19,16 @@ const defaultRightTips: BeginnerGuideTip[] = [
   { id: "soil", text: "Use well-drained soil and the right pot" },
 ];
 
-/* One flat arrow, drawn once and mirrored for the right-hand column. */
+/* The arrow is supplied as artwork; the right-hand column mirrors it. */
 function Arrow({ flip = false }: { flip?: boolean }) {
   return (
-    <svg
+    <img
+      src={`${ART_DIR}/arrow sign.png`}
+      alt=""
       aria-hidden="true"
-      viewBox="0 0 116 14"
-      className={`hidden h-3.5 shrink-0 text-[#2b7a63] lg:block lg:w-[116px] ${flip ? "rotate-180" : ""}`}
-      fill="none"
-    >
-      <path d="M0 7h104" stroke="currentColor" strokeWidth="1.75" />
-      <path d="M103 1.5L115 7l-12 5.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+      loading="lazy"
+      className={`hidden w-[150px] shrink-0 select-none lg:block ${flip ? "rotate-180" : ""}`}
+    />
   );
 }
 
@@ -74,14 +72,14 @@ export function BeginnersGuideSection({
         alt=""
         aria-hidden="true"
         loading="lazy"
-        className="pointer-events-none absolute -left-8 top-0 w-28 select-none opacity-90 sm:w-56 lg:-left-6 lg:w-80"
+        className="pointer-events-none absolute left-0 top-0 w-24 select-none sm:w-36 lg:w-52"
       />
       <img
         src={`${ART_DIR}/bottom leaves image.png`}
         alt=""
         aria-hidden="true"
         loading="lazy"
-        className="pointer-events-none absolute -right-8 -bottom-2 w-28 select-none opacity-90 sm:w-56 lg:-right-6 lg:w-80"
+        className="pointer-events-none absolute bottom-0 right-0 w-24 select-none sm:w-36 lg:w-52"
       />
 
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">

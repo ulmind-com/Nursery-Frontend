@@ -269,19 +269,28 @@ export function SectionRenderer({ section, ctx }: { section: PageSection; ctx: H
     case "trust_bar":
       return <TrustBar settings={ctx.settings} />;
 
-    case "product_rails":
-      /* The care-basics band closes the rails, so it follows them here rather
-         than as its own band — the stored layout has no slot for it yet. */
+    case "product_rails": {
+      /* The care-basics band belongs directly under "Recommended for you", so it
+         is emitted after that rail rather than as its own band — the stored
+         layout has no slot for a new type yet. With no recommendation feed the
+         rail never renders, and the band closes the rails instead. */
+      const guideAfter = ctx.rails.some((rail) => rail.key === "recommended")
+        ? "recommended"
+        : ctx.rails[ctx.rails.length - 1]?.key;
       return (
         <>
           {ctx.rails.map((rail) => (
-            <div key={rail.key} className={rail.featured ? "bg-primary-tint" : ""}>
-              <ProductRail {...(rail.eyebrow ? { eyebrow: rail.eyebrow } : {})} title={rail.title} products={rail.products} />
+            <div key={rail.key}>
+              <div className={rail.featured ? "bg-primary-tint" : ""}>
+                <ProductRail {...(rail.eyebrow ? { eyebrow: rail.eyebrow } : {})} title={rail.title} products={rail.products} />
+              </div>
+              {rail.key === guideAfter ? <BeginnersGuideSection /> : null}
             </div>
           ))}
-          <BeginnersGuideSection />
+          {guideAfter === undefined ? <BeginnersGuideSection /> : null}
         </>
       );
+    }
 
     case "google_reviews":
       return (
