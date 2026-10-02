@@ -21,6 +21,13 @@ import { CartDrawer } from "@/components/commerce/cart-drawer";
 import { RewardBar } from "@/components/commerce/reward-rail";
 import type { Settings } from "@/types/api";
 
+/* What the bundled nav already covers. A live category on one of these slugs
+   would only repeat a link the row already has. */
+const NAV_SLUGS = new Set([
+  "plants", "pots", "plant-care", "seeds", "combos", "gifting", "corporate-gifts",
+  "garden-services", "offers", "journal", "blog", "locate-store",
+]);
+
 function NavLinks({
   className,
   activeClassName,
@@ -170,6 +177,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   });
   /* Home-section trees (Shop by Space) stay out of the shop navigation */
   const categories = navCategories(allCategories);
+  const extraCategories = categories
+    .filter((cat) => !NAV_SLUGS.has((cat.slug || "").toLowerCase()))
+    .slice(0, 3);
 
   const whatsapp = settings?.support?.whatsapp || "918537861040";
   const isCheckout = path.startsWith("/checkout");
@@ -280,8 +290,15 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </div>
+        {/* The standing nav, with any category the admin has added that the row
+            does not already cover appended to it — a new category extends the
+            nav rather than replacing everything in it. */}
         <nav className="mx-auto hidden h-11 max-w-[1480px] items-center justify-center gap-8 overflow-hidden px-9 lg:flex">
-          {categories.slice(0, 7).map((category) => (
+          <NavLinks
+            className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary"
+            activeClassName="text-primary"
+          />
+          {extraCategories.map((category) => (
             <Link
               key={category.id}
               to="/category/$slug"
@@ -292,12 +309,6 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               {category.name}
             </Link>
           ))}
-          {categories.length === 0 && (
-            <NavLinks
-              className="shrink-0 text-[13px] font-medium text-foreground/80 transition-colors duration-200 hover:text-primary"
-              activeClassName="text-primary"
-            />
-          )}
         </nav>
       </header>
       <main>{children}</main>
