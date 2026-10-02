@@ -46,7 +46,7 @@ function NavLinks({
       <Link to="/plants" search={{ q: "plant care" }} {...props}>
         Plant Care
       </Link>
-      <Link to="/plants" search={{ q: "seeds" }} {...props}>
+      <Link to="/category/$slug" params={{ slug: "seeds" }} {...props}>
         Seeds
       </Link>
       <Link to="/combos" {...props}>

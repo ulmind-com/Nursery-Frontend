@@ -1,6 +1,7 @@
 /* The green band of round category tiles under the hero. Tiles come from the
-   admin's category tree; the bundled artwork below is only used while the
-   catalogue is still empty. */
+   admin's category tree, and the bundled artwork below fills the row out to
+   nine while the catalogue still has departments the admin has not created —
+   a single live category must not leave the band with one tile in it. */
 
 import { Link } from "@tanstack/react-router";
 import { Leaf } from "lucide-react";
@@ -34,6 +35,10 @@ export function CategoryStrip({
   limit?: number;
 }) {
   const live = navCategories(categories).slice(0, limit);
+  const liveSlugs = new Set(live.map((cat) => (cat.slug || "").toLowerCase()));
+  const filler = fallbackShortcuts
+    .filter((shortcut) => !liveSlugs.has(shortcut.slug))
+    .slice(0, Math.max(0, limit - live.length));
 
   return (
     <section className="mt-6 min-w-0 overflow-hidden bg-forest px-3 py-5 sm:px-6 sm:py-7 lg:mt-8 lg:px-9 lg:py-8">
@@ -59,15 +64,14 @@ export function CategoryStrip({
             </Link>
           ))}
 
-          {live.length === 0 &&
-            fallbackShortcuts.slice(0, limit).map(({ name, slug, image }) => (
-              <Link key={name} to="/category/$slug" params={{ slug }} className={TILE}>
-                <div className={TILE_IMG}>
-                  <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
-                </div>
-                <h3 className={`${TILE_LABEL} lg:min-h-10`}>{name}</h3>
-              </Link>
-            ))}
+          {filler.map(({ name, slug, image }) => (
+            <Link key={name} to="/category/$slug" params={{ slug }} className={TILE}>
+              <div className={TILE_IMG}>
+                <img src={image} alt="" width={816} height={816} loading="lazy" className="size-full object-contain" />
+              </div>
+              <h3 className={`${TILE_LABEL} lg:min-h-10`}>{name}</h3>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
