@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { money } from "@/components/product/product-card";
-import { findPreviewItem, previewItemsFor } from "@/components/category/preview-products";
-import { YouMayAlsoLike, alsoLikeFromPreview, alsoLikeFromProduct } from "@/components/product/you-may-also-like";
+import { YouMayAlsoLike, alsoLikeFromProduct } from "@/components/product/you-may-also-like";
 import { PurchaseInfo, PurchaseButtons, PurchaseActions } from "@/components/product/purchase-extras";
 import { ReviewsSection } from "@/components/product/reviews-section";
 import { ComparisonSection } from "@/components/product/comparison-section";
@@ -135,10 +134,8 @@ function reasonsForProduct(product: Product, variant: ProductSize | undefined, s
 
 function ProductPage() {
   const { id } = Route.useParams();
-  const preview = findPreviewItem(id);
-  const q = useQuery({ queryKey: queryKeys.product(id), queryFn: () => productsApi.get(id), enabled: !preview });
+  const q = useQuery({ queryKey: queryKeys.product(id), queryFn: () => productsApi.get(id) });
 
-  if (preview) return <PreviewProductPage preview={preview} />;
   if (q.isLoading) return <PageSkeleton />;
   if (q.isError || !q.data) return <ErrorState retry={() => void q.refetch()} />;
   return <LiveProductPage product={q.data} />;
@@ -340,140 +337,6 @@ function Breadcrumbs({ title, category }: { title: string; category?: string }) 
       <Link to="/plants" search={{}} className="hover:text-primary">{category || "Products"}</Link><ChevronRight className="size-3.5" />
       <span className="truncate text-foreground">{title}</span>
     </nav>
-  );
-}
-
-function PreviewProductPage({ preview }: { preview: NonNullable<ReturnType<typeof findPreviewItem>> }) {
-  const nav = useNavigate();
-  const { addItem, openCart } = useCart();
-  const [activeImage, setActiveImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<"Small" | "Medium">("Small");
-  const [selectedPlanter, setSelectedPlanter] = useState("Yoda");
-  const [selectedColor, setSelectedColor] = useState("Ivory");
-  const [quantity, setQuantity] = useState(1);
-  const settings = useQuery({ queryKey: queryKeys.settings, queryFn: settingsApi.get, staleTime: 300_000 });
-  const previewPlanters = [
-    { name: "GroPot", prices: { Small: 249, Medium: 349 }, shape: "plain" },
-    { name: "Krish", prices: { Small: 299, Medium: 399 }, shape: "rim" },
-    { name: "Kyoto", prices: { Small: 299, Medium: 449 }, shape: "ribbed" },
-    { name: "Yoda", prices: { Small: 299, Medium: 449 }, shape: "round" },
-    { name: "Lagos", prices: { Small: 349, Medium: 499 }, shape: "legs" },
-    { name: "Roma", prices: { Small: 549, Medium: 699 }, shape: "ribbed" },
-    { name: "Diamond", prices: { Small: 549, Medium: 699 }, shape: "diamond" },
-    { name: "Table Top", prices: { Small: 549, Medium: 699 }, shape: "plain" },
-    { name: "Spiro", prices: { Small: 549, Medium: 699 }, shape: "rim" },
-  ] as const;
-  const selectedPreviewPlanter = previewPlanters.find((item) => item.name === selectedPlanter) ?? previewPlanters[0];
-  const planterPrice = selectedPreviewPlanter.prices[selectedSize];
-  const gallery = preview.gallery?.length ? preview.gallery : [preview.image];
-  const previewFacts = preview.facts ?? [];
-  const previewCare = preview.careInstructions ?? [];
-  const isPlantPreview = preview.category === "plants";
-  const previewNoun = isPlantPreview ? "plant" : "product";
-  const sameCategory = previewItemsFor(preview.category).filter((item) => item.id !== preview.id);
-  const alsoLikeItems = (sameCategory.length >= 3 ? sameCategory : [...sameCategory, ...previewItemsFor("plants").filter((item) => item.id !== preview.id)])
-    .slice(0, 8)
-    .map(alsoLikeFromPreview);
-  const deliveryLabel = textFromUnknown(settings.data?.delivery?.["time"]) ?? textFromUnknown(settings.data?.delivery?.["delivery_time"]);
-  const chooseSize = (size: "Small" | "Medium") => {
-    setSelectedSize(size);
-    setActiveImage(size === "Medium" && gallery.length > 1 ? gallery.length - 1 : 0);
-  };
-  const previewCartItem = () => ({
-    product_id: preview.id,
-    title: preview.title,
-    ...(gallery[0] ? { image: gallery[0] } : {}),
-    qty: quantity,
-    size_variant: selectedSize,
-    pot_type: `${selectedPlanter} · ${selectedColor}`,
-    unit_price: preview.price + planterPrice,
-    mrp: preview.mrp + planterPrice,
-    stock: 99,
-    sku: `PREVIEW-${preview.id}`,
-  });
-  const addPreviewToCart = () => {
-    void flyHeroToCart(gallery[0]).then(openCart);
-    addItem(previewCartItem(), { openDrawer: false });
-    toast.success(`${quantity} × ${preview.title} added to cart`);
-  };
-  const buyPreviewNow = async () => {
-    addItem(previewCartItem(), { openDrawer: false });
-    await nav({ to: "/checkout" });
-  };
-  return (
-    <div className="bg-storefront-wash pb-24 lg:pb-16">
-      <div className="mx-auto max-w-[1480px] px-4 py-7 sm:px-6 lg:px-10 lg:py-8">
-        <Breadcrumbs title={preview.title} category={preview.category} />
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.18fr)_minmax(400px,.82fr)] lg:gap-7">
-          <div className="min-w-0">
-            <Gallery images={gallery} title={preview.title} activeImage={activeImage} onChange={setActiveImage} />
-            <BelowImageInfo description={preview.description} care={previewCare} careTitle={isPlantPreview ? "Care Instruction" : "Usage & Care"} deliveryLabel={deliveryLabel} actions={<PurchaseActions price={preview.price + planterPrice} quantity={quantity} stock={0} preview settings={settings.data} />} />
-          </div>
-          <section className="min-w-0 rounded-md p-5 sm:p-6">
-            <RatingLine rating={preview.rating} count={preview.reviewCount} suffix="Design preview" />
-            <h1 className="mt-2.5 text-3xl leading-tight text-foreground">{preview.title}</h1>
-            <p className="mt-2 text-sm text-foreground/85">{preview.subtitle ?? "Premium nursery product preview"}</p>
-
-            <div className="mt-6">
-              <div className="mb-2.5 flex items-center justify-between gap-4">
-                <h2 className="text-sm font-bold text-foreground">Select Plant Size</h2>
-                <span className="text-xs font-semibold text-forest underline underline-offset-4">Size Guide</span>
-              </div>
-              <div className="grid max-w-[250px] grid-cols-2 gap-2">
-                {(["Small", "Medium"] as const).map((size) => (
-                  <Button key={size} type="button" variant="outline" aria-pressed={selectedSize === size} onClick={() => chooseSize(size)} className={`h-12 rounded-md px-4 text-sm font-semibold ${selectedSize === size ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>{size}</Button>
-                ))}
-              </div>
-            </div>
-
-            <PurchaseInfo
-              colors={[{ label: "Stone", available: true }, { label: "Ivory", available: true }, { label: "Terracotta", available: true }]}
-              selectedColor={selectedColor}
-              onColorChange={setSelectedColor}
-              price={preview.price + planterPrice}
-              mrp={preview.mrp + planterPrice}
-              quantity={quantity}
-              stock={99}
-              onQuantityChange={setQuantity}
-              settings={settings.data}
-              sku="PREVIEW-PLANT"
-              sizeLabel={selectedSize}
-            />
-
-            <PurchaseButtons
-              stock={99}
-              onAdd={addPreviewToCart}
-              onBuyNow={() => void buyPreviewNow()}
-            />
-
-            <div className="mt-6">
-              <h2 className="mb-2.5 text-sm font-bold text-foreground">Select Planter</h2>
-              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                {previewPlanters.map((planter) => {
-                  const active = planter.name === selectedPlanter;
-                  return (
-                    <Button key={planter.name} type="button" variant="outline" aria-pressed={active} onClick={() => setSelectedPlanter(planter.name)} className={`h-24 min-w-0 flex-col gap-0.5 rounded-md px-1.5 py-2 ${active ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground" : "border-input bg-background text-foreground hover:border-primary hover:bg-background"}`}>
-                      <span aria-hidden="true" data-pot-shape={planter.shape} className="preview-pot-icon"><span /></span>
-                      <span className="max-w-full truncate text-xs font-semibold">{planter.name}</span>
-                      <span className="price-num text-xs">{money(planter.prices[selectedSize])}</span>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-6"><ProductFactsGrid facts={previewFacts} /></div>
-
-          </section>
-        </div>
-        <ProductDescriptionSection description={preview.description} />
-      </div>
-      <ReviewsSection productId={preview.id} preview fallbackReviews={preview.reviews ?? []} rating={preview.rating} count={preview.reviews?.length} />
-      <ReasonsToBuySection image={preview.reasonsImage ?? gallery[0]} title={preview.title} reasons={preview.reasonsToBuy ?? []} noun={previewNoun} />
-      <ComparisonSection comparison={preview.comparison} />
-      <YouMayAlsoLike items={alsoLikeItems} />
-      <ProductFaqSection faq={preview.faq} fallbackImage={gallery[0]} />
-    </div>
   );
 }
 

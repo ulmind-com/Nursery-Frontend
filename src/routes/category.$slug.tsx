@@ -46,7 +46,6 @@ function CategoryPage() {
         filters={filters}
         onFiltersChange={setFilters}
         hideHeader
-        previewCategory={slug}
       />
     </div>
   );

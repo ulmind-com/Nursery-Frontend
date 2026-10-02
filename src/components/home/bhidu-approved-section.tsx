@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ShoppingBag, Star } from "lucide-react";
 import { useRef, useState } from "react";
 import { money } from "@/components/product/product-card";
-import { previewItemsFor } from "@/components/category/preview-products";
 import type { Product, ProductSize } from "@/types/api";
 
 const DEFAULT_PERSON_IMAGE = "/images/bhidu-person.png";
@@ -12,15 +11,6 @@ const SUNBURST =
   "repeating-conic-gradient(from 6deg at 56% 44%, #fdd95e 0deg 9deg, #fdf5d1 9deg 18deg)";
 
 /* ── Static fallback data (matches screenshot) ── */
-const previewProducts = previewItemsFor("plants").slice(0, 6);
-const previewMeta: Array<[string, number, number, number]> = [
-  ["Stunning air-purifying plant", 4.8, 440, 15],
-  ["Long-lasting indoor plant", 4.8, 111, 13],
-  ["Easy-care lucky succulent", 4.8, 414, 17],
-  ["Graceful tropical indoor palm", 4.7, 286, 12],
-  ["Lush trailing foliage plant", 4.9, 532, 10],
-  ["Hardy low-light favourite", 4.8, 368, 14],
-];
 
 /* ── Helpers ── */
 function liveProductDetails(product: Product) {
@@ -179,7 +169,9 @@ export function BhiduApprovedSection({
     rail.scrollBy({ left: direction * (rail.clientWidth + 20), behavior: "smooth" });
   };
 
-  const hasLive = products && products.length > 0;
+  const items = products ?? [];
+  /* The band is a product rail — with nothing to put in it there is no band. */
+  if (items.length === 0) return null;
 
   return (
     <section className="relative overflow-hidden bg-[#fdfaea]">
@@ -236,8 +228,7 @@ export function BhiduApprovedSection({
               onScroll={handleScroll}
               className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:gap-5 lg:gap-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              {hasLive
-                ? products.slice(0, limit).map((product) => {
+              {items.slice(0, limit).map((product) => {
                     const { image, price, mrp } = liveProductDetails(product);
                     return (
                       <BhiduProductCard
@@ -252,24 +243,6 @@ export function BhiduApprovedSection({
                         mrp={mrp ?? price}
                         discount={discountPct(price, mrp)}
                         isBestseller={product.is_bestseller ?? false}
-                      />
-                    );
-                  })
-                : previewProducts.map((product, index) => {
-                    const meta = previewMeta[index] ?? ["Plant", 0, 0, 0];
-                    return (
-                      <BhiduProductCard
-                        key={product.id}
-                        productId={product.id}
-                        title={product.title}
-                        image={product.image}
-                        subtitle={meta[0] as string}
-                        rating={meta[1] as number}
-                        reviews={meta[2] as number}
-                        price={product.price}
-                        mrp={product.mrp}
-                        discount={meta[3] as number}
-                        isBestseller
                       />
                     );
                   })}

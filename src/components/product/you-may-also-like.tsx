@@ -4,7 +4,6 @@ import { ChevronRight } from "lucide-react";
 import { money } from "@/components/product/product-card";
 import { CartActions } from "@/components/product/cart-actions";
 import type { Product } from "@/types/api";
-import type { PreviewItem } from "@/components/category/preview-products";
 
 export type AlsoLikeItem = {
   id: string;
@@ -33,18 +32,6 @@ export const alsoLikeFromProduct = (product: Product): AlsoLikeItem => {
     bestseller: product.is_bestseller ?? undefined,
   };
 };
-
-export const alsoLikeFromPreview = (item: PreviewItem): AlsoLikeItem => ({
-  id: item.id,
-  title: item.title,
-  subtitle: item.subtitle,
-  image: item.image,
-  price: item.price,
-  mrp: item.mrp,
-  rating: item.rating,
-  reviewCount: item.reviewCount,
-  bestseller: item.bestseller,
-});
 
 function Card({ item }: { item: AlsoLikeItem }) {
   return (

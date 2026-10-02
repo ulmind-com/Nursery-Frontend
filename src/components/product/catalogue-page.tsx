@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Minus, Plus, SlidersHorizontal, X } from "lucide-react";
 import { productsApi, facetsApi } from "@/api/services";
 import { ProductCard } from "./product-card";
-import { CategoryPreviewGrid } from "@/components/category/category-preview-grid";
 import { EmptyState, ErrorState, PageSkeleton } from "@/components/shared/page-state";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -95,7 +94,6 @@ export function CataloguePage({
   filters,
   onFiltersChange,
   hideHeader = false,
-  previewCategory,
 }: {
   title: string;
   description?: string;
@@ -103,7 +101,6 @@ export function CataloguePage({
   filters?: CatalogueFilters;
   onFiltersChange?: (next: CatalogueFilters) => void;
   hideHeader?: boolean;
-  previewCategory?: string;
 }) {
   const [limit, setLimit] = useState(24);
   const active = filters ?? {};
@@ -336,8 +333,6 @@ export function CataloguePage({
                 </div>
               )}
             </>
-          ) : previewCategory ? (
-            <CategoryPreviewGrid slug={previewCategory} />
           ) : (
             <EmptyState title="Nothing matches yet" description="Try removing a filter or exploring a different collection." />
           )}
